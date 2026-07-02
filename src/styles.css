@@ -104,6 +104,7 @@ select {
 
 .dashboard-header {
   position: relative;
+  filter: brightness(0.78) saturate(0.86);
 }
 
 .dashboard-header::before {
@@ -253,7 +254,7 @@ select {
 }
 
 .title-frame h1 {
-  font-size: 32px;
+  font-size: 28px;
   text-shadow:
     0 0 7px color-mix(in srgb, var(--accent-2) 28%, transparent),
     0 2px 0 color-mix(in srgb, black 35%, transparent);
