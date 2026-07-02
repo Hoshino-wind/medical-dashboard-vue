@@ -22,7 +22,7 @@ const ringTones = computed(() => {
 </script>
 
 <template>
-  <div class="grid h-full grid-cols-3 items-center gap-2">
+  <div class="availability-grid grid h-full grid-cols-3 items-center gap-2" :class="`availability-${variant}`">
     <MetricRing
       v-for="(item, index) in items"
       :key="item.name"

@@ -678,6 +678,10 @@ select {
   font-weight: 900;
 }
 
+.availability-grid.availability-life {
+  transform: translateY(6px);
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
