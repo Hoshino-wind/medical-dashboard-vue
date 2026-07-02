@@ -118,5 +118,5 @@ const option = computed(() => {
 </script>
 
 <template>
-  <EChart :option="option" height="172px" />
+  <EChart :option="option" height="100%" />
 </template>

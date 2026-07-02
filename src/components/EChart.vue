@@ -1,6 +1,6 @@
 <script setup>
 import * as echarts from "echarts";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 
 const props = defineProps({
   option: {
@@ -26,7 +26,13 @@ function render() {
 }
 
 onMounted(() => {
-  render();
+  nextTick(() => {
+    render();
+    requestAnimationFrame(() => {
+      chart?.resize();
+      chart?.setOption(props.option, true);
+    });
+  });
   observer = new ResizeObserver(() => chart?.resize());
   observer.observe(chartEl.value);
 });

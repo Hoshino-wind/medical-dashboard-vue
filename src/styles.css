@@ -41,6 +41,7 @@ select {
 }
 
 .dashboard-shell.config-mode .screen-frame {
+  width: min(100vw, 1600px);
   height: auto;
   min-height: 100vh;
   padding-bottom: 86px;
@@ -72,19 +73,183 @@ select {
 }
 
 .screen-frame {
-  width: min(100vw, 1920px);
-  height: min(100vh, 1080px);
+  width: min(100vw, calc(100vh * 16 / 9), 1920px);
+  height: min(100vh, calc(100vw * 9 / 16), 1080px);
   margin: 0 auto;
-  padding: 12px;
+  padding: clamp(8px, 0.74vw, 14px);
   position: relative;
   z-index: 1;
+}
+
+.brand-chip,
+.hospital-chip {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: 58px;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--border-strong) 84%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-strong) 44%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 66%, transparent), color-mix(in srgb, var(--surface) 36%, transparent)),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 68%);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 15%, transparent);
+}
+
+.brand-chip {
+  justify-content: flex-start;
+  padding: 0 12px;
+  clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%);
+}
+
+.hospital-chip {
+  justify-content: flex-end;
+  padding: 0 8px 0 14px;
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 8% 100%, 0 50%);
+}
+
+.brand-chip::after,
+.hospital-chip::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  height: 2px;
+  width: 58%;
+  background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+  opacity: 0.78;
+}
+
+.brand-chip::after {
+  right: 8px;
+}
+
+.hospital-chip::after {
+  left: 8px;
+}
+
+.brand-mark {
+  position: relative;
+  display: grid;
+  width: 54px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 24% 24%, rgba(255, 255, 255, 0.55), transparent 24%),
+    linear-gradient(135deg, #ff2d9d, #624bff 68%, #0fd5ff);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-3) 30%, transparent);
+}
+
+.brand-mark span {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.brand-name,
+.hospital-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brand-time,
+.hospital-subtitle {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.title-frame {
+  position: relative;
+  display: flex;
+  height: 58px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 86%, transparent);
+  background:
+    radial-gradient(ellipse at center bottom, color-mix(in srgb, var(--accent-2) 34%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 86%, transparent), color-mix(in srgb, var(--surface) 50%, transparent));
+  clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
+  box-shadow:
+    inset 0 0 24px color-mix(in srgb, var(--accent) 20%, transparent),
+    0 0 28px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.title-frame::before,
+.title-frame::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.title-frame::before {
+  inset: 6px 58px auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+  opacity: 0.9;
+}
+
+.title-frame::after {
+  bottom: 4px;
+  width: min(44%, 360px);
+  height: 9px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-2) 76%, transparent), transparent 68%);
+  filter: blur(5px);
+}
+
+.screen-toggle {
+  display: inline-flex;
+  width: 42px;
+  height: 22px;
+  flex: none;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 74%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-muted) 82%, transparent);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.screen-toggle span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent-2);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-2) 72%, transparent);
+}
+
+.screen-toggle span:last-child {
+  background: color-mix(in srgb, var(--muted) 70%, transparent);
+  box-shadow: none;
+}
+
+.hospital-badge {
+  width: 54px;
+  height: 54px;
+  flex: none;
+  border-radius: 999px;
+  object-fit: cover;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--accent-3) 42%, transparent));
 }
 
 .panel {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 13px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 84%, transparent), var(--surface)),
     radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 32%);
@@ -135,8 +300,8 @@ select {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 36px;
-  padding: 10px 14px 6px;
+  min-height: 34px;
+  padding: 8px 13px 6px;
   color: var(--text);
   font-weight: 800;
   letter-spacing: 0;
@@ -148,8 +313,8 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 30px;
-  height: 24px;
+  min-width: 29px;
+  height: 23px;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
@@ -169,7 +334,7 @@ select {
 
 .panel-body {
   position: relative;
-  padding: 8px 16px 16px;
+  padding: 7px 14px 13px;
   z-index: 1;
 }
 
@@ -232,6 +397,71 @@ select {
   font-weight: 900;
   line-height: 1;
   color: var(--text);
+}
+
+.overview-layout {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.overview-ring {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.overview-metrics {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.overview-stat {
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface-muted) 70%, transparent);
+  padding: 10px 12px;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 14%, transparent);
+}
+
+.overview-stat.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.overview-stat.span-2 {
+  grid-column: span 2;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.overview-value {
+  margin-top: 6px;
+  overflow: hidden;
+  font-size: 20px;
+  font-weight: 950;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overview-value span {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .kpi-card {
@@ -309,7 +539,7 @@ select {
 
 .completion-orb {
   position: relative;
-  min-height: 148px;
+  min-height: 154px;
   display: grid;
   place-items: center;
   text-align: center;
@@ -318,9 +548,9 @@ select {
 .completion-orb::before {
   content: "";
   position: absolute;
-  width: 170px;
-  height: 64px;
-  bottom: 14px;
+  width: 188px;
+  height: 68px;
+  bottom: 12px;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--accent-2) 70%, transparent);
   background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-2) 26%, transparent), transparent 70%);
@@ -331,10 +561,10 @@ select {
 .completion-orb::after {
   content: "";
   position: absolute;
-  width: 126px;
-  height: 92px;
+  width: 138px;
+  height: 96px;
   bottom: 48px;
-  border-radius: 18px 18px 42px 42px;
+  border-radius: 20px 20px 46px 46px;
   border: 1px solid color-mix(in srgb, var(--accent-2) 48%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 20%, transparent), color-mix(in srgb, var(--surface-strong) 24%, transparent)),
@@ -359,6 +589,47 @@ select {
   margin-bottom: 6px;
   color: var(--muted);
   font-size: 12px;
+  font-weight: 800;
+}
+
+.inspection-hub {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(112px, 1fr) minmax(170px, 210px) minmax(112px, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.hub-side {
+  display: grid;
+  align-content: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.hub-card {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 10px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), color-mix(in srgb, var(--surface-muted) 72%, transparent)),
+    color-mix(in srgb, var(--surface-muted) 70%, transparent);
+}
+
+.hub-number {
+  margin-top: 7px;
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.hub-number span {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 11px;
   font-weight: 800;
 }
 
@@ -394,8 +665,8 @@ select {
   display: grid;
   grid-template-columns: 1.02fr 1.34fr 1.02fr;
   grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  height: calc(100% - 76px);
+  gap: clamp(6px, 0.56vw, 10px);
+  height: calc(100% - 66px);
   min-height: 0;
 }
 
@@ -413,7 +684,7 @@ select {
 }
 
 .panel-body {
-  height: calc(100% - 46px);
+  height: calc(100% - 42px);
   overflow: hidden;
 }
 
@@ -430,6 +701,27 @@ select {
   padding: 0 12px;
   font-size: 13px;
   font-weight: 800;
+}
+
+.view-switch {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.view-switch.screen-mode {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.view-switch.screen-mode:hover,
+.view-switch.screen-mode:focus-within {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .app-button.active,
@@ -561,6 +853,14 @@ select {
   .panel-body {
     padding-bottom: 14px;
     height: auto;
+  }
+
+  .overview-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-value {
+    font-size: 18px;
   }
 
   .data-table {

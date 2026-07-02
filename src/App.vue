@@ -21,7 +21,7 @@ const themeStyle = computed(() => activeTheme.value.variables);
 
 <template>
   <div class="dashboard-shell" :class="{ 'config-mode': view === 'config' }" :style="themeStyle">
-    <div class="fixed bottom-4 right-4 z-20 flex gap-2">
+    <div class="view-switch" :class="{ 'screen-mode': view === 'screen' }">
       <button class="app-button" :class="{ active: view === 'screen' }" @click="view = 'screen'">
         <Monitor class="h-4 w-4" />
         大屏
