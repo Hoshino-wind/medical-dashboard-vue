@@ -30,7 +30,7 @@ const option = computed(() => {
   const accent3 = v("--accent-3");
 
   if (props.type === "bar") {
-    const barColors = [accent3, v("--warn"), accent2];
+    const barColors = [accent, accent3, accent2];
     return {
       color: barColors,
       grid: { left: 36, right: 12, top: 24, bottom: 26 },

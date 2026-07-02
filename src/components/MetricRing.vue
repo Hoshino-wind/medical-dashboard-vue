@@ -14,13 +14,20 @@ defineProps({
     type: String,
     default: "",
   },
+  insideLabel: {
+    type: String,
+    default: "",
+  },
 });
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center gap-2">
     <div class="metric-ring" :style="{ '--value': value, '--ring-size': size, '--ring-accent': tone || undefined }">
-      <div class="metric-value">{{ value }}%</div>
+      <div class="metric-inner">
+        <div v-if="insideLabel" class="metric-inside-label">{{ insideLabel }}</div>
+        <div class="metric-value">{{ value }}%</div>
+      </div>
     </div>
     <div class="text-center">
       <div class="text-[13px] font-extrabold">{{ label }}</div>

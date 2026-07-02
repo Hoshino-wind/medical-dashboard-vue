@@ -1,5 +1,5 @@
 <script setup>
-import { AlertTriangle, BadgeCheck, HeartPulse, ShieldCheck, Wrench } from "lucide-vue-next";
+import { AlertTriangle, BadgeCheck, Heart, ShieldCheck, Wrench } from "lucide-vue-next";
 
 defineProps({
   data: {
@@ -10,8 +10,8 @@ defineProps({
 </script>
 
 <template>
-  <div class="grid h-full grid-cols-[1fr_190px_1fr] gap-4">
-    <div class="grid content-center gap-3">
+  <div class="health-layout">
+    <div class="health-side">
       <div class="kpi-card flex items-center gap-3">
         <BadgeCheck class="h-5 w-5 text-[color:var(--good)]" />
         <div>
@@ -27,15 +27,19 @@ defineProps({
         </div>
       </div>
     </div>
-    <div class="hologram-base">
-      <div class="hologram-content">
-        <ShieldCheck class="mx-auto h-16 w-16 text-[color:var(--accent)] drop-shadow-[0_0_18px_var(--accent)]" />
-        <HeartPulse class="mx-auto -mt-10 h-8 w-8 text-[color:var(--accent-2)]" />
-        <div class="mt-8 text-xs font-bold text-[color:var(--muted)]">健康评分</div>
-        <div class="text-3xl font-black text-[color:var(--accent-2)]">{{ data.score }}</div>
+
+    <div class="health-stage">
+      <div class="health-emblem">
+        <ShieldCheck class="health-shield" />
+        <Heart class="health-heart" />
+      </div>
+      <div class="health-score">
+        <div class="health-label">健康评分</div>
+        <div class="health-value">{{ data.score }}</div>
       </div>
     </div>
-    <div class="grid content-center gap-3">
+
+    <div class="health-side">
       <div class="kpi-card flex items-center gap-3">
         <Wrench class="h-5 w-5 text-[color:var(--danger)]" />
         <div>

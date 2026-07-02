@@ -13,7 +13,14 @@ defineProps({
 <template>
   <div class="overview-layout">
     <div class="overview-ring">
-      <MetricRing :value="data.availability" label="设备可用率" :count="data.available" size="112px" />
+      <MetricRing
+        class="overview-feature-ring"
+        :value="data.availability"
+        label="设备可用率"
+        :count="data.available"
+        size="128px"
+        inside-label="设备可用率"
+      />
     </div>
     <div class="overview-metrics">
       <div class="overview-stat">
