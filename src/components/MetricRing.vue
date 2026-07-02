@@ -18,6 +18,10 @@ defineProps({
     type: String,
     default: "",
   },
+  showFooter: {
+    type: Boolean,
+    default: true,
+  },
 });
 </script>
 
@@ -29,7 +33,7 @@ defineProps({
         <div class="metric-value">{{ value }}%</div>
       </div>
     </div>
-    <div class="text-center">
+    <div v-if="showFooter" class="text-center">
       <div class="text-[13px] font-extrabold">{{ label }}</div>
       <div class="mt-1 text-[13px] font-black text-[color:var(--text)]">{{ count }}<span class="ml-1 text-[11px] text-[color:var(--muted)]">台</span></div>
     </div>

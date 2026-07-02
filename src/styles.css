@@ -594,21 +594,21 @@ select {
   min-height: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  border: 1px solid color-mix(in srgb, var(--border) 48%, transparent);
-  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border) 34%, transparent);
+  border-radius: 12px;
   overflow: hidden;
   background: color-mix(in srgb, var(--surface-muted) 30%, transparent);
 }
 
 .overview-stat {
   min-width: 0;
-  min-height: 55px;
-  border-right: 1px solid color-mix(in srgb, var(--border) 42%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 42%, transparent);
+  min-height: 54px;
+  border-right: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 62%),
     color-mix(in srgb, var(--surface-muted) 36%, transparent);
-  padding: 9px 12px;
+  padding: 9px 10px;
   box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
 }
 
@@ -628,16 +628,15 @@ select {
 
 .overview-stat.span-2 {
   grid-column: span 2;
-  min-height: 48px;
+  min-height: 50px;
   align-items: center;
-  justify-content: flex-start;
   border-right: 0;
 }
 
 .overview-value {
   margin-top: 6px;
   overflow: hidden;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 950;
   line-height: 1.05;
   letter-spacing: 0;
@@ -768,9 +767,9 @@ select {
 }
 
 .holo-ring-wide {
-  bottom: 12px;
-  width: 248px;
-  height: 84px;
+  bottom: 9px;
+  width: 226px;
+  height: 92px;
   border: 1px solid color-mix(in srgb, var(--accent) 88%, transparent);
   background:
     repeating-conic-gradient(from 24deg, color-mix(in srgb, var(--accent) 38%, transparent) 0 3deg, transparent 3deg 14deg),
@@ -778,13 +777,13 @@ select {
   box-shadow:
     0 0 20px color-mix(in srgb, var(--accent) 26%, transparent),
     inset 0 0 18px color-mix(in srgb, var(--accent) 16%, transparent);
-  opacity: 0.78;
+  opacity: 0.82;
 }
 
 .holo-ring-core {
   bottom: 28px;
-  width: 170px;
-  height: 56px;
+  width: 154px;
+  height: 60px;
   border: 1px solid color-mix(in srgb, var(--accent-2) 84%, transparent);
   background:
     repeating-conic-gradient(from -12deg, color-mix(in srgb, white 18%, transparent) 0 2deg, transparent 2deg 18deg),
@@ -816,6 +815,20 @@ select {
   padding: 8px 10px;
 }
 
+.health-side .kpi-card > svg,
+.hub-card > svg {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  padding: 5px;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in srgb, currentColor 30%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface-strong) 64%, transparent);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, currentColor 58%, transparent));
+}
+
 .health-side .text-xl {
   font-size: 18px;
   line-height: 1.05;
@@ -841,9 +854,9 @@ select {
 }
 
 .health-stage::before {
-  bottom: 14px;
-  width: 248px;
-  height: 84px;
+  bottom: 10px;
+  width: 222px;
+  height: 92px;
   border: 1px solid color-mix(in srgb, var(--accent) 84%, transparent);
   border-radius: 50%;
   background:
@@ -943,9 +956,9 @@ select {
 .completion-orb::before {
   content: "";
   position: absolute;
-  width: 252px;
-  height: 88px;
-  bottom: 0;
+  width: 226px;
+  height: 92px;
+  bottom: -2px;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--accent) 86%, transparent);
   background:
