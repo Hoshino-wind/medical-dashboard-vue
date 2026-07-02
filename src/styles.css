@@ -556,6 +556,7 @@ select {
   min-width: 0;
   align-items: center;
   justify-content: center;
+  transform: translateX(-8px);
 }
 
 .overview-feature-ring .metric-ring {
@@ -600,22 +601,22 @@ select {
   min-height: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  border: 1px solid color-mix(in srgb, var(--border) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 20%, transparent);
   border-radius: 12px;
   overflow: hidden;
-  background: color-mix(in srgb, var(--surface-muted) 30%, transparent);
+  background: color-mix(in srgb, var(--surface-muted) 18%, transparent);
 }
 
 .overview-stat {
   min-width: 0;
   min-height: 54px;
-  border-right: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border) 18%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 18%, transparent);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 62%),
-    color-mix(in srgb, var(--surface-muted) 36%, transparent);
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 3%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface-muted) 22%, transparent);
   padding: 9px 10px;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 5%, transparent);
 }
 
 .overview-stat:nth-child(2n) {
@@ -680,6 +681,20 @@ select {
 
 .availability-grid.availability-life {
   transform: translateY(6px);
+}
+
+.availability-grid.availability-life .metric-ring {
+  filter: brightness(0.84) saturate(0.93);
+}
+
+.availability-grid.availability-ultrasound .metric-ring {
+  filter: brightness(0.82) saturate(0.92);
+}
+
+.availability-grid.availability-ultrasound .text-center > div:first-child {
+  font-size: 12px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--text) 88%, transparent);
 }
 
 .data-table {
@@ -901,7 +916,7 @@ select {
   width: 124px;
   height: 128px;
   place-items: center;
-  transform: translateY(-16px);
+  transform: translateY(-16px) scale(0.9);
 }
 
 .health-emblem::before {
@@ -1042,7 +1057,7 @@ select {
 .completion-value {
   position: relative;
   z-index: 1;
-  font-size: clamp(38px, 4.1vw, 54px);
+  font-size: clamp(36px, 3.15vw, 42px);
   line-height: 0.95;
   font-weight: 950;
   color: var(--accent-2);

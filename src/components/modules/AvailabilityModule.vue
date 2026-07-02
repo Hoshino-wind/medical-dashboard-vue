@@ -19,6 +19,8 @@ const ringTones = computed(() => {
   }
   return ["var(--accent)", "var(--accent-2)", "var(--accent)"];
 });
+
+const ringSize = computed(() => (props.variant === "ultrasound" ? "84px" : "92px"));
 </script>
 
 <template>
@@ -30,7 +32,7 @@ const ringTones = computed(() => {
       :label="item.name"
       :count="item.count"
       :tone="ringTones[index % ringTones.length]"
-      size="92px"
+      :size="ringSize"
     />
   </div>
 </template>
