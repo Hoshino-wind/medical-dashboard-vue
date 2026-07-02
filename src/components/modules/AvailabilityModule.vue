@@ -30,7 +30,7 @@ const ringTones = computed(() => {
       :label="item.name"
       :count="item.count"
       :tone="ringTones[index % ringTones.length]"
-      size="88px"
+      size="96px"
     />
   </div>
 </template>

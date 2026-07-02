@@ -329,7 +329,7 @@ select {
   position: relative;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--border) 126%, white 8%);
-  border-radius: 12px;
+  border-radius: 16px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 92%, transparent), color-mix(in srgb, var(--surface) 100%, transparent)),
     radial-gradient(circle at 22% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 30%),
@@ -389,8 +389,8 @@ select {
   letter-spacing: 0;
   position: relative;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 13%, transparent), transparent),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 76%);
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 88%),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%);
   text-shadow: 0 0 7px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
@@ -470,19 +470,21 @@ select {
   display: grid;
   place-items: center;
   position: relative;
+  border: 1px solid color-mix(in srgb, var(--ring-accent, var(--accent)) 64%, transparent);
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 92%, black 8%) 0 42%, transparent 43%),
-    radial-gradient(circle at 50% 18%, color-mix(in srgb, white 28%, transparent), transparent 20%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 94%, black 10%) 0 56%, transparent 57%),
+    radial-gradient(circle at center, transparent 0 63%, color-mix(in srgb, white 18%, transparent) 64% 65%, transparent 66% 72%, color-mix(in srgb, var(--ring-accent, var(--accent)) 58%, transparent) 73% 75%, transparent 76%),
+    radial-gradient(circle at 50% 17%, color-mix(in srgb, white 34%, transparent), transparent 18%),
     conic-gradient(
       from 216deg,
-      color-mix(in srgb, var(--ring-accent, var(--accent)) 72%, white 12%) 0 calc(var(--value) * 0.72%),
-      color-mix(in srgb, var(--ring-accent, var(--accent)) 80%, var(--accent-2) 20%) calc(var(--value) * 0.72%) calc(var(--value) * 1%),
-      color-mix(in srgb, var(--ring-accent, var(--accent)) 13%, transparent) 0
+      color-mix(in srgb, var(--ring-accent, var(--accent)) 76%, #ffffff 8%) 0 calc(var(--value) * 0.7%),
+      color-mix(in srgb, var(--ring-accent, var(--accent)) 58%, var(--accent-2) 42%) calc(var(--value) * 0.7%) calc(var(--value) * 1%),
+      color-mix(in srgb, var(--ring-accent, var(--accent)) 12%, transparent) 0
     );
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
-    inset 0 0 22px color-mix(in srgb, var(--ring-accent, var(--accent)) 22%, transparent),
-    0 0 26px color-mix(in srgb, var(--ring-accent, var(--accent)) 30%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, white 18%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--ring-accent, var(--accent)) 18%, transparent),
+    0 0 24px color-mix(in srgb, var(--ring-accent, var(--accent)) 34%, transparent);
   flex: none;
 }
 
@@ -507,10 +509,13 @@ select {
   position: absolute;
   inset: 8px;
   border-radius: inherit;
-  border: 1px solid color-mix(in srgb, white 28%, transparent);
+  border: 1px solid color-mix(in srgb, white 32%, transparent);
+  background:
+    radial-gradient(circle at center, transparent 0 58%, color-mix(in srgb, var(--ring-accent, var(--accent)) 18%, transparent) 59% 61%, transparent 62%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--surface) 56%, transparent), transparent 57%);
   box-shadow:
-    inset 0 0 0 6px color-mix(in srgb, var(--ring-accent, var(--accent)) 8%, transparent),
-    inset 0 0 16px color-mix(in srgb, var(--ring-accent, var(--accent)) 20%, transparent);
+    inset 0 0 0 5px color-mix(in srgb, var(--ring-accent, var(--accent)) 7%, transparent),
+    inset 0 0 16px color-mix(in srgb, var(--ring-accent, var(--accent)) 18%, transparent);
 }
 
 .metric-ring::after {
@@ -541,7 +546,7 @@ select {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: 132px minmax(0, 1fr);
+  grid-template-columns: 150px minmax(0, 1fr);
   align-items: center;
   gap: 10px;
 }
@@ -555,11 +560,12 @@ select {
 
 .overview-feature-ring .metric-ring {
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 92%, black 8%) 0 42%, transparent 43%),
-    radial-gradient(circle at 50% 17%, color-mix(in srgb, white 30%, transparent), transparent 18%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 94%, black 10%) 0 55%, transparent 56%),
+    radial-gradient(circle at center, transparent 0 62%, color-mix(in srgb, white 20%, transparent) 63% 64%, transparent 65% 71%, color-mix(in srgb, var(--accent) 60%, transparent) 72% 74%, transparent 75%),
+    radial-gradient(circle at 50% 17%, color-mix(in srgb, white 32%, transparent), transparent 18%),
     conic-gradient(
       from 216deg,
-      color-mix(in srgb, var(--accent) 82%, white 8%) 0 calc(var(--value) * 0.68%),
+      color-mix(in srgb, var(--accent) 84%, white 8%) 0 calc(var(--value) * 0.68%),
       color-mix(in srgb, var(--accent-2) 86%, white 6%) calc(var(--value) * 0.68%) calc(var(--value) * 1%),
       color-mix(in srgb, var(--accent) 13%, transparent) 0
     );
@@ -586,7 +592,7 @@ select {
 }
 
 .overview-feature-ring .metric-value {
-  font-size: 25px;
+  font-size: 29px;
 }
 
 .overview-metrics {
