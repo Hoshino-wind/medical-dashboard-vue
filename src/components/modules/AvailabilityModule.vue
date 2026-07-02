@@ -1,11 +1,23 @@
 <script setup>
+import { computed } from "vue";
 import MetricRing from "../MetricRing.vue";
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     required: true,
   },
+  variant: {
+    type: String,
+    default: "life",
+  },
+});
+
+const ringTones = computed(() => {
+  if (props.variant === "ultrasound") {
+    return ["var(--accent)", "var(--accent-3)", "var(--accent-2)"];
+  }
+  return ["var(--accent)", "var(--accent-2)", "var(--accent)"];
 });
 </script>
 
@@ -17,7 +29,7 @@ defineProps({
       :value="item.value"
       :label="item.name"
       :count="item.count"
-      :tone="['var(--accent)', 'var(--accent-2)', 'var(--accent-3)'][index % 3]"
+      :tone="ringTones[index % ringTones.length]"
       size="88px"
     />
   </div>

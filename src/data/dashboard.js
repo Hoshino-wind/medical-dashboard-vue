@@ -32,10 +32,10 @@ export const themes = [
     variables: {
       "--bg": "#010711",
       "--bg-soft": "#031126",
-      "--surface": "rgba(1, 10, 25, 0.94)",
-      "--surface-strong": "rgba(3, 18, 45, 0.97)",
-      "--surface-muted": "rgba(5, 25, 60, 0.8)",
-      "--border": "rgba(0, 174, 255, 0.46)",
+      "--surface": "rgba(3, 16, 39, 0.94)",
+      "--surface-strong": "rgba(7, 28, 66, 0.97)",
+      "--surface-muted": "rgba(9, 34, 75, 0.82)",
+      "--border": "rgba(0, 184, 255, 0.5)",
       "--border-strong": "rgba(0, 210, 255, 0.88)",
       "--text": "#f5fbff",
       "--muted": "#a4c8e8",
@@ -104,13 +104,13 @@ export const themes = [
 export const moduleCatalog = [
   { id: "overview", number: "01", title: "设备总览", kind: "overview", size: "normal" },
   { id: "repairOrders", number: "02", title: "维修工单", kind: "table", size: "wide" },
-  { id: "repairStats", number: "03", title: "报修统计", kind: "bar", size: "normal" },
+  { id: "repairStats", number: "03", title: "报修统计（近7天）", kind: "bar", size: "normal" },
   { id: "lifeSupport", number: "04", title: "生命支持设备可用率", kind: "availability", size: "normal" },
   { id: "inspectionOrders", number: "05", title: "巡检工单", kind: "completion", size: "wide" },
-  { id: "maintenanceStats", number: "06", title: "保养统计", kind: "line", size: "normal" },
+  { id: "maintenanceStats", number: "06", title: "保养统计（近7天）", kind: "line", size: "normal" },
   { id: "ultrasound", number: "07", title: "超声设备可用率", kind: "availability", size: "normal" },
   { id: "healthTrend", number: "08", title: "设备健康态势", kind: "health", size: "wide" },
-  { id: "inspectionStats", number: "09", title: "巡检统计", kind: "line", size: "normal" },
+  { id: "inspectionStats", number: "09", title: "巡检统计（近7天）", kind: "line", size: "normal" },
 ];
 
 export const defaultConfig = {

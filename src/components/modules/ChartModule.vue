@@ -57,12 +57,12 @@ const option = computed(() => {
       series: props.data.series.map((series, index) => ({
         ...series,
         type: "bar",
-        barWidth: 13,
+        barWidth: 14,
         barMinHeight: 2,
-        barGap: "-58%",
-        barCategoryGap: "38%",
+        barGap: "20%",
+        barCategoryGap: "46%",
         itemStyle: {
-          borderRadius: [8, 8, 2, 2],
+          borderRadius: [7, 7, 2, 2],
           color: {
             type: "linear",
             x: 0,

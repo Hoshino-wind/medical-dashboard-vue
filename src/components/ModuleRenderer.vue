@@ -40,6 +40,7 @@ defineProps({
     <AvailabilityModule
       v-else-if="module.id === 'lifeSupport'"
       :items="dashboardData.lifeSupport"
+      variant="life"
     />
 
     <CompletionModule
@@ -57,6 +58,7 @@ defineProps({
     <AvailabilityModule
       v-else-if="module.id === 'ultrasound'"
       :items="dashboardData.ultrasound"
+      variant="ultrasound"
     />
 
     <HealthTrendModule
