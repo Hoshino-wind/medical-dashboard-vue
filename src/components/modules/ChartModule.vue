@@ -148,5 +148,5 @@ const option = computed(() => {
 </script>
 
 <template>
-  <EChart :option="option" height="100%" />
+  <EChart :class="`chart-${type}`" :option="option" height="100%" />
 </template>
