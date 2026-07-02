@@ -1,5 +1,7 @@
 <script setup>
-import hospitalBadge from "../assets/hospital-badge.png";
+import headerTitle from "../assets/header-title-ref.png";
+import hospitalHeader from "../assets/hospital-header-ref.png";
+import sunnicareBrand from "../assets/sunnicare-brand-ref.png";
 
 defineProps({
   data: {
@@ -13,8 +15,7 @@ defineProps({
   <header class="dashboard-header mb-[18px] grid grid-cols-[350px_1fr_350px] items-center gap-3">
     <div class="brand-chip">
       <div class="brand-lockup" aria-label="Sunnicare 上云赋">
-        <span class="brand-main">Sunnicare</span>
-        <span class="brand-cn">上云赋</span>
+        <img class="brand-image" :src="sunnicareBrand" alt="Sunnicare 上云赋" />
       </div>
       <div class="brand-clock">
         <div>{{ data.updatedAt }}</div>
@@ -23,19 +24,11 @@ defineProps({
     </div>
 
     <div class="title-frame">
-      <h1 class="text-center text-[28px] font-black leading-none tracking-0">{{ data.title }}</h1>
+      <img class="title-image" :src="headerTitle" :alt="data.title" />
     </div>
 
     <div class="hospital-chip">
-      <div class="text-right">
-        <div class="hospital-name">{{ data.hospital }}</div>
-        <div class="hospital-subtitle">{{ data.subtitle }}</div>
-      </div>
-      <div class="screen-toggle" aria-hidden="true">
-        <span></span>
-        <span></span>
-      </div>
-      <img class="hospital-badge" :src="hospitalBadge" alt="医院院徽" />
+      <img class="hospital-header-image" :src="hospitalHeader" :alt="`${data.hospital} ${data.subtitle}`" />
     </div>
   </header>
 </template>
