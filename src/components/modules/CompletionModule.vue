@@ -29,6 +29,8 @@ defineProps({
     </div>
 
     <div class="completion-orb">
+      <span class="holo-ring holo-ring-wide" aria-hidden="true"></span>
+      <span class="holo-ring holo-ring-core" aria-hidden="true"></span>
       <div class="completion-content">
         <div class="completion-label">本月巡检完成率</div>
         <div class="completion-value">{{ data.rate }}%</div>

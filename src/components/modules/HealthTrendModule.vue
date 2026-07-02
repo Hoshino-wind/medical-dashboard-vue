@@ -29,6 +29,8 @@ defineProps({
     </div>
 
     <div class="health-stage">
+      <span class="holo-ring holo-ring-wide" aria-hidden="true"></span>
+      <span class="holo-ring holo-ring-core" aria-hidden="true"></span>
       <div class="health-emblem">
         <ShieldCheck class="health-shield" />
         <Heart class="health-heart" />

@@ -31,8 +31,8 @@ select {
 .dashboard-shell {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 30%),
-    radial-gradient(circle at 84% 24%, color-mix(in srgb, var(--accent-3) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 30%),
+    radial-gradient(circle at 84% 24%, color-mix(in srgb, var(--accent-3) 12%, transparent), transparent 28%),
     linear-gradient(135deg, var(--bg), var(--bg-soft));
   color: var(--text);
   overflow: hidden;
@@ -312,9 +312,9 @@ select {
   border: 1px solid color-mix(in srgb, var(--border) 126%, white 8%);
   border-radius: 12px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 82%, transparent), color-mix(in srgb, var(--surface) 98%, transparent)),
-    radial-gradient(circle at 22% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 30%),
-    radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 32%);
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 86%, transparent), color-mix(in srgb, var(--surface) 100%, transparent)),
+    radial-gradient(circle at 22% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 30%),
+    radial-gradient(circle at 88% 4%, color-mix(in srgb, var(--accent-2) 6%, transparent), transparent 32%);
   box-shadow:
     var(--panel-shadow),
     inset 0 0 28px color-mix(in srgb, var(--accent) 6%, transparent);
@@ -370,8 +370,8 @@ select {
   letter-spacing: 0;
   position: relative;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 15%, transparent), transparent),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 76%);
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 13%, transparent), transparent),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 76%);
   text-shadow: 0 0 7px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
@@ -650,23 +650,24 @@ select {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 12px;
   table-layout: fixed;
 }
 
 .data-table th {
   color: color-mix(in srgb, var(--muted) 92%, white 8%);
-  font-weight: 800;
+  font-weight: 900;
   text-align: left;
-  padding: 8px 7px;
+  padding: 7px 6px;
   border-bottom: 1px solid color-mix(in srgb, var(--border-strong) 62%, transparent);
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 8px 7px;
+  padding: 7px 6px;
   border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
   color: color-mix(in srgb, var(--text) 98%, transparent);
+  font-weight: 700;
   white-space: nowrap;
   max-width: 150px;
   overflow: hidden;
@@ -715,12 +716,12 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 64px;
-  height: 22px;
-  padding: 0 8px;
+  min-width: 56px;
+  height: 21px;
+  padding: 0 7px;
   border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 800;
 }
 
 .hologram-base {
@@ -728,6 +729,43 @@ select {
   display: grid;
   place-items: center;
   min-height: 138px;
+}
+
+.holo-ring {
+  position: absolute;
+  left: 50%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translateX(-50%) perspective(280px) rotateX(68deg);
+}
+
+.holo-ring-wide {
+  bottom: 14px;
+  width: 230px;
+  height: 78px;
+  border: 1px solid color-mix(in srgb, var(--accent) 78%, transparent);
+  background:
+    repeating-conic-gradient(from 24deg, color-mix(in srgb, var(--accent) 38%, transparent) 0 3deg, transparent 3deg 14deg),
+    radial-gradient(ellipse at center, transparent 0 36%, color-mix(in srgb, var(--accent) 18%, transparent) 37% 39%, transparent 40% 58%, color-mix(in srgb, var(--accent) 28%, transparent) 59% 61%, transparent 62%);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--accent) 26%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent) 16%, transparent);
+  opacity: 0.68;
+}
+
+.holo-ring-core {
+  bottom: 28px;
+  width: 158px;
+  height: 52px;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 72%, transparent);
+  background:
+    repeating-conic-gradient(from -12deg, color-mix(in srgb, white 18%, transparent) 0 2deg, transparent 2deg 18deg),
+    radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 18%, transparent), transparent 64%);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--accent-2) 20%, transparent),
+    inset 0 0 14px color-mix(in srgb, var(--accent-2) 16%, transparent);
+  opacity: 0.82;
 }
 
 .health-layout {
@@ -776,30 +814,33 @@ select {
 
 .health-stage::before {
   bottom: 16px;
-  width: 214px;
-  height: 72px;
-  border: 1px solid color-mix(in srgb, var(--accent) 72%, transparent);
+  width: 224px;
+  height: 76px;
+  border: 1px solid color-mix(in srgb, var(--accent) 84%, transparent);
   border-radius: 50%;
   background:
     repeating-radial-gradient(ellipse at center, transparent 0 15px, color-mix(in srgb, var(--accent) 30%, transparent) 16px 17px, transparent 18px 30px),
     radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 30%, transparent), transparent 62%),
     radial-gradient(ellipse at center, color-mix(in srgb, white 10%, transparent), transparent 42%);
   box-shadow:
-    0 0 38px color-mix(in srgb, var(--accent) 30%, transparent),
-    inset 0 0 28px color-mix(in srgb, var(--accent) 18%, transparent);
+    0 0 36px color-mix(in srgb, var(--accent) 30%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    inset 0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
   transform: translateX(-50%) perspective(260px) rotateX(68deg);
 }
 
 .health-stage::after {
   top: 0;
-  width: 126px;
-  height: 120px;
-  border-radius: 999px;
+  width: 132px;
+  height: 122px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 18px 18px 42px 42px;
   background:
+    linear-gradient(90deg, transparent 0 48%, color-mix(in srgb, white 12%, transparent) 49% 51%, transparent 52% 100%),
     linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 74%),
     repeating-linear-gradient(180deg, color-mix(in srgb, white 8%, transparent) 0 1px, transparent 1px 18px);
   filter: blur(0.2px);
-  opacity: 0.56;
+  opacity: 0.6;
 }
 
 .health-emblem {
@@ -867,44 +908,46 @@ select {
   place-items: center;
   text-align: center;
   background:
-    linear-gradient(180deg, transparent 11%, color-mix(in srgb, var(--accent) 24%, transparent) 50%, transparent 83%) center 32px / 2px 120px no-repeat;
+    linear-gradient(180deg, transparent 11%, color-mix(in srgb, var(--accent) 30%, transparent) 50%, transparent 83%) center 32px / 2px 122px no-repeat;
 }
 
 .completion-orb::before {
   content: "";
   position: absolute;
-  width: 218px;
-  height: 78px;
-  bottom: 2px;
+  width: 228px;
+  height: 82px;
+  bottom: 0;
   border-radius: 50%;
-  border: 1px solid color-mix(in srgb, var(--accent) 74%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 86%, transparent);
   background:
     repeating-radial-gradient(ellipse at center, transparent 0 16px, color-mix(in srgb, var(--accent) 34%, transparent) 17px 18px, transparent 19px 31px),
     radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 36%, transparent), transparent 66%),
     radial-gradient(ellipse at center, color-mix(in srgb, white 12%, transparent), transparent 42%);
   transform: perspective(260px) rotateX(68deg);
   box-shadow:
-    0 0 38px color-mix(in srgb, var(--accent) 34%, transparent),
-    inset 0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+    0 0 36px color-mix(in srgb, var(--accent) 32%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 14%, transparent),
+    inset 0 0 26px color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 .completion-orb::after {
   content: "";
   position: absolute;
-  width: 178px;
-  height: 112px;
-  bottom: 50px;
+  width: 184px;
+  height: 116px;
+  bottom: 48px;
   border-radius: 18px 18px 44px 44px;
-  border: 1px solid color-mix(in srgb, var(--accent) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 88%, transparent);
   background:
     radial-gradient(ellipse at top, color-mix(in srgb, white 20%, transparent), transparent 28%),
     linear-gradient(90deg, transparent 0 12%, color-mix(in srgb, white 10%, transparent) 49% 51%, transparent 88% 100%),
     linear-gradient(180deg, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--surface-strong) 16%, transparent)),
     repeating-linear-gradient(180deg, color-mix(in srgb, white 12%, transparent) 0 1px, transparent 1px 15px);
-  opacity: 0.68;
+  opacity: 0.74;
   box-shadow:
     inset 0 12px 24px color-mix(in srgb, white 10%, transparent),
-    0 0 26px color-mix(in srgb, var(--accent) 24%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, white 12%, transparent),
+    0 0 24px color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
 .completion-content {
@@ -912,13 +955,13 @@ select {
   z-index: 1;
   min-width: 174px;
   padding: 14px 12px 22px;
-  border: 1px solid color-mix(in srgb, var(--accent) 76%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 90%, transparent);
   border-radius: 16px 16px 30px 30px;
   clip-path: polygon(8% 0, 92% 0, 100% 15%, 100% 82%, 88% 100%, 12% 100%, 0 82%, 0 15%);
   background:
     linear-gradient(90deg, transparent 0 9%, color-mix(in srgb, white 9%, transparent) 50%, transparent 91% 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 14%, transparent), color-mix(in srgb, var(--surface-strong) 18%, transparent)),
-    color-mix(in srgb, var(--surface) 26%, transparent);
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--surface-strong) 24%, transparent)),
+    color-mix(in srgb, var(--surface) 36%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, white 18%, transparent),
     inset 0 0 24px color-mix(in srgb, var(--accent) 18%, transparent),
