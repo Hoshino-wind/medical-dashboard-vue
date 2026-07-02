@@ -330,7 +330,7 @@ select {
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, white 30%, transparent),
     inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent),
-    inset 0 0 14px color-mix(in srgb, var(--accent) 7%, transparent);
+    inset 0 0 14px color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .panel::after {
@@ -604,7 +604,7 @@ select {
   grid-column: span 2;
   min-height: 48px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   border-right: 0;
 }
 
@@ -716,12 +716,13 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 56px;
-  height: 21px;
-  padding: 0 7px;
-  border-radius: 999px;
-  font-size: 10.5px;
-  font-weight: 800;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+  font-size: 11px;
+  font-weight: 900;
+  text-shadow: 0 0 5px currentColor;
 }
 
 .hologram-base {
@@ -744,28 +745,28 @@ select {
   bottom: 14px;
   width: 230px;
   height: 78px;
-  border: 1px solid color-mix(in srgb, var(--accent) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 88%, transparent);
   background:
     repeating-conic-gradient(from 24deg, color-mix(in srgb, var(--accent) 38%, transparent) 0 3deg, transparent 3deg 14deg),
     radial-gradient(ellipse at center, transparent 0 36%, color-mix(in srgb, var(--accent) 18%, transparent) 37% 39%, transparent 40% 58%, color-mix(in srgb, var(--accent) 28%, transparent) 59% 61%, transparent 62%);
   box-shadow:
     0 0 20px color-mix(in srgb, var(--accent) 26%, transparent),
     inset 0 0 18px color-mix(in srgb, var(--accent) 16%, transparent);
-  opacity: 0.68;
+  opacity: 0.72;
 }
 
 .holo-ring-core {
   bottom: 28px;
   width: 158px;
   height: 52px;
-  border: 1px solid color-mix(in srgb, var(--accent-2) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 84%, transparent);
   background:
     repeating-conic-gradient(from -12deg, color-mix(in srgb, white 18%, transparent) 0 2deg, transparent 2deg 18deg),
     radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 18%, transparent), transparent 64%);
   box-shadow:
     0 0 18px color-mix(in srgb, var(--accent-2) 20%, transparent),
     inset 0 0 14px color-mix(in srgb, var(--accent-2) 16%, transparent);
-  opacity: 0.82;
+  opacity: 0.86;
 }
 
 .health-layout {

@@ -11,9 +11,9 @@ defineProps({
 });
 
 function statusStyle(value) {
-  if (value.includes("维修")) return "background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn)";
-  if (value.includes("配件")) return "background: color-mix(in srgb, var(--accent-3) 18%, transparent); color: var(--accent-3)";
-  return "background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good)";
+  if (value.includes("维修")) return "color: var(--warn)";
+  if (value.includes("配件")) return "color: var(--accent-3)";
+  return "color: var(--good)";
 }
 </script>
 

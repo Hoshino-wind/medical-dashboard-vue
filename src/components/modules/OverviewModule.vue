@@ -1,5 +1,5 @@
 <script setup>
-import { Activity, CalendarCheck, Stethoscope, Wrench } from "lucide-vue-next";
+import { Activity, CalendarCheck, Wrench } from "lucide-vue-next";
 import MetricRing from "../MetricRing.vue";
 
 defineProps({
@@ -53,7 +53,6 @@ defineProps({
             <div class="overview-value text-[color:var(--accent-2)]">{{ data.inspectionDue.toLocaleString() }}<span>台</span></div>
           </div>
         </div>
-        <Stethoscope class="h-10 w-10 opacity-30" />
       </div>
     </div>
   </div>
