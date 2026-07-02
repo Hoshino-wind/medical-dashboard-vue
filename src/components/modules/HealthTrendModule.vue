@@ -33,10 +33,6 @@ defineProps({
         <ShieldCheck class="health-shield" />
         <Heart class="health-heart" />
       </div>
-      <div class="health-score">
-        <div class="health-label">健康评分</div>
-        <div class="health-value">{{ data.score }}</div>
-      </div>
     </div>
 
     <div class="health-side">

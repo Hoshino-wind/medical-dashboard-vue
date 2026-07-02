@@ -33,36 +33,36 @@ const option = computed(() => {
     const barColors = [accent, accent3, accent2];
     return {
       color: barColors,
-      grid: { left: 36, right: 12, top: 24, bottom: 26 },
+      grid: { left: 38, right: 12, top: 26, bottom: 26 },
       legend: {
         top: 0,
         right: 6,
-        textStyle: { color: muted, fontSize: 11, fontWeight: 700 },
-        itemWidth: 9,
-        itemHeight: 9,
+        textStyle: { color: text, fontSize: 11, fontWeight: 800 },
+        itemWidth: 10,
+        itemHeight: 10,
       },
       xAxis: {
         type: "category",
         data: props.data.labels,
-        axisLabel: { color: muted, fontSize: 11, fontWeight: 700 },
+        axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
         axisLine: { lineStyle: { color: grid } },
         axisTick: { show: false },
       },
       yAxis: {
         type: "value",
         max: 400,
-        axisLabel: { color: muted, fontSize: 11, fontWeight: 700 },
-        splitLine: { lineStyle: { color: grid } },
+        axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
+        splitLine: { lineStyle: { color: grid, width: 1.2 } },
       },
       series: props.data.series.map((series, index) => ({
         ...series,
         type: "bar",
-        barWidth: 11,
+        barWidth: 13,
         barMinHeight: 2,
-        barGap: "-72%",
-        barCategoryGap: "42%",
+        barGap: "-58%",
+        barCategoryGap: "38%",
         itemStyle: {
-          borderRadius: [7, 7, 2, 2],
+          borderRadius: [8, 8, 2, 2],
           color: {
             type: "linear",
             x: 0,
@@ -75,18 +75,18 @@ const option = computed(() => {
               { offset: 1, color: `${barColors[index]}55` },
             ],
           },
-          shadowBlur: 12,
-          shadowColor: `${barColors[index]}66`,
+          shadowBlur: 10,
+          shadowColor: `${barColors[index]}80`,
           borderColor: `${barColors[index]}aa`,
-          borderWidth: 1,
+          borderWidth: 1.2,
         },
         label: {
           show: true,
           position: "top",
           formatter: ({ value }) => (value > 0 ? value : ""),
           color: text,
-          fontSize: 11,
-          fontWeight: 800,
+          fontSize: 12,
+          fontWeight: 900,
         },
       })),
       tooltip: { trigger: "axis" },
@@ -95,19 +95,19 @@ const option = computed(() => {
 
   return {
     color: [props.type === "inspection" ? accent2 : accent3],
-    grid: { left: 42, right: 16, top: 22, bottom: 28 },
+    grid: { left: 44, right: 16, top: 22, bottom: 28 },
     xAxis: {
       type: "category",
       boundaryGap: false,
       data: props.data.labels,
-      axisLabel: { color: muted, fontSize: 11, fontWeight: 700 },
+      axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
       axisLine: { lineStyle: { color: grid } },
       axisTick: { show: false },
     },
     yAxis: {
       type: "value",
-      axisLabel: { color: muted, fontSize: 11, fontWeight: 700 },
-      splitLine: { lineStyle: { color: grid } },
+      axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
+      splitLine: { lineStyle: { color: grid, width: 1.2 } },
     },
     series: [
       {
@@ -115,8 +115,18 @@ const option = computed(() => {
         type: "line",
         smooth: true,
         symbol: "circle",
-        symbolSize: 7,
-        lineStyle: { width: 3 },
+        symbolSize: 7.5,
+        itemStyle: {
+          borderColor: "#ffffff",
+          borderWidth: 1.2,
+          shadowBlur: 10,
+          shadowColor: `${props.type === "inspection" ? accent2 : accent3}88`,
+        },
+        lineStyle: {
+          width: 3.2,
+          shadowBlur: 10,
+          shadowColor: `${props.type === "inspection" ? accent2 : accent3}88`,
+        },
         areaStyle: {
           color: {
             type: "linear",
