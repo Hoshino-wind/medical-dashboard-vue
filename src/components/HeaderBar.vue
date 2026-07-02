@@ -10,7 +10,7 @@ defineProps({
 </script>
 
 <template>
-  <header class="dashboard-header mb-2 grid grid-cols-[286px_1fr_286px] items-center gap-3">
+  <header class="dashboard-header mb-[18px] grid grid-cols-[330px_1fr_330px] items-center gap-3">
     <div class="brand-chip">
       <div class="brand-lockup" aria-label="Sunnicare 上云赋">
         <span class="brand-main">Sunnicare</span>

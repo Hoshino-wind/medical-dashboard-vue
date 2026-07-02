@@ -50,16 +50,17 @@ const option = computed(() => {
       },
       yAxis: {
         type: "value",
+        max: 400,
         axisLabel: { color: muted, fontSize: 11, fontWeight: 700 },
         splitLine: { lineStyle: { color: grid } },
       },
       series: props.data.series.map((series, index) => ({
         ...series,
         type: "bar",
-        barWidth: 13,
+        barWidth: 11,
         barMinHeight: 2,
-        stack: "total",
-        barGap: "-35%",
+        barGap: "-72%",
+        barCategoryGap: "42%",
         itemStyle: {
           borderRadius: [7, 7, 2, 2],
           color: {
