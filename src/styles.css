@@ -59,6 +59,18 @@ select {
   opacity: 0.18;
 }
 
+.dashboard-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent 0 48%, color-mix(in srgb, var(--accent-2) 8%, transparent) 50%, transparent 52%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px);
+  mix-blend-mode: screen;
+  opacity: 0.18;
+}
+
 .screen-frame {
   width: min(100vw, 1920px);
   height: min(100vh, 1080px);
@@ -77,6 +89,7 @@ select {
     linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 84%, transparent), var(--surface)),
     radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 32%);
   box-shadow: var(--panel-shadow);
+  isolation: isolate;
 }
 
 .panel::before {
@@ -99,6 +112,25 @@ select {
   opacity: 0.78;
 }
 
+.screen-grid > .panel {
+  transform: translateZ(0);
+}
+
+.screen-grid > .panel:hover {
+  border-color: var(--border-strong);
+}
+
+.screen-grid > .panel > .panel-header::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  top: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-strong), transparent 72%);
+  opacity: 0.7;
+}
+
 .panel-header {
   display: flex;
   align-items: center;
@@ -108,6 +140,8 @@ select {
   color: var(--text);
   font-weight: 800;
   letter-spacing: 0;
+  position: relative;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%);
 }
 
 .panel-number {
@@ -121,11 +155,36 @@ select {
   color: #fff;
   font-size: 13px;
   box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 48%, transparent);
+  position: relative;
+}
+
+.panel-number::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 42%, transparent);
+  opacity: 0.7;
 }
 
 .panel-body {
   position: relative;
   padding: 8px 16px 16px;
+  z-index: 1;
+}
+
+.panel-body::before {
+  content: "";
+  position: absolute;
+  inset: 0 10px auto;
+  height: 44px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at top, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%);
+  opacity: 0.72;
+}
+
+.panel-body > * {
+  position: relative;
   z-index: 1;
 }
 
@@ -143,6 +202,7 @@ select {
   box-shadow:
     inset 0 0 22px color-mix(in srgb, var(--accent) 18%, transparent),
     0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+  flex: none;
 }
 
 .metric-ring::before {
@@ -151,6 +211,20 @@ select {
   inset: 9px;
   border-radius: inherit;
   border: 1px solid color-mix(in srgb, white 28%, transparent);
+}
+
+.metric-ring::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -12px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 36%, transparent);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 22%, transparent), transparent 68%);
+  filter: blur(0.2px);
+  transform: perspective(120px) rotateX(62deg);
 }
 
 .metric-value {
@@ -165,6 +239,7 @@ select {
   border-radius: 12px;
   background: color-mix(in srgb, var(--surface-muted) 72%, transparent);
   padding: 10px 12px;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 16%, transparent);
 }
 
 .kpi-label {
@@ -184,6 +259,7 @@ select {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+  table-layout: fixed;
 }
 
 .data-table th {
@@ -204,6 +280,14 @@ select {
   text-overflow: ellipsis;
 }
 
+.data-table tbody tr {
+  transition: background 140ms ease;
+}
+
+.data-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -221,6 +305,61 @@ select {
   display: grid;
   place-items: center;
   min-height: 138px;
+}
+
+.completion-orb {
+  position: relative;
+  min-height: 148px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.completion-orb::before {
+  content: "";
+  position: absolute;
+  width: 170px;
+  height: 64px;
+  bottom: 14px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 70%, transparent);
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-2) 26%, transparent), transparent 70%);
+  transform: perspective(260px) rotateX(68deg);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--accent-2) 24%, transparent);
+}
+
+.completion-orb::after {
+  content: "";
+  position: absolute;
+  width: 126px;
+  height: 92px;
+  bottom: 48px;
+  border-radius: 18px 18px 42px 42px;
+  border: 1px solid color-mix(in srgb, var(--accent-2) 48%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 20%, transparent), color-mix(in srgb, var(--surface-strong) 24%, transparent)),
+    repeating-linear-gradient(180deg, color-mix(in srgb, white 10%, transparent) 0 1px, transparent 1px 14px);
+  opacity: 0.68;
+  box-shadow: inset 0 12px 26px color-mix(in srgb, white 10%, transparent);
+}
+
+.completion-value {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(38px, 4.8vw, 60px);
+  line-height: 0.95;
+  font-weight: 950;
+  color: var(--accent-2);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent-2) 42%, transparent);
+}
+
+.completion-label {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .hologram-base::before,
@@ -305,6 +444,7 @@ select {
   background: color-mix(in srgb, var(--surface-strong) 78%, transparent);
   padding: 14px;
   transition: 160ms ease;
+  min-height: 112px;
 }
 
 .theme-card.active {
@@ -312,9 +452,14 @@ select {
   box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
+.theme-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
 .drag-row {
   display: grid;
-  grid-template-columns: 34px 48px 1fr 90px;
+  grid-template-columns: 34px 48px 1fr 68px 58px;
   gap: 10px;
   align-items: center;
   border: 1px solid var(--border);
@@ -322,10 +467,66 @@ select {
   background: color-mix(in srgb, var(--surface-strong) 72%, transparent);
   padding: 10px;
   cursor: grab;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+
+.order-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.icon-button {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface-muted) 76%, transparent);
+}
+
+.icon-button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--accent-2);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.34;
 }
 
 .drag-row:active {
   cursor: grabbing;
+}
+
+.drag-row.dragging {
+  transform: scale(0.992);
+  opacity: 0.62;
+}
+
+.drag-row.drag-over {
+  border-color: var(--border-strong);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--surface-strong) 76%, transparent));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.config-preview-tile {
+  position: relative;
+  overflow: hidden;
+}
+
+.config-preview-tile::after {
+  content: "";
+  position: absolute;
+  inset: auto 10px 7px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+  opacity: 0.7;
 }
 
 @media (max-width: 1180px) {
@@ -359,6 +560,7 @@ select {
 
   .panel-body {
     padding-bottom: 14px;
+    height: auto;
   }
 
   .data-table {

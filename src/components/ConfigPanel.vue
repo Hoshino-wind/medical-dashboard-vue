@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from "vue";
-import { GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from "lucide-vue-next";
+import { ChevronDown, ChevronUp, GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from "lucide-vue-next";
 import { moduleCatalog, themes } from "../data/dashboard";
 
 const props = defineProps({
@@ -20,6 +20,7 @@ const props = defineProps({
 
 const emit = defineEmits(["set-theme", "set-layout", "move-module", "reset"]);
 const draggingIndex = ref(null);
+const dragOverIndex = ref(null);
 const savedAt = ref("");
 
 const orderedIds = computed(() => props.modules.map((item) => item.id));
@@ -28,14 +29,39 @@ function onDragStart(index) {
   draggingIndex.value = index;
 }
 
+function onDragEnter(index) {
+  dragOverIndex.value = index;
+}
+
 function onDrop(index) {
-  if (draggingIndex.value === null || draggingIndex.value === index) return;
+  if (draggingIndex.value === null) return;
+  if (draggingIndex.value === index) {
+    draggingIndex.value = null;
+    dragOverIndex.value = null;
+    return;
+  }
   emit("move-module", draggingIndex.value, index);
   draggingIndex.value = null;
+  dragOverIndex.value = null;
+}
+
+function onDragEnd() {
+  draggingIndex.value = null;
+  dragOverIndex.value = null;
 }
 
 function saveConfig() {
   savedAt.value = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+}
+
+function moveUp(index) {
+  if (index <= 0) return;
+  emit("move-module", index, index - 1);
+}
+
+function moveDown(index) {
+  if (index >= props.modules.length - 1) return;
+  emit("move-module", index, index + 1);
 }
 </script>
 
@@ -106,10 +132,13 @@ function saveConfig() {
               v-for="(item, index) in modules"
               :key="item.id"
               class="drag-row"
+              :class="{ dragging: draggingIndex === index, 'drag-over': dragOverIndex === index && draggingIndex !== index }"
               draggable="true"
               @dragstart="onDragStart(index)"
+              @dragenter="onDragEnter(index)"
               @dragover.prevent
               @drop="onDrop(index)"
+              @dragend="onDragEnd"
             >
               <GripVertical class="h-4 w-4 text-[color:var(--muted)]" />
               <span class="panel-number">{{ item.number }}</span>
@@ -118,6 +147,14 @@ function saveConfig() {
                 <div class="mt-1 text-[11px] text-[color:var(--muted)]">{{ item.kind }}</div>
               </div>
               <div class="text-right text-xs text-[color:var(--muted)]">位置 {{ index + 1 }}</div>
+              <div class="order-actions">
+                <button class="icon-button" :data-testid="`move-up-${item.id}`" :disabled="index === 0" title="上移" @click.stop="moveUp(index)">
+                  <ChevronUp class="h-3.5 w-3.5" />
+                </button>
+                <button class="icon-button" :data-testid="`move-down-${item.id}`" :disabled="index === modules.length - 1" title="下移" @click.stop="moveDown(index)">
+                  <ChevronDown class="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -141,9 +178,12 @@ function saveConfig() {
               <div
                 v-for="(id, index) in orderedIds.slice(0, config.layout === '2x3' ? 6 : 9)"
                 :key="id"
-                class="grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[11px] font-black"
+                class="config-preview-tile grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[11px] font-black"
               >
-                {{ moduleCatalog.find((item) => item.id === id)?.number }}
+                <div>
+                  <div class="text-sm text-[color:var(--accent-2)]">{{ moduleCatalog.find((item) => item.id === id)?.number }}</div>
+                  <div class="mt-1 max-w-[80px] truncate text-[10px] text-[color:var(--muted)]">{{ moduleCatalog.find((item) => item.id === id)?.title }}</div>
+                </div>
               </div>
             </div>
           </div>
