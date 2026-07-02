@@ -17,7 +17,7 @@ defineProps({
         :value="data.availability"
         label="设备可用率"
         :count="data.available"
-        size="136px"
+        size="144px"
         inside-label="设备可用率"
         :show-footer="false"
       />

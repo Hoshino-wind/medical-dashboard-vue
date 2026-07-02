@@ -686,11 +686,11 @@ select {
 }
 
 .availability-grid.availability-life .metric-ring {
-  filter: brightness(0.84) saturate(0.93);
+  filter: brightness(0.76) saturate(0.88);
 }
 
 .availability-grid.availability-ultrasound .metric-ring {
-  filter: brightness(0.82) saturate(0.92);
+  filter: brightness(0.74) saturate(0.86);
 }
 
 .availability-grid.availability-ultrasound .text-center > div:first-child {
@@ -708,6 +708,7 @@ select {
   border-collapse: collapse;
   font-size: 12px;
   table-layout: fixed;
+  filter: brightness(0.72) saturate(0.78);
 }
 
 .chart-bar {
@@ -1164,6 +1165,7 @@ select {
   gap: 14px;
   height: calc(100% - 72px);
   min-height: 0;
+  filter: brightness(0.9) saturate(0.9);
 }
 
 .screen-grid.layout-2x3 {
