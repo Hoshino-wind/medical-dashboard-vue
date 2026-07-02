@@ -10,12 +10,16 @@ defineProps({
     type: String,
     default: "94px",
   },
+  tone: {
+    type: String,
+    default: "",
+  },
 });
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center gap-2">
-    <div class="metric-ring" :style="{ '--value': value, '--ring-size': size }">
+    <div class="metric-ring" :style="{ '--value': value, '--ring-size': size, '--ring-accent': tone || undefined }">
       <div class="metric-value">{{ value }}%</div>
     </div>
     <div class="text-center">

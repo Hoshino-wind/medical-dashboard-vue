@@ -29,7 +29,7 @@ defineProps({
     </div>
 
     <div class="completion-orb">
-      <div>
+      <div class="completion-content">
         <div class="completion-label">本月巡检完成率</div>
         <div class="completion-value">{{ data.rate }}%</div>
       </div>

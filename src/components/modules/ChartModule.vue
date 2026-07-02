@@ -30,9 +30,10 @@ const option = computed(() => {
   const accent3 = v("--accent-3");
 
   if (props.type === "bar") {
+    const barColors = [accent3, v("--warn"), accent2];
     return {
-      color: [accent3, v("--warn"), accent2],
-      grid: { left: 36, right: 14, top: 24, bottom: 26 },
+      color: barColors,
+      grid: { left: 36, right: 12, top: 24, bottom: 26 },
       legend: {
         top: 0,
         right: 6,
@@ -52,15 +53,31 @@ const option = computed(() => {
         axisLabel: { color: muted, fontSize: 10 },
         splitLine: { lineStyle: { color: grid } },
       },
-      series: props.data.series.map((series) => ({
+      series: props.data.series.map((series, index) => ({
         ...series,
         type: "bar",
-        barWidth: 14,
+        barWidth: 13,
+        barMinHeight: 2,
         stack: "total",
+        barGap: "-35%",
         itemStyle: {
-          borderRadius: [8, 8, 0, 0],
-          shadowBlur: 12,
-          shadowColor: "rgba(0,0,0,.18)",
+          borderRadius: [7, 7, 2, 2],
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: `${barColors[index]}ff` },
+              { offset: 0.42, color: `${barColors[index]}cc` },
+              { offset: 1, color: `${barColors[index]}55` },
+            ],
+          },
+          shadowBlur: 18,
+          shadowColor: `${barColors[index]}66`,
+          borderColor: `${barColors[index]}aa`,
+          borderWidth: 1,
         },
         label: {
           show: true,
