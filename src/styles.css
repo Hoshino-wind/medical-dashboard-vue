@@ -573,7 +573,7 @@ select {
 }
 
 .overview-feature-ring .metric-ring {
-  filter: brightness(0.84) saturate(0.9);
+  filter: brightness(0.92) saturate(0.98);
   background:
     radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 94%, black 10%) 0 55%, transparent 56%),
     radial-gradient(circle at center, transparent 0 62%, color-mix(in srgb, white 20%, transparent) 63% 64%, transparent 65% 71%, color-mix(in srgb, var(--accent) 60%, transparent) 72% 74%, transparent 75%),
@@ -619,6 +619,7 @@ select {
   border-radius: 12px;
   overflow: hidden;
   background: color-mix(in srgb, var(--surface-muted) 18%, transparent);
+  filter: brightness(0.9) saturate(0.9);
 }
 
 .overview-stat {
@@ -712,7 +713,7 @@ select {
 }
 
 .availability-grid .text-center {
-  filter: brightness(0.76);
+  filter: brightness(0.44);
 }
 
 .data-table {
