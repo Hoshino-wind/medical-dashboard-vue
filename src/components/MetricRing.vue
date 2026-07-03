@@ -31,6 +31,7 @@ defineProps({
       <div class="metric-inner">
         <div v-if="insideLabel" class="metric-inside-label">{{ insideLabel }}</div>
         <div class="metric-value">{{ value }}%</div>
+        <div v-if="insideLabel && !showFooter" class="metric-inside-caption">{{ insideLabel }}</div>
       </div>
     </div>
     <div v-if="showFooter" class="text-center">
