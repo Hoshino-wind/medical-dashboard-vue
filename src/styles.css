@@ -137,12 +137,14 @@ select {
   justify-content: flex-start;
   padding: 0 12px;
   clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%);
+  transform: translate(-2px, -1px);
 }
 
 .hospital-chip {
   justify-content: flex-end;
   padding: 0 8px 0 14px;
   clip-path: polygon(8% 0, 100% 0, 100% 100%, 8% 100%, 0 50%);
+  transform: translateX(2px);
 }
 
 .brand-chip::after,
@@ -255,6 +257,7 @@ select {
   background: transparent;
   clip-path: none;
   box-shadow: none;
+  transform: translateY(-2px);
 }
 
 .title-image {
@@ -405,6 +408,7 @@ select {
     linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 88%),
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%);
   text-shadow: 0 0 7px color-mix(in srgb, var(--accent) 22%, transparent);
+  filter: brightness(0.84) saturate(0.86);
 }
 
 .panel-number {
