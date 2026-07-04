@@ -1,0 +1,189 @@
+/* PC dashboard shell and screen grid */
+.dashboard-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 22% 18%, color-mix(in srgb, var(--accent) 17%, transparent), transparent 30%),
+    radial-gradient(circle at 84% 24%, color-mix(in srgb, var(--accent-3) 12%, transparent), transparent 28%),
+    linear-gradient(135deg, var(--bg), var(--bg-soft));
+  color: var(--text);
+  overflow: hidden;
+}
+
+.dashboard-shell.config-mode {
+  overflow: auto;
+}
+
+.dashboard-shell.config-mode .screen-frame {
+  display: block;
+  width: min(100vw, 1600px);
+  height: auto;
+  min-height: 100vh;
+  padding-bottom: 86px;
+}
+
+.dashboard-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border-strong) 32%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border-strong) 22%, transparent) 1px, transparent 1px);
+  background-size: 62px 62px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
+  opacity: 0.12;
+}
+
+.dashboard-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, transparent 0 48%, color-mix(in srgb, var(--accent-2) 8%, transparent) 50%, transparent 52%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 6px);
+  mix-blend-mode: screen;
+  opacity: 0.08;
+}
+
+.screen-frame {
+  display: grid;
+  grid-template-rows: 62px minmax(0, 1fr) 66px;
+  gap: 12px;
+  width: min(100vw, calc(100vh * 16 / 9), 1920px);
+  height: min(100vh, calc(100vw * 9 / 16), 1080px);
+  margin: 0 auto;
+  padding: 12px 16px 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.screen-frame::before {
+  content: "";
+  position: absolute;
+  display: none;
+  inset: 1px;
+  z-index: 0;
+  pointer-events: none;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: none;
+}
+
+
+.screen-grid {
+  display: grid;
+  grid-template-columns: 0.92fr 1.35fr 1.05fr;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  height: auto;
+  min-height: 0;
+}
+
+.screen-grid.layout-2x3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.module-wide {
+  min-width: 0;
+}
+
+.screen-grid > .panel {
+  min-height: 0;
+}
+
+.panel-body {
+  height: calc(100% - 44px);
+  overflow: hidden;
+}
+
+.footer-kpi-bar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+
+.footer-kpi-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  border-radius: 14px 14px 10px 10px;
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--accent) 20%, transparent), transparent 36%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-strong) 88%, transparent), color-mix(in srgb, var(--surface) 92%, transparent));
+  padding: 8px 16px;
+  clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 13%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--accent) 9%, transparent),
+    0 0 18px color-mix(in srgb, var(--accent) 11%, transparent);
+}
+
+.footer-kpi-item::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px 4px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-2) 70%, transparent), transparent);
+}
+
+.footer-kpi-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 72%, transparent);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 36%, color-mix(in srgb, white 22%, transparent), transparent 32%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--accent) 44%, transparent), color-mix(in srgb, var(--surface-strong) 72%, transparent));
+  color: var(--accent);
+  box-shadow:
+    inset 0 0 14px color-mix(in srgb, var(--accent) 34%, transparent),
+    0 0 16px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.footer-kpi-icon svg {
+  width: 23px;
+  height: 23px;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent-2) 72%, transparent));
+}
+
+.footer-kpi-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.footer-kpi-label {
+  color: color-mix(in srgb, var(--muted) 86%, white 14%);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.footer-kpi-value {
+  overflow: hidden;
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: 950;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.footer-kpi-value small {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}

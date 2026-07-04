@@ -1,0 +1,31 @@
+/**
+ * 设计 token 回退值。
+ *
+ * 主题 CSS 变量在运行时由 Theme.variables 通过根节点 :style 注入。
+ * 此文件提供一套默认值(对应"深蓝科技"主题),作为兜底:
+ *   - 主题 JS 尚未挂载时的首帧防闪烁;
+ *   - 任何脱离主题上下文使用 var(--xxx) 的地方仍有合理取值。
+ *
+ * 注意:运行时主题会覆盖这些默认值。
+ */
+:root {
+  --bg: #010711;
+  --bg-soft: #031126;
+  --surface: rgba(3, 16, 39, 0.94);
+  --surface-strong: rgba(7, 28, 66, 0.97);
+  --surface-muted: rgba(9, 34, 75, 0.82);
+  --border: rgba(0, 184, 255, 0.5);
+  --border-strong: rgba(0, 210, 255, 0.88);
+  --text: #f5fbff;
+  --muted: #a4c8e8;
+  --accent: #00a8ff;
+  --accent-2: #20f1d4;
+  --accent-3: #8b6dff;
+  --good: #2dfaa8;
+  --warn: #ffc857;
+  --danger: #ff5e78;
+  --chart-grid: rgba(132, 187, 230, 0.2);
+  --panel-shadow:
+    0 0 0 1px rgba(0, 168, 255, 0.1), 0 12px 28px rgba(0, 80, 180, 0.16),
+    inset 0 0 22px rgba(16, 127, 255, 0.05);
+}
