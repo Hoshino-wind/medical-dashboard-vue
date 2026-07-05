@@ -55,17 +55,74 @@ interface LayerOptions {
   phase?: number
 }
 
-function makeRing(radius: number, width: number, color: THREE.Color, opacity: number): THREE.Mesh {
-  const geometry = new THREE.RingGeometry(radius - width, radius, 160)
-  const material = new THREE.MeshBasicMaterial({
+function makeMaterial(color: THREE.Color, opacity: number): THREE.MeshBasicMaterial {
+  return new THREE.MeshBasicMaterial({
     color,
     transparent: true,
-    opacity,
+    opacity: Math.min(1, Math.max(0, opacity * props.density)),
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
-  return new THREE.Mesh(geometry, material)
+}
+
+function makeRing(radius: number, width: number, color: THREE.Color, opacity: number): THREE.Mesh {
+  const geometry = new THREE.RingGeometry(radius - width, radius, 160)
+  return new THREE.Mesh(geometry, makeMaterial(color, opacity))
+}
+
+function makeDisc(radius: number, color: THREE.Color, opacity: number): THREE.Mesh {
+  return new THREE.Mesh(new THREE.CircleGeometry(radius, 160), makeMaterial(color, opacity))
+}
+
+function makeGlowTexture(color: THREE.Color): THREE.CanvasTexture {
+  const size = 256
+  const glowCanvas = document.createElement('canvas')
+  glowCanvas.width = size
+  glowCanvas.height = size
+  const ctx = glowCanvas.getContext('2d')
+  if (!ctx) return new THREE.CanvasTexture(glowCanvas)
+
+  const rgb = `${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)}`
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+  gradient.addColorStop(0, 'rgba(255,255,255,0.86)')
+  gradient.addColorStop(0.18, `rgba(${rgb},0.72)`)
+  gradient.addColorStop(0.54, `rgba(${rgb},0.24)`)
+  gradient.addColorStop(1, `rgba(${rgb},0)`)
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, size, size)
+  const texture = new THREE.CanvasTexture(glowCanvas)
+  texture.needsUpdate = true
+  return texture
+}
+
+function makeGlow(color: THREE.Color, scaleX: number, scaleY: number, opacity: number, y = -0.28): THREE.Sprite {
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: makeGlowTexture(color),
+      transparent: true,
+      opacity: Math.min(1, Math.max(0, opacity * props.density)),
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  )
+  sprite.scale.set(scaleX, scaleY, 1)
+  sprite.position.set(0, y, -0.04)
+  return sprite
+}
+
+function makeFrontLip(radius: number, color: THREE.Color, opacity: number): THREE.Mesh {
+  const shape = new THREE.Shape()
+  const topY = -radius * 0.18
+  const bottomY = -radius * 0.31
+  shape.moveTo(-radius * 0.94, topY)
+  shape.bezierCurveTo(-radius * 0.64, -radius * 0.62, radius * 0.64, -radius * 0.62, radius * 0.94, topY)
+  shape.lineTo(radius * 0.84, bottomY)
+  shape.bezierCurveTo(radius * 0.54, -radius * 0.46, -radius * 0.54, -radius * 0.46, -radius * 0.84, bottomY)
+  shape.closePath()
+  const lip = new THREE.Mesh(new THREE.ShapeGeometry(shape, 96), makeMaterial(color, opacity))
+  lip.position.z = 0.035
+  return lip
 }
 
 function makeSegment(
@@ -76,18 +133,23 @@ function makeSegment(
   length = 0.11,
 ): THREE.Mesh {
   const geometry = new THREE.PlaneGeometry(length, 0.014)
-  const material = new THREE.MeshBasicMaterial({
-    color,
-    transparent: true,
-    opacity,
-    side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  })
-  const segment = new THREE.Mesh(geometry, material)
+  const segment = new THREE.Mesh(geometry, makeMaterial(color, opacity))
   segment.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.012)
   segment.rotation.z = angle + Math.PI / 2
   return segment
+}
+
+function makeStageTier(radius: number, color: THREE.Color, secondary: THREE.Color, opacity: number): THREE.Group {
+  const tier = new THREE.Group()
+
+  // 一层基座由半透明盘面、外圈亮边、前沿厚度组成；多层叠加后接近参考图的玻璃台阶。
+  tier.add(makeDisc(radius, color, opacity * 0.22))
+  tier.add(makeRing(radius, radius * 0.028, secondary, opacity * 0.92))
+  tier.add(makeRing(radius * 0.78, radius * 0.018, color, opacity * 0.46))
+  tier.add(makeRing(radius * 0.55, radius * 0.012, secondary, opacity * 0.28))
+  tier.add(makeFrontLip(radius, secondary, opacity * 0.72))
+
+  return tier
 }
 
 function makeLayer(opts: LayerOptions): THREE.Group {
@@ -118,39 +180,46 @@ function makeLayer(opts: LayerOptions): THREE.Group {
 function buildScene() {
   const color = cssColorToThree(props.tone)
   const secondary = color.clone().offsetHSL(0.08, 0.1, 0.12)
+  const deep = color.clone().offsetHSL(0.02, -0.04, -0.16)
 
   scene = new THREE.Scene()
   camera = new THREE.OrthographicCamera(-1.8, 1.8, 1.2, -1.2, 0.1, 10)
   camera.position.set(0, 0, 4)
 
   baseGroup = new THREE.Group()
-  baseGroup.scale.set(1.22, 0.38, 1)
+  baseGroup.position.set(0, -0.08, 0)
+  baseGroup.scale.set(1.24, 0.42, 1)
+
+  const bottomTier = makeStageTier(1.26, deep, color, 0.5)
+  bottomTier.position.y = -0.18
+  baseGroup.add(bottomTier)
+
+  const middleTier = makeStageTier(1.04, color, secondary, 0.72)
+  middleTier.position.y = -0.04
+  baseGroup.add(middleTier)
+
+  const topTier = makeStageTier(0.78, secondary, secondary, 0.92)
+  topTier.position.y = 0.09
+  baseGroup.add(topTier)
+
   ringLayers = [
-    makeLayer({ radius: 1.18, width: 0.018, color, opacity: 0.78, segmentCount: 36, speed: -0.0042 }),
+    makeLayer({ radius: 1.23, width: 0.014, color, opacity: 0.48, segmentCount: 32, speed: -0.0024 }),
     makeLayer({
-      radius: 0.9,
-      width: 0.014,
+      radius: 0.96,
+      width: 0.012,
       color: secondary,
-      opacity: 0.56,
-      segmentCount: 28,
-      speed: -0.0028,
+      opacity: 0.44,
+      segmentCount: 24,
+      speed: -0.0018,
       phase: 0.18,
     }),
-    makeLayer({ radius: 0.62, width: 0.011, color, opacity: 0.42, segmentCount: 20, speed: -0.0035, phase: 0.32 }),
+    makeLayer({ radius: 0.68, width: 0.01, color, opacity: 0.32, segmentCount: 18, speed: -0.002, phase: 0.32 }),
   ]
   ringLayers.forEach((layer) => baseGroup!.add(layer))
 
-  const glow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.72, 96),
-    new THREE.MeshBasicMaterial({
-      color,
-      transparent: true,
-      opacity: 0.13 * props.density,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    }),
-  )
-  baseGroup.add(glow)
+  baseGroup.add(makeDisc(0.54, secondary, 0.2))
+  scene.add(makeGlow(color, 2.9, 0.72, 0.38, -0.22))
+  scene.add(makeGlow(secondary, 1.5, 0.34, 0.5, -0.02))
   scene.add(baseGroup)
 }
 

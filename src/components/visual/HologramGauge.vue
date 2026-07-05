@@ -13,6 +13,7 @@ const props = withDefaults(
     insideLabel?: string
     showFooter?: boolean
     large?: boolean
+    baseDensity?: number
   }>(),
   {
     unit: '台',
@@ -21,6 +22,7 @@ const props = withDefaults(
     insideLabel: '',
     showFooter: true,
     large: false,
+    baseDensity: undefined,
   },
 )
 
@@ -60,7 +62,11 @@ onUnmounted(() => cancelAnimationFrame(raf))
 <template>
   <div class="hologram-gauge" :class="{ 'is-large': large }" :style="rootStyle">
     <!-- 第 1 层：Three.js 底座，全息发光圆盘 -->
-    <ThreeHologramBase class="hologram-gauge-base" :tone="tone" :density="large ? 1.2 : 1" />
+    <ThreeHologramBase
+      class="hologram-gauge-base"
+      :tone="tone"
+      :density="baseDensity ?? (large ? 1.2 : 1)"
+    />
 
     <!-- 第 2 层：CSS 动态进度环 -->
     <div class="hologram-gauge-ring">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import EChart from '../EChart.vue'
+import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'

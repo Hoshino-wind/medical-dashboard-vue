@@ -12,12 +12,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'screen',
-      component: () => import('@/components/BigScreen.vue'),
+      component: () => import('@/components/shared/BigScreen.vue'),
     },
     {
       path: '/config',
       name: 'config',
-      component: () => import('@/components/ConfigPanel.vue'),
+      component: () => import('@/components/shared/ConfigPanel.vue'),
     },
   ],
 })

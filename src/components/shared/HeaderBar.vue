@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import headerTitle from '../assets/header-title-ref.png'
-import hospitalHeader from '../assets/hospital-header-ref.png'
-import sunnicareBrand from '../assets/sunnicare-brand-ref.png'
+import headerTitle from '../../assets/header-title-ref.png'
+import hospitalHeader from '../../assets/hospital-header-ref.png'
+import sunnicareBrand from '../../assets/sunnicare-brand-ref.png'
 import type { HeaderData } from '@/types/dashboard'
 
 defineProps<{

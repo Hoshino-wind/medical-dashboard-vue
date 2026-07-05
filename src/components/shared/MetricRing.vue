@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HologramGauge from './visual/HologramGauge.vue'
+import HologramGauge from '../visual/HologramGauge.vue'
 
 withDefaults(
   defineProps<{

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Activity, ClipboardList, MonitorCog, ShieldCheck, Wrench } from 'lucide-vue-next'
-import MetricRing from '../MetricRing.vue'
-import CountUp from '../CountUp.vue'
+import MetricRing from '../shared/MetricRing.vue'
+import CountUp from '../shared/CountUp.vue'
 import type { OverviewData } from '@/types/dashboard'
 
 defineProps<{

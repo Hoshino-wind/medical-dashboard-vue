@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AlertTriangle, BadgeCheck, Wrench } from 'lucide-vue-next'
-import CountUp from '../CountUp.vue'
+import CountUp from '../shared/CountUp.vue'
 import HealthPieChart from '../charts/HealthPieChart.vue'
 import type { HealthTrendData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'

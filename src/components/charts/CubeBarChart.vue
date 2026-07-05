@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import echarts, { type EChartsOption } from '@/utils/echarts'
-import EChart from '../EChart.vue'
+import EChart from './EChart.vue'
 import type { BarChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
 const CUBE_HALF = 12
 const CUBE_DEPTH = 7
-const AXIS_DEPTH = 18
-const AXIS_HEIGHT = 26
-const AXIS_SLANT = 13
+const AXIS_DEPTH = 20
+const AXIS_HEIGHT = 30
+const AXIS_SLANT = 15
 const LIQUID_MIN_HEIGHT = 10
 const LIQUID_MAX_HEIGHT = 44
 
@@ -154,19 +154,21 @@ const option = computed(() => {
     { offset: 1, color: `${accent}20` },
   ])
   const baseDeckFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}84` },
-    { offset: 0.42, color: `${accent}32` },
-    { offset: 1, color: `${accent}0d` },
+    { offset: 0, color: `${accent2}aa` },
+    { offset: 0.34, color: `${accent2}5a` },
+    { offset: 0.72, color: `${accent}24` },
+    { offset: 1, color: `${accent}0a` },
   ])
   const baseFrontFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent}42` },
-    { offset: 0.55, color: `${accent}18` },
+    { offset: 0, color: `${accent2}38` },
+    { offset: 0.2, color: `${accent}44` },
+    { offset: 0.68, color: `${accent}18` },
     { offset: 1, color: `${accent}05` },
   ])
 
   return {
     animationDuration: 1000,
-    grid: { left: 44, right: 16, top: 42, bottom: 44 },
+    grid: { left: 44, right: 16, top: 42, bottom: 48 },
     xAxis: {
       type: 'category',
       data: labels,
@@ -205,15 +207,27 @@ const option = computed(() => {
               {
                 type: 'rect',
                 shape: {
-                  x: axisX - 8,
-                  y: axisY - AXIS_DEPTH - 5,
-                  width: axisWidth + AXIS_SLANT + 16,
-                  height: AXIS_HEIGHT + AXIS_DEPTH + 12,
+                  x: axisX - 12,
+                  y: axisY - AXIS_DEPTH - 8,
+                  width: axisWidth + AXIS_SLANT + 24,
+                  height: AXIS_HEIGHT + AXIS_DEPTH + 18,
                 },
                 style: {
-                  fill: `${accent2}0a`,
-                  shadowBlur: 28,
-                  shadowColor: `${accent2}55`,
+                  fill: `${accent2}08`,
+                  shadowBlur: 36,
+                  shadowColor: `${accent2}72`,
+                },
+                silent: true,
+              },
+              {
+                type: 'CuboidAxisFront',
+                shape: { x: axisX - 8, y: axisY + 7, width: axisWidth + 16 },
+                style: {
+                  fill: `${accent}12`,
+                  stroke: `${accent}28`,
+                  lineWidth: 1,
+                  shadowBlur: 18,
+                  shadowColor: `${accent}34`,
                 },
                 silent: true,
               },
@@ -222,10 +236,10 @@ const option = computed(() => {
                 shape: { x: axisX, y: axisY, width: axisWidth },
                 style: {
                   fill: baseFrontFill,
-                  stroke: `${accent}68`,
+                  stroke: `${accent}82`,
                   lineWidth: 1,
-                  shadowBlur: 12,
-                  shadowColor: `${accent}3a`,
+                  shadowBlur: 18,
+                  shadowColor: `${accent2}54`,
                 },
                 silent: true,
               },
@@ -234,7 +248,7 @@ const option = computed(() => {
                 shape: { x: axisX, y: axisY, width: axisWidth },
                 style: {
                   fill: `${accent}1e`,
-                  stroke: `${accent2}58`,
+                  stroke: `${accent2}68`,
                   lineWidth: 1,
                 },
                 silent: true,
@@ -244,10 +258,57 @@ const option = computed(() => {
                 shape: { x: axisX, y: axisY, width: axisWidth },
                 style: {
                   fill: baseDeckFill,
-                  stroke: `${accent2}b8`,
+                  stroke: `${accent2}dc`,
                   lineWidth: 1,
-                  shadowBlur: 16,
-                  shadowColor: `${accent2}65`,
+                  shadowBlur: 22,
+                  shadowColor: `${accent2}86`,
+                },
+                silent: true,
+              },
+              {
+                type: 'line',
+                shape: {
+                  x1: axisX + AXIS_SLANT + 5,
+                  y1: axisY - AXIS_DEPTH + 3,
+                  x2: axisX + axisWidth + AXIS_SLANT - 6,
+                  y2: axisY - AXIS_DEPTH + 3,
+                },
+                style: {
+                  stroke: 'rgba(255,255,255,0.5)',
+                  lineWidth: 1,
+                  shadowBlur: 10,
+                  shadowColor: `${accent2}cc`,
+                },
+                silent: true,
+              },
+              {
+                type: 'line',
+                shape: {
+                  x1: axisX + 6,
+                  y1: axisY + 3,
+                  x2: axisX + axisWidth - 6,
+                  y2: axisY + 3,
+                },
+                style: {
+                  stroke: `${accent2}9c`,
+                  lineWidth: 1,
+                  shadowBlur: 12,
+                  shadowColor: `${accent2}a0`,
+                },
+                silent: true,
+              },
+              {
+                type: 'rect',
+                shape: {
+                  x: axisX + 12,
+                  y: axisY + AXIS_HEIGHT - 4,
+                  width: axisWidth - 24,
+                  height: 2,
+                },
+                style: {
+                  fill: `${accent2}6c`,
+                  shadowBlur: 14,
+                  shadowColor: `${accent2}bc`,
                 },
                 silent: true,
               },

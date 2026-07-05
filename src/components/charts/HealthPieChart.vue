@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import CountUp from '../CountUp.vue'
-import Pie3D from '../Pie3D.vue'
-import ThreeHologramBase from '../visual/ThreeHologramBase.vue'
+import CountUp from '../shared/CountUp.vue'
+import Pie3D from './Pie3D.vue'
+import ThreePiePedestal from '../visual/ThreePiePedestal.vue'
 
 interface PieItem {
   name: string
@@ -18,9 +18,14 @@ defineProps<{
 
 <template>
   <div class="health-pie-chart">
-    <ThreeHologramBase class="health-pie-base" :tone="tone ?? 'var(--accent)'" :density="1.2" />
+    <ThreePiePedestal
+      class="health-pie-base"
+      :color="tone ?? 'var(--accent)'"
+      accent="var(--accent-2)"
+      :intensity="1.16"
+    />
     <div class="health-pie-core">
-      <Pie3D :items="items" height="174px" />
+      <Pie3D :items="items" height="140px" />
     </div>
     <div class="pie3d-caption">待处理 <b><CountUp :value="total" /></b> 台</div>
   </div>

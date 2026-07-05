@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import MetricRing from '../MetricRing.vue'
+import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
 import type { AvailabilityItem } from '@/types/dashboard'
 
 const props = withDefaults(
@@ -20,7 +20,7 @@ const ringTones = computed(() => {
   return ['var(--accent)', 'var(--accent-2)', 'var(--accent)']
 })
 
-const ringSize = computed(() => (props.variant === 'ultrasound' ? '112px' : '118px'))
+const ringSize = computed(() => (props.variant === 'ultrasound' ? '102px' : '106px'))
 </script>
 
 <template>
@@ -28,7 +28,7 @@ const ringSize = computed(() => (props.variant === 'ultrasound' ? '112px' : '118
     class="availability-grid grid h-full grid-cols-3 items-center gap-2"
     :class="`availability-${variant}`"
   >
-    <MetricRing
+    <AvailabilityMetricRing
       v-for="(item, index) in items"
       :key="item.name"
       :value="item.value"

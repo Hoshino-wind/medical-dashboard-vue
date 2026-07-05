@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Bell, CalendarCheck, CheckCircle2, UserRound } from 'lucide-vue-next'
-import CountUp from '../CountUp.vue'
+import CountUp from '../shared/CountUp.vue'
 import type { InspectionOrders } from '@/types/dashboard'
 
 defineProps<{

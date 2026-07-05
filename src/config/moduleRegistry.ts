@@ -10,7 +10,7 @@ import type { Theme } from '@/types/theme'
  * 减小首屏 JS 体积,模块按需加载。
  */
 const OverviewModule = defineAsyncComponent(() => import('@/components/modules/OverviewModule.vue'))
-const WorkOrderTable = defineAsyncComponent(() => import('@/components/WorkOrderTable.vue'))
+const WorkOrderTable = defineAsyncComponent(() => import('@/components/shared/WorkOrderTable.vue'))
 const ChartModule = defineAsyncComponent(() => import('@/components/modules/ChartModule.vue'))
 const AvailabilityModule = defineAsyncComponent(
   () => import('@/components/modules/AvailabilityModule.vue'),

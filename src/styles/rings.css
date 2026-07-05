@@ -14,14 +14,37 @@
   isolation: isolate;
 }
 
+.hologram-gauge::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--gauge-size, 118px) * 0.34);
+  z-index: 1;
+  width: calc(var(--gauge-size, 118px) * 0.11);
+  height: calc(var(--gauge-size, 118px) * 0.62);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 100%, color-mix(in srgb, white 78%, transparent), transparent 18%),
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in srgb, var(--gauge-tone) 20%, transparent) 34%,
+      color-mix(in srgb, var(--gauge-tone) 68%, transparent) 100%
+    );
+  filter: blur(7px);
+  opacity: 0.62;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
 .hologram-gauge-base,
 .three-hologram-base {
   position: absolute;
   left: 50%;
-  bottom: 22px;
+  bottom: 24px;
   z-index: 0;
-  width: calc(var(--gauge-size, 118px) + 54px);
-  height: calc(var(--gauge-size, 118px) * 0.48);
+  width: calc(var(--gauge-size, 118px) + 70px);
+  height: calc(var(--gauge-size, 118px) * 0.56);
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -40,7 +63,8 @@
   height: var(--gauge-size, 118px);
   place-items: center;
   border-radius: 999px;
-  transform: translateY(-10px);
+  transform: translateY(-12px);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--gauge-tone) 28%, transparent));
 }
 
 .hologram-gauge-ring::before {
@@ -49,10 +73,26 @@
   inset: -7px;
   border-radius: inherit;
   background:
-    repeating-conic-gradient(from 18deg, color-mix(in srgb, var(--gauge-tone) 58%, transparent) 0 2deg, transparent 2deg 12deg),
-    radial-gradient(circle at center, transparent 0 64%, color-mix(in srgb, var(--gauge-tone) 28%, transparent) 65% 67%, transparent 68%);
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--gauge-tone) 42%, transparent));
-  opacity: 0.72;
+    conic-gradient(from -30deg, transparent 0 7%, color-mix(in srgb, white 60%, var(--gauge-tone) 40%) 8% 11%, transparent 12% 42%, color-mix(in srgb, var(--gauge-tone) 78%, transparent) 43% 47%, transparent 48% 100%),
+    repeating-conic-gradient(from 18deg, color-mix(in srgb, var(--gauge-tone) 54%, transparent) 0 2deg, transparent 2deg 13deg),
+    radial-gradient(circle at center, transparent 0 62%, color-mix(in srgb, var(--gauge-tone) 36%, transparent) 63% 67%, transparent 68%);
+  filter:
+    drop-shadow(0 0 10px color-mix(in srgb, var(--gauge-tone) 44%, transparent))
+    drop-shadow(0 0 20px color-mix(in srgb, var(--gauge-tone) 24%, transparent));
+  opacity: 0.86;
+}
+
+.hologram-gauge-ring::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, white 18%, transparent), transparent 40%),
+    radial-gradient(circle at center, transparent 0 63%, color-mix(in srgb, white 34%, transparent) 64% 65%, transparent 66%);
+  opacity: 0.55;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .hologram-gauge-ring-track,
@@ -69,8 +109,9 @@
     radial-gradient(circle at center, transparent 0 64%, color-mix(in srgb, white 18%, transparent) 65% 66%, transparent 67%),
     color-mix(in srgb, var(--gauge-tone) 10%, transparent);
   box-shadow:
-    inset 0 0 28px color-mix(in srgb, var(--gauge-tone) 18%, transparent),
-    0 0 22px color-mix(in srgb, var(--gauge-tone) 26%, transparent);
+    inset 0 0 28px color-mix(in srgb, var(--gauge-tone) 24%, transparent),
+    inset 0 0 0 7px color-mix(in srgb, white 5%, transparent),
+    0 0 24px color-mix(in srgb, var(--gauge-tone) 34%, transparent);
 }
 
 .hologram-gauge-ring-progress {
@@ -122,9 +163,10 @@
   height: calc(var(--gauge-size, 118px) * 0.86);
   border-radius: 999px;
   background:
-    radial-gradient(circle at 50% 6%, color-mix(in srgb, white 62%, transparent), transparent 12%),
+    radial-gradient(circle at 50% 6%, color-mix(in srgb, white 70%, transparent), transparent 12%),
+    radial-gradient(circle at 12% 50%, color-mix(in srgb, white 38%, transparent), transparent 6%),
     linear-gradient(135deg, transparent 0 42%, color-mix(in srgb, white 16%, transparent) 49%, transparent 58% 100%);
-  opacity: 0.55;
+  opacity: 0.62;
   pointer-events: none;
   mix-blend-mode: screen;
 }
@@ -165,12 +207,12 @@
 }
 
 .hologram-gauge.is-large .hologram-gauge-base {
-  bottom: 22px;
-  width: calc(var(--gauge-size, 176px) + 82px);
+  bottom: 24px;
+  width: calc(var(--gauge-size, 176px) + 98px);
 }
 
 .hologram-gauge.is-large .hologram-gauge-ring {
-  transform: translateY(-13px);
+  transform: translateY(-15px);
 }
 
 .hologram-gauge.is-large .hologram-gauge-label {
