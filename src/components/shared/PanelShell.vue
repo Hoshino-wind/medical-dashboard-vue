@@ -16,7 +16,7 @@ defineProps<{
     <span class="panel-scan"></span>
     <div class="panel-header">
       <span class="panel-number">{{ number }}</span>
-      <h2 class="truncate text-[17px]">
+      <h2 class="truncate text-[1.0625rem]">
         {{ title }}
         <span v-if="subtitle" class="panel-title-suffix">（{{ subtitle }}）</span>
       </h2>

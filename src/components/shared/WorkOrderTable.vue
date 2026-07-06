@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   headers: string[]
@@ -16,24 +16,7 @@ function rowIconClass(index: number): string {
   return ['is-blue', 'is-purple', 'is-red', 'is-orange', 'is-cyan'][index % 5]
 }
 
-// 行轮播：每隔一段时间把首行滚到队尾，配合过渡形成循环滚动
 const displayRows = ref<string[][]>(props.rows.slice())
-let timer: ReturnType<typeof setInterval> | null = null
-
-function rotate() {
-  if (displayRows.value.length <= 1) return
-  const arr = displayRows.value.slice()
-  arr.push(arr.shift()!)
-  displayRows.value = arr
-}
-
-onMounted(() => {
-  timer = setInterval(rotate, 2600)
-})
-
-onUnmounted(() => {
-  if (timer) clearInterval(timer)
-})
 
 watch(
   () => props.rows,

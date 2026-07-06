@@ -4,6 +4,7 @@ import echarts, { type EChartsOption } from '@/utils/echarts'
 import EChart from './EChart.vue'
 import type { BarChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
+import { pxToRem } from '@/utils/rem'
 
 const CUBE_HALF = 12
 const CUBE_DEPTH = 7
@@ -12,6 +13,7 @@ const AXIS_HEIGHT = 30
 const AXIS_SLANT = 15
 const LIQUID_MIN_HEIGHT = 10
 const LIQUID_MAX_HEIGHT = 44
+const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} rgba(0, 120, 220, 0.35);`
 
 // 玻璃柱体由左右面、顶面、内部青色液面叠加，方便接近参考图的透明 3D 质感。
 const GlassColumnLeft = echarts.graphic.extendShape({
@@ -464,7 +466,7 @@ const option = computed(() => {
       borderWidth: 1,
       padding: [8, 12],
       textStyle: { color: text, fontSize: 12, fontWeight: 700 },
-      extraCssText: 'border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 120, 220, 0.35);',
+      extraCssText: tooltipExtraCssText,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       formatter(params: any) {
         const i = params.dataIndex

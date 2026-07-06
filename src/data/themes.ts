@@ -1,4 +1,5 @@
 import type { Theme } from '@/types/theme'
+import { pxToRem } from '@/utils/rem'
 
 export const themes: Theme[] = [
   {
@@ -23,7 +24,7 @@ export const themes: Theme[] = [
       '--warn': '#f59e0b',
       '--danger': '#ef4444',
       '--chart-grid': 'rgba(77, 119, 178, 0.16)',
-      '--panel-shadow': '0 18px 42px rgba(68, 110, 160, 0.16)',
+      '--panel-shadow': `0 ${pxToRem(18)} ${pxToRem(42)} rgba(68, 110, 160, 0.16)`,
     },
   },
   {
@@ -49,7 +50,7 @@ export const themes: Theme[] = [
       '--danger': '#ff5e78',
       '--chart-grid': 'rgba(132, 187, 230, 0.2)',
       '--panel-shadow':
-        '0 0 0 1px rgba(0, 168, 255, 0.1), 0 12px 28px rgba(0, 80, 180, 0.16), inset 0 0 22px rgba(16, 127, 255, 0.05)',
+        `0 0 0 ${pxToRem(1)} rgba(0, 168, 255, 0.1), 0 ${pxToRem(12)} ${pxToRem(28)} rgba(0, 80, 180, 0.16), inset 0 0 ${pxToRem(22)} rgba(16, 127, 255, 0.05)`,
     },
   },
   {
@@ -74,7 +75,7 @@ export const themes: Theme[] = [
       '--warn': '#ffd166',
       '--danger': '#ff6b95',
       '--chart-grid': 'rgba(243, 225, 255, 0.14)',
-      '--panel-shadow': '0 24px 60px rgba(111, 73, 196, 0.28)',
+      '--panel-shadow': `0 ${pxToRem(24)} ${pxToRem(60)} rgba(111, 73, 196, 0.28)`,
     },
   },
   {
@@ -99,7 +100,7 @@ export const themes: Theme[] = [
       '--warn': '#ffc857',
       '--danger': '#ff6b6b',
       '--chart-grid': 'rgba(152, 255, 232, 0.14)',
-      '--panel-shadow': '0 24px 60px rgba(18, 214, 197, 0.18)',
+      '--panel-shadow': `0 ${pxToRem(24)} ${pxToRem(60)} rgba(18, 214, 197, 0.18)`,
     },
   },
 ]

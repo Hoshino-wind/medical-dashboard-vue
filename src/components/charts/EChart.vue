@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import echarts, { type ECharts, type EChartsOption } from '@/utils/echarts'
+import { pxToRem } from '@/utils/rem'
 
 const props = withDefaults(
   defineProps<{
@@ -8,7 +9,7 @@ const props = withDefaults(
     height?: string
   }>(),
   {
-    height: '170px',
+    height: pxToRem(170),
   },
 )
 

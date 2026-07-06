@@ -4,6 +4,7 @@ import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
+import { pxToRem } from '@/utils/rem'
 
 const props = withDefaults(
   defineProps<{
@@ -20,6 +21,8 @@ function token(name: keyof ThemeVariables): string {
   return props.theme.variables[name]
 }
 
+const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} rgba(0, 120, 220, 0.35);`
+
 const option = computed(() => {
   const text = token('--text')
   const muted = token('--muted')
@@ -28,12 +31,14 @@ const option = computed(() => {
   const accent2 = token('--accent-2')
   const accent3 = token('--accent-3')
   const lineColor = props.variant === 'inspection' ? accent2 : accent3
+  const yMax = props.variant === 'inspection' ? 40000 : 10000
+  const yInterval = props.variant === 'inspection' ? 10000 : 2000
 
   return {
     color: [lineColor],
     animationDuration: 1000,
     animationEasing: 'cubicOut',
-    grid: { left: 44, right: 16, top: 22, bottom: 28 },
+    grid: { left: 54, right: 30, top: 20, bottom: 30 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
@@ -44,6 +49,8 @@ const option = computed(() => {
     },
     yAxis: {
       type: 'value',
+      max: yMax,
+      interval: yInterval,
       axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
       splitLine: { lineStyle: { color: grid, width: 1, type: 'dashed' } },
     },
@@ -96,7 +103,7 @@ const option = computed(() => {
         lineStyle: { color: `${accent2}99`, width: 1, type: 'dashed' },
         shadowStyle: { color: `${accent}14` },
       },
-      extraCssText: 'border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 120, 220, 0.35);',
+      extraCssText: tooltipExtraCssText,
     },
   } as EChartsOption
 })

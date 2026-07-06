@@ -20,9 +20,9 @@ const visibleModules = computed(() =>
 </script>
 
 <template>
-  <main class="screen-frame">
+  <main class="screen-frame" data-reference-design="medical-equipment-1920x1080">
     <HeaderBar :data="data.header" />
-    <section class="screen-grid" :class="{ 'layout-2x3': layout === '2x3' }">
+    <section class="screen-grid" :class="{ 'layout-2x3': layout === '2x3' }" :data-layout="layout">
       <ModuleRenderer
         v-for="item in visibleModules"
         :key="item.id"

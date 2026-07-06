@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
 import type { AvailabilityItem } from '@/types/dashboard'
+import { pxToRem } from '@/utils/rem'
 
 const props = withDefaults(
   defineProps<{
@@ -20,7 +21,7 @@ const ringTones = computed(() => {
   return ['var(--accent)', 'var(--accent-2)', 'var(--accent)']
 })
 
-const ringSize = computed(() => (props.variant === 'ultrasound' ? '102px' : '106px'))
+const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
 </script>
 
 <template>

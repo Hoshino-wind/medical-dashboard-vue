@@ -77,7 +77,7 @@ export interface FooterMetric {
   label: string
   value: string
   unit: string
-  /** 图标 key,对应 FooterKpiBar 的 iconMap */
+  /** 预留图标 key,用于需要展示 KPI 内容的场景 */
   icon: string
 }
 

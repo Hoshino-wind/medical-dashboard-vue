@@ -3,10 +3,13 @@ import { Activity, ClipboardList, MonitorCog, ShieldCheck, Wrench } from 'lucide
 import MetricRing from '../shared/MetricRing.vue'
 import CountUp from '../shared/CountUp.vue'
 import type { OverviewData } from '@/types/dashboard'
+import { pxToRem } from '@/utils/rem'
 
 defineProps<{
   data: OverviewData
 }>()
+
+const overviewRingSize = pxToRem(150)
 </script>
 
 <template>
@@ -17,14 +20,14 @@ defineProps<{
         :value="data.availability"
         label="设备可用率"
         :count="data.available"
-        size="154px"
+        :size="overviewRingSize"
         inside-label="设备可用率"
         :show-footer="false"
         large
       />
     </div>
     <div class="overview-metrics">
-      <div class="overview-stat with-icon">
+      <div class="overview-stat with-icon span-2">
         <MonitorCog class="overview-stat-icon text-[color:var(--accent)]" />
         <div>
           <div class="kpi-label">设备总数</div>
@@ -33,7 +36,7 @@ defineProps<{
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon">
+      <div class="overview-stat with-icon span-2">
         <ShieldCheck class="overview-stat-icon text-[color:var(--good)]" />
         <div>
           <div class="kpi-label">可用设备</div>

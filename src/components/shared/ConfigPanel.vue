@@ -80,11 +80,11 @@ function moveDown(index: number) {
       </div>
     </div>
 
-    <div class="grid grid-cols-[360px_1fr_360px] gap-4 max-[1180px]:grid-cols-1">
+    <div class="grid grid-cols-[22.5rem_1fr_22.5rem] gap-4 max-[73.75rem]:grid-cols-1">
       <section class="panel">
         <div class="panel-header">
           <span class="panel-number"><SwatchBook class="h-4 w-4" /></span>
-          <h2 class="text-[15px]">主题样式</h2>
+          <h2 class="text-[0.9375rem]">主题样式</h2>
         </div>
         <div class="panel-body grid gap-3">
           <button
@@ -115,7 +115,7 @@ function moveDown(index: number) {
       <section class="panel">
         <div class="panel-header">
           <span class="panel-number"><GripVertical class="h-4 w-4" /></span>
-          <h2 class="text-[15px]">模块顺序</h2>
+          <h2 class="text-[0.9375rem]">模块顺序</h2>
         </div>
         <div class="panel-body">
           <div class="mb-3 grid grid-cols-2 gap-2">
@@ -156,7 +156,7 @@ function moveDown(index: number) {
               <span class="panel-number">{{ item.number }}</span>
               <div class="min-w-0">
                 <div class="truncate text-sm font-black">{{ item.title }}</div>
-                <div class="mt-1 text-[11px] text-[color:var(--muted)]">{{ item.kind }}</div>
+                <div class="mt-1 text-[0.6875rem] text-[color:var(--muted)]">{{ item.kind }}</div>
               </div>
               <div class="text-right text-xs text-[color:var(--muted)]">位置 {{ index + 1 }}</div>
               <div class="order-actions">
@@ -187,7 +187,7 @@ function moveDown(index: number) {
       <section class="panel">
         <div class="panel-header">
           <span class="panel-number">预</span>
-          <h2 class="text-[15px]">配置预览</h2>
+          <h2 class="text-[0.9375rem]">配置预览</h2>
         </div>
         <div class="panel-body">
           <div class="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3">
@@ -204,13 +204,13 @@ function moveDown(index: number) {
               <div
                 v-for="id in orderedIds.slice(0, config.layout === '2x3' ? 6 : 9)"
                 :key="id"
-                class="config-preview-tile grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[11px] font-black"
+                class="config-preview-tile grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[0.6875rem] font-black"
               >
                 <div>
                   <div class="text-sm text-[color:var(--accent-2)]">
                     {{ moduleCatalog.find((item) => item.id === id)?.number }}
                   </div>
-                  <div class="mt-1 max-w-[80px] truncate text-[10px] text-[color:var(--muted)]">
+                  <div class="mt-1 max-w-[5rem] truncate text-[0.625rem] text-[color:var(--muted)]">
                     {{ moduleCatalog.find((item) => item.id === id)?.title }}
                   </div>
                 </div>
@@ -220,7 +220,7 @@ function moveDown(index: number) {
 
           <div class="mt-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-4">
             <div class="text-sm font-black">配置 JSON</div>
-            <pre class="mt-3 max-h-[260px] overflow-auto rounded-xl bg-black/20 p-3 text-[11px] leading-5 text-[color:var(--muted)]">{{ JSON.stringify(
+            <pre class="mt-3 max-h-[16.25rem] overflow-auto rounded-xl bg-black/20 p-3 text-[0.6875rem] leading-5 text-[color:var(--muted)]">{{ JSON.stringify(
               {
                 themeId: config.themeId,
                 layout: config.layout,

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pxToRem } from '@/utils/rem'
 import HologramGauge from '../visual/HologramGauge.vue'
 
 withDefaults(
@@ -13,7 +14,7 @@ withDefaults(
     large?: boolean
   }>(),
   {
-    size: '118px',
+    size: pxToRem(118),
     tone: 'var(--accent)',
     insideLabel: '',
     showFooter: true,

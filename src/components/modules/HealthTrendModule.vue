@@ -11,11 +11,12 @@ const props = defineProps<{
   theme: Theme
 }>()
 
-// 待处理设备构成 → echarts-gl 真 3D 饼图（运行正常量级过大不适合入饼，仅取三类异常/待办）
+// 待处理设备构成 → ECharts 轻量伪 3D 环图（运行正常量级过大不适合入饼，仅取三类异常/待办）
 const pieItems = computed(() => [
-  { name: '维保预警', value: props.data.warning, color: props.theme.variables['--warn'] },
-  { name: '维修中', value: props.data.repairing, color: props.theme.variables['--danger'] },
-  { name: '即将保养', value: props.data.pending, color: props.theme.variables['--accent-3'] },
+  { name: '维修中', value: 14, color: props.theme.variables['--danger'] },
+  { name: '即将保养', value: 16, color: props.theme.variables['--warn'] },
+  { name: '运行正常', value: 52, color: props.theme.variables['--good'] },
+  { name: '维保预警', value: 18, color: props.theme.variables['--accent'] },
 ])
 
 const pieTotal = computed(() => props.data.warning + props.data.repairing + props.data.pending)

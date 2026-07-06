@@ -13,11 +13,9 @@ const themeStyle = computed(() => activeTheme.value.variables)
 const isConfig = computed(() => route.name === 'config')
 
 /** RouterLink 自定义渲染为按钮,点击后失焦避免聚焦残留 */
-function navigateAndBlur(navigate: (e: MouseEvent) => void) {
-  return (e: MouseEvent) => {
-    navigate(e)
-    ;(e.currentTarget as HTMLButtonElement)?.blur()
-  }
+function navigateAndBlur(navigate: (e: MouseEvent) => void, e: MouseEvent) {
+  navigate(e)
+  ;(e.currentTarget as HTMLButtonElement)?.blur()
 }
 </script>
 
@@ -29,7 +27,7 @@ function navigateAndBlur(navigate: (e: MouseEvent) => void) {
           class="app-button"
           :class="{ active: isActive }"
           type="button"
-          @click="navigateAndBlur(navigate)"
+          @click="(e) => navigateAndBlur(navigate, e)"
         >
           <Monitor class="h-4 w-4" />
           大屏
@@ -40,7 +38,7 @@ function navigateAndBlur(navigate: (e: MouseEvent) => void) {
           class="app-button"
           :class="{ active: isActive }"
           type="button"
-          @click="navigateAndBlur(navigate)"
+          @click="(e) => navigateAndBlur(navigate, e)"
         >
           <Settings class="h-4 w-4" />
           配置

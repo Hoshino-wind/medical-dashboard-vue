@@ -26,6 +26,6 @@
   --danger: #ff5e78;
   --chart-grid: rgba(132, 187, 230, 0.2);
   --panel-shadow:
-    0 0 0 1px rgba(0, 168, 255, 0.1), 0 12px 28px rgba(0, 80, 180, 0.16),
-    inset 0 0 22px rgba(16, 127, 255, 0.05);
+    0 0 0 0.0625rem rgba(0, 168, 255, 0.1), 0 0.75rem 1.75rem rgba(0, 80, 180, 0.16),
+    inset 0 0 1.375rem rgba(16, 127, 255, 0.05);
 }
