@@ -23,7 +23,7 @@
 }
 
 .overview-feature-ring::before {
-  content: "";
+  content: '';
   position: absolute;
   display: none;
   left: 50%;
@@ -61,7 +61,7 @@
 
 .overview-stat {
   min-width: 0;
-  min-height: 3.875rem;
+  min-height: 3.5rem;
   border-right: 0.0625rem solid color-mix(in srgb, var(--border) 18%, transparent);
   border-bottom: 0.0625rem solid color-mix(in srgb, var(--border) 18%, transparent);
   background:
@@ -98,14 +98,18 @@
   border: 0.0625rem solid color-mix(in srgb, currentColor 46%, transparent);
   border-radius: 0.5625rem;
   background:
-    radial-gradient(circle at 50% 38%, color-mix(in srgb, currentColor 28%, transparent), transparent 58%),
+    radial-gradient(
+      circle at 50% 38%,
+      color-mix(in srgb, currentColor 28%, transparent),
+      transparent 58%
+    ),
     color-mix(in srgb, var(--surface-strong) 68%, transparent);
   filter: drop-shadow(0 0 0.4375rem color-mix(in srgb, currentColor 54%, transparent));
 }
 
 .overview-stat.span-2 {
   grid-column: span 2;
-  min-height: 3.875rem;
+  min-height: 3.5rem;
   align-items: center;
   border-right: 0;
 }
@@ -162,21 +166,21 @@
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(10.625rem, 1fr) minmax(17.5rem, 20.625rem) minmax(10.625rem, 1fr);
+  grid-template-columns: minmax(7.5rem, 1fr) minmax(13.5rem, 16rem) minmax(7.5rem, 1fr);
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
 .health-side {
   display: grid;
   align-content: center;
-  gap: 0.875rem;
+  gap: 0.625rem;
   min-width: 0;
 }
 
 .health-side .kpi-card {
-  min-height: 4.125rem;
-  padding: 0.625rem 0.75rem;
+  min-height: 3.875rem;
+  padding: 0.5625rem 0.625rem;
 }
 
 .health-side .kpi-card > svg,
@@ -188,13 +192,17 @@
   border: 0.0625rem solid color-mix(in srgb, currentColor 45%, transparent);
   border-radius: 62.4375rem;
   background:
-    radial-gradient(circle at 50% 45%, color-mix(in srgb, currentColor 30%, transparent), transparent 58%),
+    radial-gradient(
+      circle at 50% 45%,
+      color-mix(in srgb, currentColor 30%, transparent),
+      transparent 58%
+    ),
     color-mix(in srgb, var(--surface-strong) 64%, transparent);
   filter: drop-shadow(0 0 0.5rem color-mix(in srgb, currentColor 58%, transparent));
 }
 
 .health-side .text-xl {
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.05;
   white-space: nowrap;
 }
@@ -215,8 +223,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 20rem;
-  min-height: 13.125rem;
+  width: 15.75rem;
+  min-height: 12.25rem;
   transform: translateY(0);
 }
 
@@ -225,8 +233,8 @@
   left: 50%;
   bottom: 0;
   z-index: 0;
-  width: 21.25rem;
-  height: 8.5rem;
+  width: 17.5rem;
+  height: 7.375rem;
   transform: translateX(-50%);
   pointer-events: none;
 }
@@ -234,12 +242,34 @@
 .health-pie-core {
   position: relative;
   z-index: 2;
-  width: 17.625rem;
-  height: 10.375rem;
+  width: 14.625rem;
+  height: 9.25rem;
   transform: translateY(-1.5rem) scale(1.06);
-  filter:
-    drop-shadow(0 0 1rem color-mix(in srgb, var(--accent) 34%, transparent))
-    saturate(1.15);
+  filter: drop-shadow(0 0 1rem color-mix(in srgb, var(--accent) 34%, transparent)) saturate(1.15);
+}
+
+.health-score-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 0.625rem;
+  z-index: 5;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--accent-2) 64%, transparent);
+  border-radius: 0.625rem;
+  background: color-mix(in srgb, var(--surface-strong) 74%, transparent);
+  color: var(--muted);
+  padding: 0.3125rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 850;
+  transform: translateX(-50%);
+}
+
+.health-score-pill b {
+  color: var(--accent-2);
+  font-size: 1rem;
+  font-weight: 950;
 }
 
 .health-pie-heart {
@@ -254,8 +284,7 @@
   border: 0;
   background: transparent;
   color: color-mix(in srgb, var(--accent-2) 74%, white 26%);
-  filter:
-    drop-shadow(0 0 0.3125rem color-mix(in srgb, var(--accent-2) 92%, transparent))
+  filter: drop-shadow(0 0 0.3125rem color-mix(in srgb, var(--accent-2) 92%, transparent))
     drop-shadow(0 0 0.75rem color-mix(in srgb, var(--accent) 48%, transparent));
   pointer-events: none;
   transform: translate(-50%, -50%);
@@ -298,9 +327,28 @@
   height: 6.25rem;
   border: 0.0625rem solid color-mix(in srgb, var(--accent-2) 88%, transparent);
   background:
-    conic-gradient(from 16deg, transparent 0 7%, color-mix(in srgb, white 62%, var(--accent-2) 38%) 8% 10%, transparent 11% 46%, color-mix(in srgb, var(--accent-2) 62%, transparent) 47% 50%, transparent 51% 100%),
-    repeating-radial-gradient(ellipse at center, transparent 0 0.8125rem, color-mix(in srgb, var(--accent-2) 34%, transparent) 0.875rem 0.9375rem, transparent 1rem 1.6875rem),
-    radial-gradient(ellipse at center, transparent 0 34%, color-mix(in srgb, var(--accent) 20%, transparent) 35% 39%, transparent 40% 56%, color-mix(in srgb, var(--accent-2) 36%, transparent) 57% 62%, transparent 63%);
+    conic-gradient(
+      from 16deg,
+      transparent 0 7%,
+      color-mix(in srgb, white 62%, var(--accent-2) 38%) 8% 10%,
+      transparent 11% 46%,
+      color-mix(in srgb, var(--accent-2) 62%, transparent) 47% 50%,
+      transparent 51% 100%
+    ),
+    repeating-radial-gradient(
+      ellipse at center,
+      transparent 0 0.8125rem,
+      color-mix(in srgb, var(--accent-2) 34%, transparent) 0.875rem 0.9375rem,
+      transparent 1rem 1.6875rem
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 0 34%,
+      color-mix(in srgb, var(--accent) 20%, transparent) 35% 39%,
+      transparent 40% 56%,
+      color-mix(in srgb, var(--accent-2) 36%, transparent) 57% 62%,
+      transparent 63%
+    );
   box-shadow:
     0 0 1.5rem color-mix(in srgb, var(--accent-2) 36%, transparent),
     0 0.75rem 1.75rem color-mix(in srgb, var(--accent) 18%, transparent),
@@ -315,9 +363,22 @@
   height: 4rem;
   border: 0.0625rem solid color-mix(in srgb, var(--accent-2) 84%, transparent);
   background:
-    conic-gradient(from -18deg, transparent 0 11%, color-mix(in srgb, white 64%, transparent) 12% 15%, transparent 16% 100%),
-    repeating-conic-gradient(from -12deg, color-mix(in srgb, white 22%, transparent) 0 2deg, transparent 2deg 18deg),
-    radial-gradient(ellipse at center, color-mix(in srgb, var(--accent-2) 26%, transparent), transparent 64%);
+    conic-gradient(
+      from -18deg,
+      transparent 0 11%,
+      color-mix(in srgb, white 64%, transparent) 12% 15%,
+      transparent 16% 100%
+    ),
+    repeating-conic-gradient(
+      from -12deg,
+      color-mix(in srgb, white 22%, transparent) 0 2deg,
+      transparent 2deg 18deg
+    ),
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--accent-2) 26%, transparent),
+      transparent 64%
+    );
   box-shadow:
     0 0 1.375rem color-mix(in srgb, var(--accent-2) 30%, transparent),
     inset 0 0.0625rem 0 color-mix(in srgb, white 28%, transparent),
@@ -327,28 +388,44 @@
 
 .completion-orb {
   position: relative;
-  min-height: 14rem;
+  min-height: 12rem;
   display: grid;
   place-items: center;
   text-align: center;
   transform: translate(-0.0625rem, 0.5rem);
   background:
     radial-gradient(ellipse at 50% 82%, color-mix(in srgb, white 48%, transparent), transparent 7%),
-    linear-gradient(180deg, transparent 6%, color-mix(in srgb, var(--accent-2) 22%, transparent) 42%, color-mix(in srgb, var(--accent) 58%, transparent) 78%, transparent 88%) center 1.75rem / 0.1875rem 10.625rem no-repeat;
+    linear-gradient(
+        180deg,
+        transparent 6%,
+        color-mix(in srgb, var(--accent-2) 22%, transparent) 42%,
+        color-mix(in srgb, var(--accent) 58%, transparent) 78%,
+        transparent 88%
+      )
+      center 1.75rem / 0.1875rem 10.625rem no-repeat;
 }
 
 .completion-orb::before {
-  content: "";
+  content: '';
   position: absolute;
-  width: 20.625rem;
-  height: 8.25rem;
+  width: 14.75rem;
+  height: 6.125rem;
   bottom: -0.25rem;
   border-radius: 50%;
   border: 0.0625rem solid color-mix(in srgb, var(--accent-2) 88%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, white 8%, transparent), transparent 45%),
-    repeating-radial-gradient(ellipse at center, transparent 0 0.875rem, color-mix(in srgb, var(--accent-2) 36%, transparent) 0.9375rem 1rem, transparent 1.0625rem 1.8125rem),
-    radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 34%, transparent), transparent 67%),
+    repeating-radial-gradient(
+      ellipse at center,
+      transparent 0 0.875rem,
+      color-mix(in srgb, var(--accent-2) 36%, transparent) 0.9375rem 1rem,
+      transparent 1.0625rem 1.8125rem
+    ),
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--accent) 34%, transparent),
+      transparent 67%
+    ),
     radial-gradient(ellipse at center, color-mix(in srgb, white 16%, transparent), transparent 42%);
   transform: perspective(16.25rem) rotateX(68deg);
   box-shadow:
@@ -359,18 +436,31 @@
 }
 
 .completion-orb::after {
-  content: "";
+  content: '';
   position: absolute;
-  width: 14.5rem;
-  height: 8.875rem;
-  bottom: 4.375rem;
+  width: 10.75rem;
+  height: 7.25rem;
+  bottom: 3.875rem;
   border-radius: 1.125rem 1.125rem 2.75rem 2.75rem;
   border: 0.0625rem solid color-mix(in srgb, var(--accent) 88%, transparent);
   background:
     radial-gradient(ellipse at top, color-mix(in srgb, white 20%, transparent), transparent 28%),
-    linear-gradient(90deg, transparent 0 12%, color-mix(in srgb, white 10%, transparent) 49% 51%, transparent 88% 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--surface-strong) 16%, transparent)),
-    repeating-linear-gradient(180deg, color-mix(in srgb, white 12%, transparent) 0 0.0625rem, transparent 0.0625rem 0.9375rem);
+    linear-gradient(
+      90deg,
+      transparent 0 12%,
+      color-mix(in srgb, white 10%, transparent) 49% 51%,
+      transparent 88% 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 28%, transparent),
+      color-mix(in srgb, var(--surface-strong) 16%, transparent)
+    ),
+    repeating-linear-gradient(
+      180deg,
+      color-mix(in srgb, white 12%, transparent) 0 0.0625rem,
+      transparent 0.0625rem 0.9375rem
+    );
   opacity: 0.74;
   box-shadow:
     inset 0 0.75rem 1.5rem color-mix(in srgb, white 10%, transparent),
@@ -381,14 +471,23 @@
 .completion-content {
   position: relative;
   z-index: 1;
-  min-width: 13.75rem;
-  padding: 1.25rem 1rem 1.75rem;
+  min-width: 10.75rem;
+  padding: 1rem 0.75rem 1.375rem;
   border: 0.0625rem solid color-mix(in srgb, var(--accent) 90%, transparent);
   border-radius: 1rem 1rem 1.875rem 1.875rem;
   clip-path: polygon(8% 0, 92% 0, 100% 15%, 100% 82%, 88% 100%, 12% 100%, 0 82%, 0 15%);
   background:
-    linear-gradient(90deg, transparent 0 9%, color-mix(in srgb, white 9%, transparent) 50%, transparent 91% 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--surface-strong) 24%, transparent)),
+    linear-gradient(
+      90deg,
+      transparent 0 9%,
+      color-mix(in srgb, white 9%, transparent) 50%,
+      transparent 91% 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) 16%, transparent),
+      color-mix(in srgb, var(--surface-strong) 24%, transparent)
+    ),
     color-mix(in srgb, var(--surface) 36%, transparent);
   box-shadow:
     inset 0 0.0625rem 0 color-mix(in srgb, white 18%, transparent),
@@ -398,12 +497,17 @@
 
 .completion-content::before,
 .completion-content::after {
-  content: "";
+  content: '';
   position: absolute;
   left: 1rem;
   right: 1rem;
   height: 0.0625rem;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent-2) 80%, transparent), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent-2) 80%, transparent),
+    transparent
+  );
   opacity: 0.72;
 }
 
@@ -418,7 +522,7 @@
 .completion-value {
   position: relative;
   z-index: 1;
-  font-size: clamp(2.875rem, 3.45vw, 3.625rem);
+  font-size: clamp(2.375rem, 3vw, 3rem);
   line-height: 0.95;
   font-weight: 950;
   color: var(--accent-2);
@@ -430,7 +534,7 @@
   z-index: 1;
   margin-bottom: 0.375rem;
   color: color-mix(in srgb, var(--text) 86%, transparent);
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-weight: 800;
 }
 
@@ -438,32 +542,36 @@
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(13.125rem, 1fr) minmax(15.625rem, 20rem) minmax(13.125rem, 1fr);
+  grid-template-columns: minmax(8rem, 1fr) minmax(12.5rem, 16rem) minmax(8rem, 1fr);
   align-items: center;
-  gap: 1.125rem;
+  gap: 0.625rem;
 }
 
 .hub-side {
   display: grid;
   align-content: center;
-  gap: 1rem;
+  gap: 0.625rem;
   min-width: 0;
 }
 
 .hub-card {
   display: flex;
-  min-height: 4.25rem;
+  min-height: 3.875rem;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent), color-mix(in srgb, var(--surface-muted) 72%, transparent)),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      color-mix(in srgb, var(--surface-muted) 72%, transparent)
+    ),
     color-mix(in srgb, var(--surface-muted) 70%, transparent);
 }
 
 .hub-number {
   margin-top: 0.4375rem;
   color: var(--text);
-  font-size: 1.1875rem;
+  font-size: 1rem;
   font-weight: 950;
   line-height: 1;
 }

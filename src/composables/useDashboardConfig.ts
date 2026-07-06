@@ -11,8 +11,8 @@ import { useDashboardStore } from '@/stores/dashboard'
  * 使历史代码可平滑迁移,同时保证全局单例语义。
  *
  * @example
- * const { themeId, layout, activeTheme, orderedModules } = useDashboardConfig()
- * const { setTheme, setLayout, moveModule, resetConfig } = useDashboardConfig()
+ * const { themeId, layout, activeTheme, orderedModules, moduleSettings } = useDashboardConfig()
+ * const { setTheme, moveModule, resetConfig, updateFieldLabel } = useDashboardConfig()
  */
 export function useDashboardConfig() {
   const store = useDashboardStore()
@@ -24,6 +24,7 @@ export function useDashboardConfig() {
     themeId: config.value.themeId,
     layout: config.value.layout,
     moduleOrder: config.value.moduleOrder,
+    moduleSettings: config.value.moduleSettings,
     activeTheme,
     orderedModules,
     // actions(直接透传 store 方法)
@@ -31,5 +32,9 @@ export function useDashboardConfig() {
     setLayout: store.setLayout,
     moveModule: store.moveModule,
     resetConfig: store.resetConfig,
+    updateModuleTitle: store.updateModuleTitle,
+    updateModuleSubtitle: store.updateModuleSubtitle,
+    updateFieldLabel: store.updateFieldLabel,
+    toggleField: store.toggleField,
   }
 }

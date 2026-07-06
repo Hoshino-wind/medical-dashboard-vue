@@ -35,7 +35,11 @@ watch(
         </tr>
       </thead>
       <transition-group tag="tbody" name="row-rotate">
-        <tr v-for="(row, index) in displayRows" :key="row[2]" :class="{ 'is-active': index === 0 }">
+        <tr
+          v-for="(row, index) in displayRows"
+          :key="`${row.join('|')}-${index}`"
+          :class="{ 'is-active': index === 0 }"
+        >
           <td v-for="(cell, cellIndex) in row" :key="cellIndex">
             <span v-if="cellIndex === 0" class="table-cell-leading">
               <span class="table-row-icon" :class="rowIconClass(index)">{{ index + 1 }}</span>

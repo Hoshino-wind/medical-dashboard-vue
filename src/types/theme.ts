@@ -1,8 +1,10 @@
 /** 主题标识 */
-export type ThemeId = 'light-medical' | 'deep-blue' | 'aurora-purple' | 'teal-future'
+export type ThemeId =
+  'clinical-command' | 'light-medical' | 'deep-blue' | 'aurora-purple' | 'teal-future'
 
 /** 全部主题 ID 常量,可用于遍历或校验 */
 export const THEME_IDS: ThemeId[] = [
+  'clinical-command',
   'light-medical',
   'deep-blue',
   'aurora-purple',

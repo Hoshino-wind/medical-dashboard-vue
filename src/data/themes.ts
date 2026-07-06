@@ -3,6 +3,31 @@ import { pxToRem } from '@/utils/rem'
 
 export const themes: Theme[] = [
   {
+    id: 'clinical-command',
+    name: '医疗运维指挥',
+    description: '深色中性底，强调告警、工单和设备状态',
+    preview: ['#07100f', '#18d5c4', '#f5b642'],
+    variables: {
+      '--bg': '#06100f',
+      '--bg-soft': '#111827',
+      '--surface': 'rgba(11, 24, 26, 0.86)',
+      '--surface-strong': 'rgba(17, 32, 38, 0.94)',
+      '--surface-muted': 'rgba(23, 45, 48, 0.68)',
+      '--border': 'rgba(56, 189, 178, 0.28)',
+      '--border-strong': 'rgba(47, 235, 210, 0.7)',
+      '--text': '#effcf9',
+      '--muted': '#93aaa8',
+      '--accent': '#18d5c4',
+      '--accent-2': '#6ee7b7',
+      '--accent-3': '#9a7cff',
+      '--good': '#40d98a',
+      '--warn': '#f5b642',
+      '--danger': '#ff5d73',
+      '--chart-grid': 'rgba(160, 196, 190, 0.16)',
+      '--panel-shadow': `0 0 0 ${pxToRem(1)} rgba(24, 213, 196, 0.08), 0 ${pxToRem(14)} ${pxToRem(32)} rgba(0, 0, 0, 0.22), inset 0 0 ${pxToRem(24)} rgba(24, 213, 196, 0.045)`,
+    },
+  },
+  {
     id: 'light-medical',
     name: '浅蓝医疗',
     description: '清爽、明亮，适合日常科室展示',
@@ -49,8 +74,7 @@ export const themes: Theme[] = [
       '--warn': '#ffc857',
       '--danger': '#ff5e78',
       '--chart-grid': 'rgba(132, 187, 230, 0.2)',
-      '--panel-shadow':
-        `0 0 0 ${pxToRem(1)} rgba(0, 168, 255, 0.1), 0 ${pxToRem(12)} ${pxToRem(28)} rgba(0, 80, 180, 0.16), inset 0 0 ${pxToRem(22)} rgba(16, 127, 255, 0.05)`,
+      '--panel-shadow': `0 0 0 ${pxToRem(1)} rgba(0, 168, 255, 0.1), 0 ${pxToRem(12)} ${pxToRem(28)} rgba(0, 80, 180, 0.16), inset 0 0 ${pxToRem(22)} rgba(16, 127, 255, 0.05)`,
     },
   },
   {

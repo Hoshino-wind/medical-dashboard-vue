@@ -14,7 +14,7 @@
 
 ```json
 {
-  "themeId": "deep-blue",
+  "themeId": "clinical-command",
   "layout": "3x3",
   "moduleOrder": [
     "overview",
@@ -26,7 +26,13 @@
     "ultrasound",
     "healthTrend",
     "inspectionStats"
-  ]
+  ],
+  "moduleSettings": {
+    "overview": {
+      "title": "设备总览",
+      "fields": [{ "key": "total", "label": "设备总数", "visible": true, "unit": "台" }]
+    }
+  }
 }
 ```
 
@@ -38,11 +44,24 @@
 
 字段说明：
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| themeId | string | 主题 ID |
-| layout | string | `2x3` 或 `3x3` |
-| moduleOrder | string[] | 9 个模块 ID 的排序 |
+| 字段           | 类型     | 说明                             |
+| -------------- | -------- | -------------------------------- |
+| themeId        | string   | 主题 ID                          |
+| layout         | string   | 固定为 `3x3`                     |
+| moduleOrder    | string[] | 9 个模块 ID 的排序               |
+| moduleSettings | object   | 每个模块的标题、副标题和字段配置 |
+
+`moduleSettings` 说明：
+
+| 字段             | 类型    | 说明                             |
+| ---------------- | ------- | -------------------------------- |
+| title            | string  | 模块标题                         |
+| subtitle         | string  | 模块副标题，可为空               |
+| fields           | array   | 字段配置列表                     |
+| fields[].key     | string  | 字段稳定标识，由前端模块映射使用 |
+| fields[].label   | string  | 展示名称，可配置                 |
+| fields[].visible | boolean | 是否展示该字段                   |
+| fields[].unit    | string  | 展示单位，可为空                 |
 
 ## 展示数据接口
 
@@ -78,21 +97,13 @@
     "finished": 1411,
     "waiting": 71,
     "overdue": 12,
-    "rows": [
-      ["临床药学组", "微量分析天平", "29天", "刘民华"]
-    ]
+    "rows": [["临床药学组", "微量分析天平", "29天", "刘民华"]]
   },
-  "lifeSupport": [
-    { "name": "心电图机", "value": 92.6, "count": 68 }
-  ],
-  "ultrasound": [
-    { "name": "感染科重症监护", "value": 100, "count": 1 }
-  ],
+  "lifeSupport": [{ "name": "心电图机", "value": 92.6, "count": 68 }],
+  "ultrasound": [{ "name": "感染科重症监护", "value": 100, "count": 1 }],
   "repairStats": {
     "labels": ["06-26", "06-27"],
-    "series": [
-      { "name": "全保", "data": [0, 187] }
-    ]
+    "series": [{ "name": "全保", "data": [0, 187] }]
   },
   "maintenanceStats": {
     "labels": ["06-26", "06-27"],
@@ -114,10 +125,10 @@
 
 ## 前端替换位置
 
-- mock 数据：`src/data/dashboard.js`
-- 配置保存：`src/composables/useDashboardConfig.js`
+- mock 数据：`src/data/mock/dashboardData.ts`
+- 配置保存：`src/stores/dashboard.ts`
 - 图表组件：`src/components/modules/ChartModule.vue`
-- 模块渲染入口：`src/components/ModuleRenderer.vue`
+- 模块渲染入口：`src/components/shared/ModuleRenderer.vue`
 
 ## 状态约定
 

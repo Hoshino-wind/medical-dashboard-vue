@@ -9,10 +9,17 @@ defineProps<{
   type: string
   data: BarChartData | LineChartData
   theme: Theme
+  metricLabel?: string
 }>()
 </script>
 
 <template>
   <CubeBarChart v-if="type === 'bar'" :data="data as BarChartData" :theme="theme" />
-  <LineAreaChart v-else :data="data as LineChartData" :theme="theme" :variant="type" />
+  <LineAreaChart
+    v-else
+    :data="data as LineChartData"
+    :theme="theme"
+    :variant="type"
+    :metric-label="metricLabel"
+  />
 </template>

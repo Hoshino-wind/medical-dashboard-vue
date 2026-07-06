@@ -5,9 +5,9 @@ Vue 3 + Vite + Tailwind CSS + ECharts 实现的医疗设备全场景智慧管理
 ## 已实现
 
 - 9 个大屏模块组件化
-- 4 套主题：浅蓝医疗、深蓝科技、紫色渐变、蓝绿未来
-- 3x3 / 2x3 布局切换
-- 配置页模块拖拽排序
+- 5 套主题：医疗运维指挥、浅蓝医疗、深蓝科技、紫色渐变、蓝绿未来
+- 固定 3x3 九模块大屏
+- 配置页模块拖拽排序、标题配置、字段配置
 - 配置本地保存和发布演示
 - ECharts 图表主题适配
 - mock 数据驱动
@@ -49,7 +49,7 @@ docs/
 
 ```json
 {
-  "themeId": "deep-blue",
+  "themeId": "clinical-command",
   "layout": "3x3",
   "moduleOrder": [
     "overview",
@@ -61,8 +61,14 @@ docs/
     "ultrasound",
     "healthTrend",
     "inspectionStats"
-  ]
+  ],
+  "moduleSettings": {
+    "overview": {
+      "title": "设备总览",
+      "fields": [{ "key": "total", "label": "设备总数", "visible": true, "unit": "台" }]
+    }
+  }
 }
 ```
 
-当前版本使用 `localStorage` 模拟保存，接真实后端时替换 `src/composables/useDashboardConfig.js` 中的读写逻辑即可。
+当前版本使用 `localStorage` 模拟保存，配置状态由 `src/stores/dashboard.ts` 托管；接真实后端时替换 store 中的读写逻辑即可。

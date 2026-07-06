@@ -11,9 +11,11 @@ const props = withDefaults(
     data: LineChartData
     theme: Theme
     variant?: string
+    metricLabel?: string
   }>(),
   {
     variant: 'maintenance',
+    metricLabel: '数量',
   },
 )
 
@@ -56,6 +58,7 @@ const option = computed(() => {
     },
     series: [
       {
+        name: props.metricLabel,
         data: props.data.data,
         type: 'line',
         smooth: true,
