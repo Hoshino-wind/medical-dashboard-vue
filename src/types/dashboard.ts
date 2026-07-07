@@ -70,15 +70,7 @@ export interface HealthTrendData {
   repairing: number
   pending: number
   score: number
-}
-
-/** 底部 KPI 指标 */
-export interface FooterMetric {
-  label: string
-  value: string
-  unit: string
-  /** 预留图标 key,用于需要展示 KPI 内容的场景 */
-  icon: string
+  rows: string[][]
 }
 
 /** 大屏全量数据聚合 */
@@ -93,5 +85,4 @@ export interface DashboardData {
   maintenanceStats: LineChartData
   inspectionStats: LineChartData
   healthTrend: HealthTrendData
-  footerMetrics: FooterMetric[]
 }

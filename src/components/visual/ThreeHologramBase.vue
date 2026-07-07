@@ -98,9 +98,9 @@ function makeGradientTexture(
   ctx.fillRect(0, 0, size, size)
 
   const gloss = ctx.createLinearGradient(0, 0, 0, size)
-  gloss.addColorStop(0, 'rgba(255,255,255,0.34)')
-  gloss.addColorStop(0.22, 'rgba(255,255,255,0.1)')
-  gloss.addColorStop(0.56, 'rgba(255,255,255,0)')
+  gloss.addColorStop(0, rgba(inner, 0.18))
+  gloss.addColorStop(0.22, rgba(inner, 0.06))
+  gloss.addColorStop(0.56, rgba(inner, 0))
   gloss.addColorStop(1, 'rgba(0,0,0,0.22)')
   ctx.fillStyle = gloss
   ctx.fillRect(0, 0, size, size)
@@ -218,9 +218,9 @@ function makeGlowTexture(color: THREE.Color): THREE.CanvasTexture {
 
   const rgb = `${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)}`
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  gradient.addColorStop(0, 'rgba(255,255,255,0.86)')
-  gradient.addColorStop(0.18, `rgba(${rgb},0.72)`)
-  gradient.addColorStop(0.54, `rgba(${rgb},0.24)`)
+  gradient.addColorStop(0, `rgba(${rgb},0.74)`)
+  gradient.addColorStop(0.18, `rgba(${rgb},0.54)`)
+  gradient.addColorStop(0.54, `rgba(${rgb},0.2)`)
   gradient.addColorStop(1, `rgba(${rgb},0)`)
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, size, size)

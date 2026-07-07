@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import {
-  ChevronDown,
-  ChevronUp,
-  GripVertical,
-  RotateCcw,
-  Save,
-  SlidersHorizontal,
-  SwatchBook,
-} from 'lucide-vue-next'
+import { ChevronDown, ChevronUp, GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from 'lucide-vue-next'
 import { moduleCatalog } from '@/data/modules'
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
-import type { FieldConfig } from '@/types/config'
+import type { LayoutType } from '@/types/config'
 import type { ThemeId } from '@/types/theme'
 
 const store = useDashboardStore()
@@ -22,21 +14,8 @@ const { config, orderedModules, activeTheme } = storeToRefs(store)
 const draggingIndex = ref<number | null>(null)
 const dragOverIndex = ref<number | null>(null)
 const savedAt = ref('')
-const selectedModuleId = ref(moduleCatalog[0]?.id ?? '')
 
 const orderedIds = computed(() => orderedModules.value.map((item) => item.id))
-const selectedModule = computed(
-  () =>
-    orderedModules.value.find((item) => item.id === selectedModuleId.value) ??
-    orderedModules.value[0],
-)
-const selectedSettings = computed(() =>
-  selectedModule.value ? config.value.moduleSettings[selectedModule.value.id] : undefined,
-)
-
-function selectModule(id: string) {
-  selectedModuleId.value = id
-}
 
 function onDragStart(index: number) {
   draggingIndex.value = index
@@ -80,30 +59,14 @@ function moveDown(index: number) {
   if (index >= orderedModules.value.length - 1) return
   store.moveModule(index, index + 1)
 }
-
-function inputValue(event: Event): string {
-  return (event.target as HTMLInputElement).value
-}
-
-function updateField(field: FieldConfig, event: Event) {
-  if (!selectedModule.value) return
-  store.updateFieldLabel(selectedModule.value.id, field.key, inputValue(event))
-}
-
-function toggleField(field: FieldConfig, event: Event) {
-  if (!selectedModule.value) return
-  store.toggleField(selectedModule.value.id, field.key, (event.target as HTMLInputElement).checked)
-}
 </script>
 
 <template>
   <main class="screen-frame">
-    <div class="config-topbar">
+    <div class="mb-4 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-black">大屏配置</h1>
-        <div class="mt-1 text-sm text-[color:var(--muted)]">
-          固定九模块，支持主题、顺序、标题与字段配置
-        </div>
+        <div class="mt-1 text-sm text-[color:var(--muted)]">主题、布局、模块顺序(自动持久化)</div>
       </div>
       <div class="flex gap-2">
         <button class="app-button" @click="store.resetConfig()">
@@ -117,7 +80,7 @@ function toggleField(field: FieldConfig, event: Event) {
       </div>
     </div>
 
-    <div class="config-workspace">
+    <div class="grid grid-cols-[22.5rem_1fr_22.5rem] gap-4 max-[73.75rem]:grid-cols-1">
       <section class="panel">
         <div class="panel-header">
           <span class="panel-number"><SwatchBook class="h-4 w-4" /></span>
@@ -152,11 +115,26 @@ function toggleField(field: FieldConfig, event: Event) {
       <section class="panel">
         <div class="panel-header">
           <span class="panel-number"><GripVertical class="h-4 w-4" /></span>
-          <h2 class="text-[0.9375rem]">九模块顺序</h2>
+          <h2 class="text-[0.9375rem]">模块顺序</h2>
         </div>
         <div class="panel-body">
-          <div class="config-note">
-            当前大屏固定显示 9 个模块。拖拽或点击箭头调整位置，点击模块可编辑字段。
+          <div class="mb-3 grid grid-cols-2 gap-2">
+            <button
+              class="app-button"
+              :class="{ active: config.layout === '2x3' }"
+              @click="store.setLayout('2x3' as LayoutType)"
+            >
+              <LayoutGrid class="h-4 w-4" />
+              2行3列
+            </button>
+            <button
+              class="app-button"
+              :class="{ active: config.layout === '3x3' }"
+              @click="store.setLayout('3x3' as LayoutType)"
+            >
+              <LayoutGrid class="h-4 w-4" />
+              3行3列
+            </button>
           </div>
           <div class="grid gap-2">
             <div
@@ -164,12 +142,10 @@ function toggleField(field: FieldConfig, event: Event) {
               :key="item.id"
               class="drag-row"
               :class="{
-                active: selectedModule?.id === item.id,
                 dragging: draggingIndex === index,
                 'drag-over': dragOverIndex === index && draggingIndex !== index,
               }"
               draggable="true"
-              @click="selectModule(item.id)"
               @dragstart="onDragStart(index)"
               @dragenter="onDragEnter(index)"
               @dragover.prevent
@@ -180,9 +156,7 @@ function toggleField(field: FieldConfig, event: Event) {
               <span class="panel-number">{{ item.number }}</span>
               <div class="min-w-0">
                 <div class="truncate text-sm font-black">{{ item.title }}</div>
-                <div class="mt-1 text-[0.6875rem] text-[color:var(--muted)]">
-                  {{ item.kind }} · {{ item.size }}
-                </div>
+                <div class="mt-1 text-[0.6875rem] text-[color:var(--muted)]">{{ item.kind }}</div>
               </div>
               <div class="text-right text-xs text-[color:var(--muted)]">位置 {{ index + 1 }}</div>
               <div class="order-actions">
@@ -212,68 +186,23 @@ function toggleField(field: FieldConfig, event: Event) {
 
       <section class="panel">
         <div class="panel-header">
-          <span class="panel-number"><SlidersHorizontal class="h-4 w-4" /></span>
-          <h2 class="text-[0.9375rem]">字段配置</h2>
+          <span class="panel-number">预</span>
+          <h2 class="text-[0.9375rem]">配置预览</h2>
         </div>
-        <div v-if="selectedModule && selectedSettings" class="panel-body">
-          <div class="field-editor-head">
-            <span class="panel-number">{{ selectedModule.number }}</span>
-            <div class="min-w-0">
-              <div class="truncate text-sm font-black">{{ selectedModule.title }}</div>
-              <div class="mt-1 text-xs text-[color:var(--muted)]">{{ selectedModule.id }}</div>
-            </div>
-          </div>
-
-          <label class="config-label" :for="`${selectedModule.id}-title`">模块标题</label>
-          <input
-            :id="`${selectedModule.id}-title`"
-            class="config-input"
-            :value="selectedSettings.title"
-            @input="store.updateModuleTitle(selectedModule.id, inputValue($event))"
-          />
-
-          <label class="config-label" :for="`${selectedModule.id}-subtitle`">副标题</label>
-          <input
-            :id="`${selectedModule.id}-subtitle`"
-            class="config-input"
-            :value="selectedSettings.subtitle ?? ''"
-            placeholder="可留空"
-            @input="store.updateModuleSubtitle(selectedModule.id, inputValue($event))"
-          />
-
-          <div class="field-list">
-            <label v-for="field in selectedSettings.fields" :key="field.key" class="field-row">
-              <input
-                class="field-toggle"
-                type="checkbox"
-                :checked="field.visible"
-                @change="toggleField(field, $event)"
-              />
-              <div class="min-w-0">
-                <div class="field-key">{{ field.key }}</div>
-                <input
-                  class="config-input compact"
-                  :value="field.label"
-                  @input="updateField(field, $event)"
-                />
-              </div>
-              <span class="field-unit">{{ field.unit }}</span>
-            </label>
-          </div>
-
-          <div class="config-preview-card">
+        <div class="panel-body">
+          <div class="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3">
             <div class="mb-3 flex items-center justify-between">
               <div>
                 <div class="text-sm font-black">{{ activeTheme.name }}</div>
-                <div class="text-xs text-[color:var(--muted)]">九模块 · {{ config.layout }}</div>
+                <div class="text-xs text-[color:var(--muted)]">{{ config.layout }}</div>
               </div>
               <div class="text-xs text-[color:var(--good)]">
-                {{ savedAt ? `已发布 ${savedAt}` : '自动保存中' }}
+                {{ savedAt ? `已发布 ${savedAt}` : '未发布' }}
               </div>
             </div>
             <div class="grid grid-cols-3 gap-2">
               <div
-                v-for="id in orderedIds"
+                v-for="id in orderedIds.slice(0, config.layout === '2x3' ? 6 : 9)"
                 :key="id"
                 class="config-preview-tile grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[0.6875rem] font-black"
               >
@@ -282,11 +211,24 @@ function toggleField(field: FieldConfig, event: Event) {
                     {{ moduleCatalog.find((item) => item.id === id)?.number }}
                   </div>
                   <div class="mt-1 max-w-[5rem] truncate text-[0.625rem] text-[color:var(--muted)]">
-                    {{ config.moduleSettings[id]?.title }}
+                    {{ moduleCatalog.find((item) => item.id === id)?.title }}
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div class="mt-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-4">
+            <div class="text-sm font-black">配置 JSON</div>
+            <pre class="mt-3 max-h-[16.25rem] overflow-auto rounded-xl bg-black/20 p-3 text-[0.6875rem] leading-5 text-[color:var(--muted)]">{{ JSON.stringify(
+              {
+                themeId: config.themeId,
+                layout: config.layout,
+                moduleOrder: orderedIds,
+              },
+              null,
+              2,
+            ) }}</pre>
           </div>
         </div>
       </section>

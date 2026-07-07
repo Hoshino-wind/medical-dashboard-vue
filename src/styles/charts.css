@@ -18,7 +18,6 @@
   font-size: 0.75rem;
   font-weight: 800;
   line-height: 1;
-  text-shadow: 0 0 0.5rem rgba(132, 210, 255, 0.42);
   pointer-events: none;
 }
 
@@ -33,22 +32,21 @@
   width: 0.625rem;
   height: 0.625rem;
   border-radius: 0.125rem;
-  box-shadow: 0 0 0.5rem currentColor;
 }
 
 .cube-bar-legend .is-all {
-  color: #3b7cff;
-  background: linear-gradient(135deg, #4e86ff, #2e66ff);
+  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 75%, #000));
 }
 
 .cube-bar-legend .is-onsite {
-  color: #8b5cff;
-  background: linear-gradient(135deg, #a374ff, #7b49ff);
+  color: var(--accent-3);
+  background: linear-gradient(135deg, var(--accent-3), color-mix(in srgb, var(--accent-3) 75%, #000));
 }
 
 .cube-bar-legend .is-factory {
-  color: #22d9df;
-  background: linear-gradient(135deg, #28edf2, #10b9c9);
+  color: var(--accent-2);
+  background: linear-gradient(135deg, var(--accent-2), color-mix(in srgb, var(--accent-2) 75%, #000));
 }
 
 .chart-bar {
@@ -74,7 +72,6 @@
   z-index: 1;
   height: 31%;
   pointer-events: none;
-  filter: drop-shadow(0 0 0.6875rem color-mix(in srgb, var(--accent-2) 52%, transparent));
 }
 
 .cube-bar-base-top {
@@ -89,9 +86,7 @@
     linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 48%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
   border-top: 0.0625rem solid color-mix(in srgb, var(--accent-2) 78%, transparent);
   border-bottom: 0.0625rem solid color-mix(in srgb, var(--accent) 38%, transparent);
-  box-shadow:
-    inset 0 0.0625rem 0 color-mix(in srgb, white 30%, transparent),
-    0 0 1rem color-mix(in srgb, var(--accent-2) 38%, transparent);
+  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--accent-2) 18%, transparent);
 }
 
 .cube-bar-base-front {
@@ -122,15 +117,81 @@
   font-weight: 900;
   line-height: 1;
   text-align: center;
-  text-shadow:
-    0 0 0.25rem rgba(0, 0, 0, 0.92),
-    0 0 0.5rem color-mix(in srgb, var(--accent-2) 34%, transparent);
 }
 
 .chart-maintenance {
-  transform: translate(-0.5rem, 0.75rem);
+  transform: none;
 }
 
 .chart-inspection {
-  transform: translate(1.1875rem, 0.375rem);
+  transform: none;
+}
+
+.line-chart-module {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) 2.25rem;
+  gap: 0.25rem;
+}
+
+.line-chart-body {
+  min-height: 0;
+}
+
+.line-chart-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 0.0625rem solid color-mix(in srgb, var(--border) 34%, transparent);
+  color: var(--muted);
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+}
+
+.line-chart-footer > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.line-chart-footer > div:first-child {
+  border-right: 0.0625rem solid color-mix(in srgb, var(--border) 24%, transparent);
+}
+
+.line-chart-footer span {
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.line-chart-footer b {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 950;
+  font-style: normal;
+}
+
+.line-chart-footer em {
+  font-size: 0.6875rem;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.line-chart-trend strong {
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.line-chart-trend.is-up b,
+.line-chart-trend.is-up strong {
+  color: var(--good);
+}
+
+.line-chart-trend.is-down b,
+.line-chart-trend.is-down strong {
+  color: var(--good);
 }

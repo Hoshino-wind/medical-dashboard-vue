@@ -74,13 +74,11 @@ export const dashboardData: DashboardData = {
     repairing: 44,
     pending: 102,
     score: 96.8,
+    rows: [
+      ['全院设备', '运行正常', '15,744台', '稳定'],
+      ['生命支持设备', '维保预警', '68台', '需排查'],
+      ['普通诊疗设备', '维修中', '44台', '处理中'],
+      ['重点科室设备', '即将保养', '102台', '待安排'],
+    ],
   },
-  footerMetrics: [
-    { label: '重点设备数', value: '2,350', unit: '台', icon: 'bag' },
-    { label: '设备故障率', value: '0.26', unit: '%', icon: 'wrench' },
-    { label: '平均响应时长', value: '1.2', unit: '小时', icon: 'clock' },
-    { label: '平均修复时长', value: '5.6', unit: '小时', icon: 'tool' },
-    { label: '设备生命周期利用率', value: '87.4', unit: '%', icon: 'timer' },
-    { label: '年度节约费用', value: '¥2,438,760', unit: '', icon: 'bank' },
-  ],
 }

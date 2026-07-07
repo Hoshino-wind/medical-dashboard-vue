@@ -1,14 +1,20 @@
 /** 主题标识 */
 export type ThemeId =
-  'clinical-command' | 'light-medical' | 'deep-blue' | 'aurora-purple' | 'teal-future'
+  | 'light-medical'
+  | 'deep-sea-instrument'
+  | 'ink-blue-medical'
+  | 'midnight-violet'
+  | 'black-gold-blue'
+  | 'light-blue'
 
 /** 全部主题 ID 常量,可用于遍历或校验 */
 export const THEME_IDS: ThemeId[] = [
-  'clinical-command',
   'light-medical',
-  'deep-blue',
-  'aurora-purple',
-  'teal-future',
+  'deep-sea-instrument',
+  'ink-blue-medical',
+  'midnight-violet',
+  'black-gold-blue',
+  'light-blue',
 ]
 
 /**

@@ -36,18 +36,8 @@ withDefaults(
   min-height: calc(var(--gauge-size, 6.625rem) * 1.16);
 }
 
-.availability-metric-ring :deep(.hologram-gauge-base) {
-  top: calc(var(--gauge-size, 6.625rem) * 0.68);
-  width: calc(var(--gauge-size, 6.625rem) * 1.58);
-  height: calc(var(--gauge-size, 6.625rem) * 0.32);
-}
-
 .availability-metric-ring :deep(.hologram-gauge-ring) {
   transform: translateY(-0.125rem);
-}
-
-.availability-metric-ring :deep(.hologram-gauge-content) {
-  top: -0.375rem;
 }
 
 .availability-metric-ring :deep(.hologram-gauge-footer) {

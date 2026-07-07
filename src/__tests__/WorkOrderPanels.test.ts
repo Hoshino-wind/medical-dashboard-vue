@@ -1,0 +1,92 @@
+import { mount } from '@vue/test-utils'
+import { describe, expect, it } from 'vitest'
+import CompletionModule from '@/components/modules/CompletionModule.vue'
+import HealthTrendModule from '@/components/modules/HealthTrendModule.vue'
+import { themes } from '@/data/themes'
+
+const CountUpStub = {
+  props: ['value'],
+  template: '<span>{{ value }}</span>',
+}
+
+const PieStub = {
+  props: ['items', 'total', 'tone'],
+  template: '<div class="pie-stub" data-test="pie-chart">{{ total }}</div>',
+}
+
+describe('work order style panels', () => {
+  it('renders inspection orders as a compact detail list plus full-width bottom status summary', () => {
+    const wrapper = mount(CompletionModule, {
+      props: {
+        data: {
+          rate: 95.2,
+          total: 1482,
+          finished: 1411,
+          waiting: 71,
+          overdue: 12,
+          rows: [
+            ['血液科层流病房', '不锈钢床头柜', '25天', '叶茂永'],
+            ['血液科层流病房', '病房对讲机', '25天', '叶茂永'],
+          ],
+        },
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+          Pie3D: PieStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('.inspection-order-grid').exists()).toBe(true)
+    expect(wrapper.find('.inspection-order-table').exists()).toBe(true)
+    expect(wrapper.find('.inspection-pie-panel').exists()).toBe(true)
+    expect(wrapper.find('.inspection-status-summary').exists()).toBe(true)
+    expect(wrapper.find('.inspection-pie-panel .inspection-status-summary').exists()).toBe(false)
+    expect(wrapper.text()).toContain('血液科层流病房')
+    expect(wrapper.text()).toContain('本月巡检完成率')
+    expect(wrapper.text()).toContain('总数1482单')
+    expect(wrapper.text()).toContain('已完成1411单')
+    expect(wrapper.text()).toContain('待巡检71单')
+    expect(wrapper.text()).toContain('逾期未检12单')
+    expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
+  })
+
+  it('renders health trend as a compact status list plus full-width bottom status summary', () => {
+    const wrapper = mount(HealthTrendModule, {
+      props: {
+        theme: themes[1],
+        data: {
+          online: 15744,
+          warning: 68,
+          repairing: 44,
+          pending: 102,
+          score: 96.8,
+          rows: [
+            ['运行正常', '生命支持设备', '15,744台', '稳定'],
+            ['维保预警', '呼吸机/监护仪', '68台', '需排查'],
+          ],
+        },
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+          HealthPieChart: PieStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('.health-status-grid').exists()).toBe(true)
+    expect(wrapper.find('.health-status-table').exists()).toBe(true)
+    expect(wrapper.find('.health-pie-panel').exists()).toBe(true)
+    expect(wrapper.find('.health-status-summary').exists()).toBe(true)
+    expect(wrapper.find('.health-pie-panel .health-status-summary').exists()).toBe(false)
+    expect(wrapper.text()).toContain('生命支持设备')
+    expect(wrapper.text()).toContain('设备健康态势')
+    expect(wrapper.text()).toContain('运行正常15744台')
+    expect(wrapper.text()).toContain('维保预警68台')
+    expect(wrapper.text()).toContain('维修中44台')
+    expect(wrapper.text()).toContain('即将保养102台')
+    expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
+  })
+})

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { buildPie3DSegments, type Pie3DInputItem, type Pie3DSegment } from '@/utils/pie3dSegments'
 import { pxToRem } from '@/utils/rem'
+import type { Theme } from '@/types/theme'
 
 const TAU = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
@@ -16,6 +17,11 @@ const props = withDefaults(
     items: Pie3DInputItem[]
     height?: string
     thickness?: number
+    theme?: Theme
+    tone?: string
+    accent?: string
+    surface?: string
+    text?: string
   }>(),
   {
     height: pxToRem(150),
@@ -48,6 +54,15 @@ const tooltip = reactive({
 
 const tooltipStyle = computed(() => ({
   transform: `translate(${pxToRem(tooltip.x)}, ${pxToRem(tooltip.y)})`,
+}))
+
+const shellStyle = computed(() => ({
+  height: props.height,
+  '--pie-tone': props.tone ?? props.theme?.variables['--accent'] ?? 'var(--accent)',
+  '--pie-accent': props.accent ?? props.theme?.variables['--accent-2'] ?? 'var(--accent-2)',
+  '--pie-surface':
+    props.surface ?? props.theme?.variables['--surface-strong'] ?? 'var(--surface-strong)',
+  '--pie-text': props.text ?? props.theme?.variables['--text'] ?? 'var(--text)',
 }))
 
 let renderer: THREE.WebGLRenderer | null = null
@@ -89,12 +104,31 @@ function disposeScene() {
   segmentMeshes = []
 }
 
-function resolveColor(value: string, fallback = '#20f1d4'): THREE.Color {
+function resolveColor(value: string, fallback = '#000000'): THREE.Color {
+  const rgb = value
+    .trim()
+    .match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)/i)
+  if (rgb) {
+    return new THREE.Color(Number(rgb[1]) / 255, Number(rgb[2]) / 255, Number(rgb[3]) / 255)
+  }
+
   try {
     return new THREE.Color(value)
   } catch {
     return new THREE.Color(fallback)
   }
+}
+
+function cssVariableName(value: string): string | null {
+  return value.match(/^var\((--[\w-]+)/)?.[1] ?? null
+}
+
+function runtimeColor(value: string | undefined, token: keyof Theme['variables'], fallback: string): string {
+  if (value && !cssVariableName(value)) return value
+  if (props.theme?.variables[token]) return props.theme.variables[token]
+  const variableName = value ? cssVariableName(value) : token
+  if (!variableName || !host.value) return fallback
+  return getComputedStyle(host.value).getPropertyValue(variableName).trim() || fallback
 }
 
 function makeAnnularSectorGeometry(start: number, end: number, depth: number): THREE.ExtrudeGeometry {
@@ -155,7 +189,7 @@ function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): TH
   const edges = new THREE.LineSegments(
     edgeGeometry,
     new THREE.LineBasicMaterial({
-      color: '#ffffff',
+      color: rimColor,
       transparent: true,
       opacity: 0.18,
     }),
@@ -179,12 +213,12 @@ function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): TH
   return group
 }
 
-function makeCenterCap(depth: number): THREE.Mesh {
+function makeCenterCap(depth: number, toneColor: THREE.Color, accentColor: THREE.Color, surfaceColor: THREE.Color): THREE.Mesh {
   const geometry = new THREE.CylinderGeometry(INNER_RADIUS * 0.82, INNER_RADIUS * 0.9, depth * 0.92, 96)
   geometry.rotateX(Math.PI / 2)
   const material = new THREE.MeshStandardMaterial({
-    color: '#123e63',
-    emissive: '#0a8fb7',
+    color: surfaceColor.clone().lerp(toneColor, 0.34),
+    emissive: accentColor.clone().multiplyScalar(0.72),
     emissiveIntensity: 0.28,
     metalness: 0.34,
     roughness: 0.28,
@@ -196,55 +230,44 @@ function makeCenterCap(depth: number): THREE.Mesh {
   return mesh
 }
 
-function makeFloorShadow(depth: number): THREE.Mesh {
-  const geometry = new THREE.CircleGeometry(1.18, 128)
-  const material = new THREE.MeshBasicMaterial({
-    color: '#20f1d4',
-    transparent: true,
-    opacity: 0.09,
-    depthWrite: false,
-  })
-  const shadow = new THREE.Mesh(geometry, material)
-  shadow.position.z = -depth / 2 - 0.055
-  shadow.scale.set(1.24, 0.62, 1)
-  return shadow
-}
-
 function buildScene() {
   disposeScene()
 
   const depth = pieDepth()
   const segments = buildPie3DSegments(props.items)
   const gap = segments.length > 1 ? 0.014 : 0
+  const toneColor = resolveColor(runtimeColor(props.tone, '--accent', '#000000'))
+  const accentColor = resolveColor(runtimeColor(props.accent, '--accent-2', '#000000'))
+  const surfaceColor = resolveColor(runtimeColor(props.surface, '--surface-strong', '#000000'))
+  const mutedColor = resolveColor(runtimeColor(undefined, '--surface-muted', '#000000'))
 
   scene = new THREE.Scene()
   camera = new THREE.OrthographicCamera(-1.6, 1.6, 1.05, -1.05, 0.1, 20)
   camera.position.set(0, -2.65, 2.05)
   camera.lookAt(0, 0, 0)
 
-  scene.add(new THREE.AmbientLight('#ffffff', 1.25))
+  scene.add(new THREE.AmbientLight(toneColor.clone().offsetHSL(0, 0, 0.1), 1.05))
 
-  const keyLight = new THREE.DirectionalLight('#ffffff', 2.4)
+  const keyLight = new THREE.DirectionalLight(toneColor.clone().offsetHSL(0, 0.03, 0.16), 2.1)
   keyLight.position.set(-1.5, -2.6, 3.2)
   scene.add(keyLight)
 
-  const rimLight = new THREE.DirectionalLight('#53fff0', 1.75)
+  const rimLight = new THREE.DirectionalLight(accentColor.clone().offsetHSL(0, 0.04, 0.14), 1.75)
   rimLight.position.set(2.4, 1.8, 2.4)
   scene.add(rimLight)
 
-  const frontLight = new THREE.PointLight('#4defff', 1.25, 6)
+  const frontLight = new THREE.PointLight(accentColor, 1.25, 6)
   frontLight.position.set(0, -1.5, 1.2)
   scene.add(frontLight)
 
   rootGroup = new THREE.Group()
   rootGroup.rotation.z = -0.12
   rootGroup.scale.set(1.04, 1.04, 1)
-  rootGroup.add(makeFloorShadow(depth))
 
   if (segments.length === 0) {
     rootGroup.add(
       makeSegmentGroup(
-        { name: '暂无数据', value: 1, color: '#265d85', startRatio: 0, endRatio: 1 },
+        { name: '暂无数据', value: 1, color: mutedColor.getStyle(), startRatio: 0, endRatio: 1 },
         depth,
         0,
       ),
@@ -253,7 +276,7 @@ function buildScene() {
     segments.forEach((segment) => rootGroup?.add(makeSegmentGroup(segment, depth, gap)))
   }
 
-  rootGroup.add(makeCenterCap(depth))
+  rootGroup.add(makeCenterCap(depth, toneColor, accentColor, surfaceColor))
   scene.add(rootGroup)
 }
 
@@ -365,7 +388,7 @@ onMounted(() => {
 })
 
 watch(
-  () => [props.items, props.thickness],
+  () => [props.items, props.thickness, props.theme, props.tone, props.accent, props.surface],
   () => nextTick(mountScene),
   { deep: true },
 )
@@ -382,7 +405,7 @@ onUnmounted(() => {
   <div
     ref="host"
     class="pie3d-three-shell"
-    :style="{ height }"
+    :style="shellStyle"
     @pointermove="onPointerMove"
     @pointerleave="resetHover"
   >
@@ -418,11 +441,10 @@ onUnmounted(() => {
   z-index: 4;
   min-width: 7.25rem;
   padding: 0.4375rem 0.625rem;
-  border: 0.0625rem solid rgba(32, 241, 212, 0.58);
+  border: 0.0625rem solid color-mix(in srgb, var(--pie-accent) 58%, transparent);
   border-radius: 0.5rem;
-  background: rgba(6, 20, 48, 0.92);
-  box-shadow: 0 0.375rem 1.25rem rgba(0, 120, 220, 0.35);
-  color: #eaf6ff;
+  background: color-mix(in srgb, var(--pie-surface) 92%, transparent);
+  color: var(--pie-text);
   font-size: 0.75rem;
   font-weight: 800;
   line-height: 1.45;

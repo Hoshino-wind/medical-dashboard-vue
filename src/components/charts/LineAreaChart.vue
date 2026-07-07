@@ -4,18 +4,15 @@ import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
-import { pxToRem } from '@/utils/rem'
 
 const props = withDefaults(
   defineProps<{
     data: LineChartData
     theme: Theme
     variant?: string
-    metricLabel?: string
   }>(),
   {
     variant: 'maintenance',
-    metricLabel: '数量',
   },
 )
 
@@ -23,7 +20,7 @@ function token(name: keyof ThemeVariables): string {
   return props.theme.variables[name]
 }
 
-const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} rgba(0, 120, 220, 0.35);`
+const tooltipExtraCssText = 'border-radius: 0.5rem;'
 
 const option = computed(() => {
   const text = token('--text')
@@ -33,14 +30,14 @@ const option = computed(() => {
   const accent2 = token('--accent-2')
   const accent3 = token('--accent-3')
   const lineColor = props.variant === 'inspection' ? accent2 : accent3
-  const yMax = props.variant === 'inspection' ? 40000 : 10000
-  const yInterval = props.variant === 'inspection' ? 10000 : 2000
+  const yMax = props.variant === 'inspection' ? 50000 : 12000
+  const yInterval = props.variant === 'inspection' ? 10000 : 4000
 
   return {
     color: [lineColor],
     animationDuration: 1000,
     animationEasing: 'cubicOut',
-    grid: { left: 54, right: 30, top: 20, bottom: 30 },
+    grid: { left: 54, right: 24, top: 18, bottom: 28 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
@@ -58,7 +55,6 @@ const option = computed(() => {
     },
     series: [
       {
-        name: props.metricLabel,
         data: props.data.data,
         type: 'line',
         smooth: true,
@@ -67,17 +63,12 @@ const option = computed(() => {
         z: 3,
         itemStyle: {
           color: lineColor,
-          borderColor: '#ffffff',
+          borderColor: accent2,
           borderWidth: 1.4,
-          shadowBlur: 12,
-          shadowColor: lineColor,
         },
         lineStyle: {
           width: 3,
           cap: 'round',
-          shadowColor: 'rgba(2, 10, 32, 0.55)',
-          shadowBlur: 8,
-          shadowOffsetY: 9,
         },
         areaStyle: {
           color: {

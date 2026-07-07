@@ -9,23 +9,21 @@
  * 注意:运行时主题会覆盖这些默认值。
  */
 :root {
-  --bg: #010711;
-  --bg-soft: #031126;
-  --surface: rgba(3, 16, 39, 0.94);
-  --surface-strong: rgba(7, 28, 66, 0.97);
-  --surface-muted: rgba(9, 34, 75, 0.82);
-  --border: rgba(0, 184, 255, 0.5);
-  --border-strong: rgba(0, 210, 255, 0.88);
-  --text: #f5fbff;
-  --muted: #a4c8e8;
-  --accent: #00a8ff;
-  --accent-2: #20f1d4;
+  --bg: #07182c;
+  --bg-soft: #102a49;
+  --surface: rgba(12, 34, 64, 0.96);
+  --surface-strong: rgba(16, 46, 84, 0.98);
+  --surface-muted: rgba(19, 58, 99, 0.86);
+  --border: rgba(75, 139, 232, 0.48);
+  --border-strong: rgba(87, 160, 255, 0.74);
+  --text: #edf6ff;
+  --muted: #a4bad0;
+  --accent: #2b6dff;
+  --accent-2: #1a9bff;
   --accent-3: #8b6dff;
   --good: #2dfaa8;
   --warn: #ffc857;
   --danger: #ff5e78;
-  --chart-grid: rgba(132, 187, 230, 0.2);
-  --panel-shadow:
-    0 0 0 0.0625rem rgba(0, 168, 255, 0.1), 0 0.75rem 1.75rem rgba(0, 80, 180, 0.16),
-    inset 0 0 1.375rem rgba(16, 127, 255, 0.05);
+  --chart-grid: rgba(141, 174, 210, 0.2);
+  --panel-shadow: 0 0.625rem 1.375rem rgba(2, 10, 24, 0.24);
 }

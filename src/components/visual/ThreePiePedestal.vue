@@ -67,9 +67,9 @@ function makeGlowTexture(color: THREE.Color): THREE.CanvasTexture {
   if (!ctx) return new THREE.CanvasTexture(glowCanvas)
   const rgb = `rgb(${Math.round(color.r * 255)}, ${Math.round(color.g * 255)}, ${Math.round(color.b * 255)})`
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-  gradient.addColorStop(0, 'rgba(255,255,255,0.9)')
-  gradient.addColorStop(0.2, rgb.replace('rgb', 'rgba').replace(')', ',0.72)'))
-  gradient.addColorStop(0.58, rgb.replace('rgb', 'rgba').replace(')', ',0.22)'))
+  gradient.addColorStop(0, rgb.replace('rgb', 'rgba').replace(')', ',0.68)'))
+  gradient.addColorStop(0.2, rgb.replace('rgb', 'rgba').replace(')', ',0.52)'))
+  gradient.addColorStop(0.58, rgb.replace('rgb', 'rgba').replace(')', ',0.18)'))
   gradient.addColorStop(1, rgb.replace('rgb', 'rgba').replace(')', ',0)'))
   ctx.fillStyle = gradient
   ctx.fillRect(0, 0, size, size)

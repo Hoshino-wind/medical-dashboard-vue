@@ -21,7 +21,7 @@ const ringTones = computed(() => {
   return ['var(--accent)', 'var(--accent-2)', 'var(--accent)']
 })
 
-const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
+const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 106 : 112))
 </script>
 
 <template>

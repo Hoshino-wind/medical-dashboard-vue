@@ -3,7 +3,6 @@ import type { Component } from 'vue'
 import type { ModuleCatalogItem, ModuleKind } from '@/types/module'
 import type { DashboardData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
-import type { FieldConfig, ModuleSettings } from '@/types/config'
 
 /**
  * 大屏模块组件采用 defineAsyncComponent 懒加载,
@@ -36,126 +35,52 @@ const HealthTrendModule = defineAsyncComponent(
 export interface ModuleRenderContext {
   data: DashboardData
   theme: Theme
-  settings?: ModuleSettings
 }
 
 export interface ModuleRenderEntry {
   component: Component
-  resolveProps: (module: ModuleCatalogItem, ctx: ModuleRenderContext) => Record<string, unknown>
+  resolveProps: (
+    module: ModuleCatalogItem,
+    ctx: ModuleRenderContext,
+  ) => Record<string, unknown>
 }
 
-const REPAIR_FIELD_ORDER = ['department', 'equipment', 'code', 'duration', 'owner', 'status']
-const REPAIR_FALLBACK_HEADERS = ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态']
-const REPAIR_STAT_FIELD_ORDER = ['fullService', 'techService', 'vendorService']
-
-function visibleFields(settings?: ModuleSettings): FieldConfig[] {
-  return settings?.fields.filter((field) => field.visible) ?? []
-}
-
-function fieldLabel(settings: ModuleSettings | undefined, key: string, fallback: string): string {
-  return settings?.fields.find((field) => field.key === key)?.label || fallback
-}
-
-function projectRows(rows: string[][], fields: FieldConfig[], order: string[]): string[][] {
-  const indexes = fields.map((field) => order.indexOf(field.key)).filter((index) => index >= 0)
-
-  if (indexes.length === 0) return []
-  return rows.map((row) => indexes.map((index) => row[index] ?? ''))
-}
-
-function resolveTable(ctx: ModuleRenderContext): Record<string, unknown> {
-  const fields = visibleFields(ctx.settings)
-  const resolvedFields =
-    fields.length > 0
-      ? fields
-      : REPAIR_FIELD_ORDER.map((key, index) => ({
-          key,
-          label: REPAIR_FALLBACK_HEADERS[index],
-          visible: true,
-        }))
-
-  return {
-    headers: resolvedFields.map((field) => field.label),
-    rows: projectRows(ctx.data.repairOrders, resolvedFields, REPAIR_FIELD_ORDER),
-  }
-}
-
-function applyAvailabilityFields(
-  items: DashboardData['lifeSupport'],
-  settings?: ModuleSettings,
-): DashboardData['lifeSupport'] {
-  const fields = visibleFields(settings)
-  if (fields.length === 0) return []
-  return fields
-    .map((field, index) => {
-      const source = items[index]
-      return source ? { ...source, name: field.label } : null
-    })
-    .filter((item): item is DashboardData['lifeSupport'][number] => Boolean(item))
-}
-
-function applyBarFields(
-  data: DashboardData['repairStats'],
-  settings?: ModuleSettings,
-): DashboardData['repairStats'] {
-  const fields = visibleFields(settings)
-  const series = data.series
-    .map((item, index) => {
-      const field = fields.find((candidate) => candidate.key === REPAIR_STAT_FIELD_ORDER[index])
-      return field ? { ...item, name: field.label } : null
-    })
-    .filter((item): item is DashboardData['repairStats']['series'][number] => Boolean(item))
-
-  return { ...data, series }
-}
+const REPAIR_HEADERS = ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态']
 
 function resolveAvailability(
   module: ModuleCatalogItem,
   ctx: ModuleRenderContext,
 ): Record<string, unknown> {
   if (module.id === 'ultrasound') {
-    return {
-      items: applyAvailabilityFields(ctx.data.ultrasound, ctx.settings),
-      variant: 'ultrasound',
-    }
+    return { items: ctx.data.ultrasound, variant: 'ultrasound' }
   }
-  return {
-    items: applyAvailabilityFields(ctx.data.lifeSupport, ctx.settings),
-    variant: 'life',
-  }
+  return { items: ctx.data.lifeSupport, variant: 'life' }
 }
 
-function resolveLine(module: ModuleCatalogItem, ctx: ModuleRenderContext): Record<string, unknown> {
+function resolveLine(
+  module: ModuleCatalogItem,
+  ctx: ModuleRenderContext,
+): Record<string, unknown> {
   if (module.id === 'inspectionStats') {
-    return {
-      type: 'inspection',
-      data: ctx.data.inspectionStats,
-      theme: ctx.theme,
-      metricLabel: fieldLabel(ctx.settings, 'count', '巡检数量'),
-    }
+    return { type: 'inspection', data: ctx.data.inspectionStats, theme: ctx.theme }
   }
-  return {
-    type: 'maintenance',
-    data: ctx.data.maintenanceStats,
-    theme: ctx.theme,
-    metricLabel: fieldLabel(ctx.settings, 'count', '保养数量'),
-  }
+  return { type: 'maintenance', data: ctx.data.maintenanceStats, theme: ctx.theme }
 }
 
 export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   overview: {
     component: OverviewModule,
-    resolveProps: (_module, ctx) => ({ data: ctx.data.overview, fields: ctx.settings?.fields }),
+    resolveProps: (_module, ctx) => ({ data: ctx.data.overview }),
   },
   table: {
     component: WorkOrderTable,
-    resolveProps: (_module, ctx) => resolveTable(ctx),
+    resolveProps: (_module, ctx) => ({ headers: REPAIR_HEADERS, rows: ctx.data.repairOrders }),
   },
   bar: {
     component: ChartModule,
     resolveProps: (_module, ctx) => ({
       type: 'bar',
-      data: applyBarFields(ctx.data.repairStats, ctx.settings),
+      data: ctx.data.repairStats,
       theme: ctx.theme,
     }),
   },
@@ -165,10 +90,7 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   completion: {
     component: CompletionModule,
-    resolveProps: (_module, ctx) => ({
-      data: ctx.data.inspectionOrders,
-      fields: ctx.settings?.fields,
-    }),
+    resolveProps: (_module, ctx) => ({ data: ctx.data.inspectionOrders, theme: ctx.theme }),
   },
   line: {
     component: ChartModule,
@@ -176,10 +98,6 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   health: {
     component: HealthTrendModule,
-    resolveProps: (_module, ctx) => ({
-      data: ctx.data.healthTrend,
-      theme: ctx.theme,
-      fields: ctx.settings?.fields,
-    }),
+    resolveProps: (_module, ctx) => ({ data: ctx.data.healthTrend, theme: ctx.theme }),
   },
 }

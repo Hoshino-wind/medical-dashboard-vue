@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import echarts, { type EChartsOption } from '@/utils/echarts'
 import EChart from './EChart.vue'
 import type { BarChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 import { pxToRem } from '@/utils/rem'
+import { colorWithAlpha } from '@/utils/themeColor'
+import {
+  BASE_DROP,
+  BASE_VERTICAL_OFFSET,
+  BAR_ANIMATION_DURATION,
+  createColumnBasePoint,
+  createBaseCuboidGeometry,
+  interpolateBarValue,
+} from './cubeBarGeometry'
 
 const CUBE_HALF = 12
 const CUBE_DEPTH = 7
@@ -13,7 +22,6 @@ const AXIS_HEIGHT = 30
 const AXIS_SLANT = 15
 const LIQUID_MIN_HEIGHT = 10
 const LIQUID_MAX_HEIGHT = 44
-const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} rgba(0, 120, 220, 0.35);`
 
 // 玻璃柱体由左右面、顶面、内部青色液面叠加，方便接近参考图的透明 3D 质感。
 const GlassColumnLeft = echarts.graphic.extendShape({
@@ -109,14 +117,41 @@ const props = defineProps<{
   theme: Theme
 }>()
 
+const animationProgress = ref(0)
+let animationFrame = 0
+
 function token(name: keyof Theme['variables']): string {
   return props.theme.variables[name]
 }
+
+function runColumnAnimation() {
+  cancelAnimationFrame(animationFrame)
+  animationProgress.value = 0
+  let start: number | null = null
+
+  const step = (timestamp: number) => {
+    if (start === null) start = timestamp
+    const progress = Math.min(1, (timestamp - start) / BAR_ANIMATION_DURATION)
+    animationProgress.value = progress
+    if (progress < 1) {
+      animationFrame = requestAnimationFrame(step)
+    }
+  }
+
+  animationFrame = requestAnimationFrame(step)
+}
+
+onMounted(runColumnAnimation)
+watch(() => props.data, runColumnAnimation, { deep: true })
+onUnmounted(() => cancelAnimationFrame(animationFrame))
 
 const option = computed(() => {
   const labels = props.data.labels
   const series = props.data.series
   const barValues = labels.map((_, i) => series.find((item) => (item.data[i] || 0) > 0)?.data[i] || 0)
+  const animatedBarValues = barValues.map((value) =>
+    interpolateBarValue(value, animationProgress.value),
+  )
   const totals = labels.map((_, i) => series.reduce((sum, s) => sum + (s.data[i] || 0), 0))
   const text = token('--text')
   const muted = token('--muted')
@@ -124,53 +159,67 @@ const option = computed(() => {
   const accent = token('--accent')
   const accent2 = token('--accent-2')
   const accent3 = token('--accent-3')
+  const surface = token('--surface')
+  const surfaceStrong = token('--surface-strong')
+  const themed = colorWithAlpha
+  const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} ${themed(accent, 0.3)};`
 
+  // 克制玻璃质感:柱体收敛到单一青蓝色系(去掉 accent3 紫的混入),降饱和、弱化荧光高光,
+  // 让 3D 柱从"糖果塑料感"变成"精密玻璃"——保留全部 3D 几何,只调材质配色。
   const glassLeftFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent3}d0` },
-    { offset: 0.24, color: `${accent}d8` },
-    { offset: 0.68, color: `${accent}72` },
-    { offset: 1, color: `${accent2}28` },
+    { offset: 0, color: `${accent2}b2` },
+    { offset: 0.5, color: `${accent}66` },
+    { offset: 1, color: `${accent}16` },
   ])
   const glassRightFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent3}82` },
-    { offset: 0.28, color: `${accent}a4` },
-    { offset: 1, color: `${accent}20` },
+    { offset: 0, color: `${accent}80` },
+    { offset: 0.55, color: `${accent}40` },
+    { offset: 1, color: `${accent}12` },
   ])
   const topCapFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-    { offset: 0, color: `${accent3}f2` },
-    { offset: 0.48, color: `${accent3}a8` },
-    { offset: 1, color: `${accent}d8` },
+    { offset: 0, color: `${accent2}d4` },
+    { offset: 1, color: `${accent}96` },
   ])
   const liquidFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}dc` },
-    { offset: 0.72, color: `${accent2}78` },
-    { offset: 1, color: `${accent}24` },
+    { offset: 0, color: `${accent2}96` },
+    { offset: 0.78, color: `${accent2}38` },
+    { offset: 1, color: `${accent}14` },
   ])
   const liquidSideFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}a8` },
-    { offset: 1, color: `${accent}1c` },
+    { offset: 0, color: `${accent2}6e` },
+    { offset: 1, color: `${accent}12` },
   ])
   const liquidTopFill = new echarts.graphic.RadialGradient(0.5, 0.55, 0.72, [
-    { offset: 0, color: `${accent2}f5` },
-    { offset: 0.56, color: `${accent2}86` },
-    { offset: 1, color: `${accent}20` },
-  ])
-  const baseDeckFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
     { offset: 0, color: `${accent2}aa` },
-    { offset: 0.34, color: `${accent2}5a` },
-    { offset: 0.72, color: `${accent}24` },
-    { offset: 1, color: `${accent}0a` },
+    { offset: 0.6, color: `${accent2}44` },
+    { offset: 1, color: `${accent}10` },
+  ])
+  const baseLeftFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+    { offset: 0, color: themed(accent3, 0.22) },
+    { offset: 0.52, color: themed(accent, 0.18) },
+    { offset: 1, color: themed(surface, 0.24) },
+  ])
+  const baseDeckFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+    { offset: 0, color: themed(accent3, 0.64) },
+    { offset: 0.36, color: themed(accent, 0.78) },
+    { offset: 0.72, color: themed(accent, 0.5) },
+    { offset: 1, color: themed(accent3, 0.26) },
   ])
   const baseFrontFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}38` },
-    { offset: 0.2, color: `${accent}44` },
-    { offset: 0.68, color: `${accent}18` },
-    { offset: 1, color: `${accent}05` },
+    { offset: 0, color: themed(accent, 0.46) },
+    { offset: 0.3, color: themed(accent3, 0.28) },
+    { offset: 0.72, color: themed(surfaceStrong, 0.34) },
+    { offset: 1, color: themed(surface, 0.18) },
   ])
-
+  const baseRightFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+    { offset: 0, color: themed(accent3, 0.36) },
+    { offset: 0.58, color: themed(accent, 0.22) },
+    { offset: 1, color: themed(surface, 0.16) },
+  ])
   return {
     animationDuration: 1000,
-    grid: { left: 44, right: 16, top: 42, bottom: 48 },
+    // 上下留白配平:底部比顶部多 ~16px,抵消 3D 底座向下延伸,使视觉留白对称、数据不贴底
+    grid: { left: 44, right: 16, top: 50, bottom: 66 },
     xAxis: {
       type: 'category',
       data: labels,
@@ -190,127 +239,76 @@ const option = computed(() => {
         type: 'custom',
         encode: { x: 0, y: 1 },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        renderItem(_params: any, api: any) {
+        renderItem(params: any, api: any) {
           const val = api.value(1)
           const index = api.value(0)
           const label = labels[index]
           const base = api.coord([api.value(0), 0])
+          const chartTop = params.coordSys?.y ?? 0
           const band = Math.max(42, api.size([1, 0])[0])
           const axisX = base[0] - band * index - band * 0.49
           const axisWidth = band * labels.length * 0.98
-          const axisY = base[1] + 1
-          const barX = base[0] + AXIS_SLANT * 0.28
-          const cubeBase = [barX, axisY - AXIS_DEPTH * 0.72]
+          const baseGeometry = createBaseCuboidGeometry({
+            axisX,
+            baseY: base[1] + 1,
+            width: axisWidth,
+            slant: AXIS_SLANT,
+            depth: AXIS_DEPTH,
+            drop: BASE_DROP,
+            offsetY: BASE_VERTICAL_OFFSET,
+          })
+          const axisY = baseGeometry.axisY
+          const cubeBase = createColumnBasePoint({
+            categoryX: base[0],
+            axisY,
+            slant: AXIS_SLANT,
+            depth: AXIS_DEPTH,
+          })
+          const barX = cubeBase[0]
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const children: any[] = []
 
           if (index === 0) {
             children.push(
               {
-                type: 'rect',
+                type: 'polygon',
                 shape: {
-                  x: axisX - 12,
-                  y: axisY - AXIS_DEPTH - 8,
-                  width: axisWidth + AXIS_SLANT + 24,
-                  height: AXIS_HEIGHT + AXIS_DEPTH + 18,
+                  points: baseGeometry.faces.left,
                 },
                 style: {
-                  fill: `${accent2}08`,
-                  shadowBlur: 36,
-                  shadowColor: `${accent2}72`,
+                  fill: baseLeftFill,
+                  lineWidth: 0,
                 },
                 silent: true,
               },
               {
-                type: 'CuboidAxisFront',
-                shape: { x: axisX - 8, y: axisY + 7, width: axisWidth + 16 },
-                style: {
-                  fill: `${accent}12`,
-                  stroke: `${accent}28`,
-                  lineWidth: 1,
-                  shadowBlur: 18,
-                  shadowColor: `${accent}34`,
+                type: 'polygon',
+                shape: {
+                  points: baseGeometry.faces.front,
                 },
-                silent: true,
-              },
-              {
-                type: 'CuboidAxisFront',
-                shape: { x: axisX, y: axisY, width: axisWidth },
                 style: {
                   fill: baseFrontFill,
-                  stroke: `${accent}82`,
-                  lineWidth: 1,
-                  shadowBlur: 18,
-                  shadowColor: `${accent2}54`,
+                  lineWidth: 0,
                 },
                 silent: true,
               },
               {
-                type: 'CuboidAxisRight',
-                shape: { x: axisX, y: axisY, width: axisWidth },
+                type: 'polygon',
+                shape: {
+                  points: baseGeometry.faces.right,
+                },
                 style: {
-                  fill: `${accent}1e`,
-                  stroke: `${accent2}68`,
-                  lineWidth: 1,
+                  fill: baseRightFill,
+                  lineWidth: 0,
                 },
                 silent: true,
               },
               {
-                type: 'CuboidAxisTop',
-                shape: { x: axisX, y: axisY, width: axisWidth },
+                type: 'polygon',
+                shape: { points: baseGeometry.faces.top },
                 style: {
                   fill: baseDeckFill,
-                  stroke: `${accent2}dc`,
-                  lineWidth: 1,
-                  shadowBlur: 22,
-                  shadowColor: `${accent2}86`,
-                },
-                silent: true,
-              },
-              {
-                type: 'line',
-                shape: {
-                  x1: axisX + AXIS_SLANT + 5,
-                  y1: axisY - AXIS_DEPTH + 3,
-                  x2: axisX + axisWidth + AXIS_SLANT - 6,
-                  y2: axisY - AXIS_DEPTH + 3,
-                },
-                style: {
-                  stroke: 'rgba(255,255,255,0.5)',
-                  lineWidth: 1,
-                  shadowBlur: 10,
-                  shadowColor: `${accent2}cc`,
-                },
-                silent: true,
-              },
-              {
-                type: 'line',
-                shape: {
-                  x1: axisX + 6,
-                  y1: axisY + 3,
-                  x2: axisX + axisWidth - 6,
-                  y2: axisY + 3,
-                },
-                style: {
-                  stroke: `${accent2}9c`,
-                  lineWidth: 1,
-                  shadowBlur: 12,
-                  shadowColor: `${accent2}a0`,
-                },
-                silent: true,
-              },
-              {
-                type: 'rect',
-                shape: {
-                  x: axisX + 12,
-                  y: axisY + AXIS_HEIGHT - 4,
-                  width: axisWidth - 24,
-                  height: 2,
-                },
-                style: {
-                  fill: `${accent2}6c`,
-                  shadowBlur: 14,
-                  shadowColor: `${accent2}bc`,
+                  lineWidth: 0,
                 },
                 silent: true,
               },
@@ -322,22 +320,43 @@ const option = computed(() => {
             style: {
               text: label,
               x: barX,
-              y: axisY + AXIS_HEIGHT * 0.58,
+              y: baseGeometry.labelY,
               textAlign: 'center',
               textVerticalAlign: 'middle',
               fill: text,
               fontSize: 12,
               fontWeight: 900,
-              textBorderColor: 'rgba(0, 8, 24, 0.88)',
-              textBorderWidth: 2,
-              shadowBlur: 8,
-              shadowColor: 'rgba(255,255,255,0.3)',
+              textBorderColor: `${accent2}18`,
+              textBorderWidth: 1,
             },
             silent: true,
           })
 
-          const renderValue = val > 0 ? val : 5
-          const top = api.coord([api.value(0), renderValue])
+          if (val <= 0) {
+            children.push({
+              type: 'text',
+              style: {
+                text: String(val),
+                x: barX,
+                y: axisY - AXIS_DEPTH - 9,
+                textAlign: 'center',
+                textVerticalAlign: 'bottom',
+                fill: text,
+                fontSize: 14,
+                fontWeight: 900,
+                textBorderColor: `${accent2}1f`,
+                textBorderWidth: 1,
+              },
+              silent: true,
+            })
+
+            return {
+              type: 'group',
+              children,
+            }
+          }
+
+          const top = api.coord([api.value(0), val])
           const shape = { x: barX, y: top[1], xAxisPoint: cubeBase }
           const columnHeight = Math.max(6, cubeBase[1] - top[1])
           const liquidHeight = Math.min(
@@ -355,8 +374,6 @@ const option = computed(() => {
                 fill: glassLeftFill,
                 stroke: `${accent2}5f`,
                 lineWidth: 1,
-                shadowBlur: 18,
-                shadowColor: `${accent}86`,
               },
             },
             {
@@ -373,10 +390,8 @@ const option = computed(() => {
               shape: { x: barX, y: top[1] },
               style: {
                 fill: topCapFill,
-                stroke: `${accent3}dd`,
+                stroke: `${accent2}aa`,
                 lineWidth: 1,
-                shadowBlur: 16,
-                shadowColor: `${accent3}aa`,
               },
             },
             {
@@ -386,8 +401,6 @@ const option = computed(() => {
                 fill: liquidFill,
                 stroke: `${accent2}72`,
                 lineWidth: 1,
-                shadowBlur: 16,
-                shadowColor: `${accent2}8c`,
               },
             },
             {
@@ -406,47 +419,21 @@ const option = computed(() => {
                 fill: liquidTopFill,
                 stroke: `${accent2}d6`,
                 lineWidth: 1,
-                shadowBlur: 14,
-                shadowColor: `${accent2}9c`,
               },
-            },
-            {
-              type: 'line',
-              shape: {
-                x1: barX - CUBE_HALF * 0.35,
-                y1: top[1] + CUBE_DEPTH + 4,
-                x2: barX - CUBE_HALF * 0.35,
-                y2: cubeBase[1] - CUBE_DEPTH - 4,
-              },
-              style: {
-                stroke: 'rgba(255,255,255,0.36)',
-                lineWidth: 1,
-                shadowBlur: 7,
-                shadowColor: `${accent2}bb`,
-              },
-              silent: true,
-            },
-            {
-              type: 'circle',
-              shape: { cx: barX - CUBE_HALF * 0.38, cy: top[1] + columnHeight * 0.28, r: 1.8 },
-              style: { fill: 'rgba(255,255,255,0.74)', shadowBlur: 7, shadowColor: '#fff' },
-              silent: true,
             },
             {
               type: 'text',
               style: {
-                text: String(val),
+                text: String(Math.round(val)),
                 x: barX,
-                y: top[1] - CUBE_DEPTH * 2 - 11,
+                y: Math.max(chartTop + 16, top[1] - CUBE_DEPTH * 2 - 8),
                 textAlign: 'center',
-                textVerticalAlign: 'middle',
-                fill: '#ffffff',
+                textVerticalAlign: 'bottom',
+                fill: text,
                 fontSize: 15,
                 fontWeight: 900,
-                textBorderColor: 'rgba(0, 7, 20, 0.92)',
-                textBorderWidth: 3,
-                shadowBlur: 10,
-                shadowColor: `${accent}aa`,
+                textBorderColor: `${accent2}24`,
+                textBorderWidth: 1,
               },
             },
           )
@@ -456,12 +443,12 @@ const option = computed(() => {
             children,
           }
         },
-        data: barValues.map((value, index) => [index, value]),
+        data: animatedBarValues.map((value, index) => [index, value]),
       },
     ],
     tooltip: {
       trigger: 'item',
-      backgroundColor: 'rgba(6, 20, 48, 0.92)',
+      backgroundColor: themed(surfaceStrong, 0.92),
       borderColor: `${accent}cc`,
       borderWidth: 1,
       padding: [8, 12],
