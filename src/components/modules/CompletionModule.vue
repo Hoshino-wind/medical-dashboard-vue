@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import Pie3D from '../charts/Pie3D.vue'
 import CountUp from '../shared/CountUp.vue'
+import ThreePiePedestal from '../visual/ThreePiePedestal.vue'
 import { pxToRem } from '@/utils/rem'
 import type { InspectionOrders } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
@@ -22,28 +23,29 @@ function rowIconClass(index: number): string {
   return ['is-blue', 'is-purple', 'is-red', 'is-orange', 'is-cyan'][index % 5]
 }
 
-// 同色系明度分层：以主题亮蓝为基准派生蓝青梯度，取代信号色大面积填充带来的廉价感
-function shade(hex: string, amount: number): string {
-  const value = hex.trim().replace('#', '')
-  const full = value.length === 3 ? value.replace(/(.)/g, '$1$1') : value
-  const r = Number.parseInt(full.slice(0, 2), 16)
-  const g = Number.parseInt(full.slice(2, 4), 16)
-  const b = Number.parseInt(full.slice(4, 6), 16)
-  const target = amount >= 0 ? 255 : 0
-  const k = Math.min(1, Math.abs(amount))
-  const mix = (channel: number) => Math.round(channel + (target - channel) * k)
-  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`
+function isLightTheme(theme: Theme | undefined): boolean {
+  return theme?.id.startsWith('light-') ?? false
 }
 
 const inspectionPieItems = computed(() => {
-  const base = themeColor('--accent-2', '#1a9bff')
   return [
-    { name: '已完成', value: props.data.finished, color: shade(base, 0.34) },
-    { name: '待巡检', value: props.data.waiting, color: base },
-    { name: '逾期未检', value: props.data.overdue, color: shade(base, -0.42) },
+    {
+      name: '已完成',
+      value: props.data.finished,
+      color: themeColor('--data-inspection-pie-finished', '#20e8ff'),
+    },
+    {
+      name: '待巡检',
+      value: props.data.waiting,
+      color: themeColor('--data-inspection-pie-waiting', '#7efcff'),
+    },
+    {
+      name: '逾期未检',
+      value: props.data.overdue,
+      color: themeColor('--data-inspection-pie-overdue', '#ff5a92'),
+    },
   ]
 })
-
 </script>
 
 <template>
@@ -56,7 +58,11 @@ const inspectionPieItems = computed(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, index) in data.rows" :key="`${row[0]}-${row[1]}-${index}`" :class="{ 'is-active': index === 0 }">
+          <tr
+            v-for="(row, index) in data.rows"
+            :key="`${row[0]}-${row[1]}-${index}`"
+            :class="{ 'is-active': index === 0 }"
+          >
             <td>
               <span class="table-cell-leading">
                 <span class="table-row-icon" :class="rowIconClass(index)">{{ index + 1 }}</span>
@@ -74,19 +80,27 @@ const inspectionPieItems = computed(() => {
     <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月巡检完成率">
       <div class="pie-summary-title">本月巡检完成率</div>
       <div class="pie-chart-shell inspection-pie-shell">
+        <ThreePiePedestal
+          class="inspection-pie-base"
+          :color="themeColor('--instrument-base', '#33566c')"
+          :accent="themeColor('--data-inspection-pie-finished', '#20e8ff')"
+          :intensity="isLightTheme(theme) ? 0.72 : 0.96"
+          label-deck
+        />
         <Pie3D
           :items="inspectionPieItems"
           :height="chartHeight"
           :thickness="7"
           :theme="theme"
-          :tone="themeColor('--accent', '#000000')"
+          :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
+          :accent="themeColor('--data-inspection-pie-waiting', '#7efcff')"
         />
         <div class="pie-center-value"><CountUp :value="data.rate" :decimals="1" />%</div>
       </div>
     </aside>
 
     <div class="module-status-summary inspection-status-summary">
-      <div>
+      <div class="is-total">
         <span>总数</span><b><CountUp :value="data.total" /></b><em>单</em>
       </div>
       <div class="is-good">

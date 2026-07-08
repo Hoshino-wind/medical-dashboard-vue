@@ -1,7 +1,13 @@
+<script setup lang="ts">
+import ThreePiePedestal from './ThreePiePedestal.vue'
+</script>
+
 <template>
-  <div class="hologram-gauge-base" aria-hidden="true">
-    <span class="gauge-base-ring base-ring-a"></span>
-    <span class="gauge-base-ring base-ring-b"></span>
-    <span class="gauge-base-core"></span>
-  </div>
+  <ThreePiePedestal
+    class="hologram-gauge-base"
+    variant="compact"
+    color="var(--instrument-base)"
+    accent="var(--gauge-tone)"
+    :intensity="0.72"
+  />
 </template>

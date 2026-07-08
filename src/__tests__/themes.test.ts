@@ -8,15 +8,21 @@ const selectableThemeIds = [
   'ink-blue-medical',
   'midnight-violet',
   'black-gold-blue',
-  'light-blue',
 ]
 
 const requiredVariableKeys: Array<keyof ThemeVariables> = [
+  '--bg-top',
+  '--bg-bottom',
+  '--backdrop',
   '--bg',
   '--bg-soft',
   '--surface',
   '--surface-strong',
   '--surface-muted',
+  '--glass',
+  '--glass-strong',
+  '--glass-edge',
+  '--glass-highlight',
   '--border',
   '--border-strong',
   '--text',
@@ -24,20 +30,58 @@ const requiredVariableKeys: Array<keyof ThemeVariables> = [
   '--accent',
   '--accent-2',
   '--accent-3',
+  '--chart-primary',
+  '--chart-secondary',
+  '--chart-tertiary',
+  '--data-bar',
+  '--data-bar-secondary',
+  '--data-maintenance-line',
+  '--data-inspection-line',
+  '--data-ring',
+  '--data-ring-secondary',
+  '--data-pie-primary',
+  '--data-pie-pending',
+  '--data-health-pie-good',
+  '--data-health-pie-warning',
+  '--data-health-pie-repairing',
+  '--data-health-pie-pending',
+  '--data-inspection-pie-finished',
+  '--data-inspection-pie-waiting',
+  '--data-inspection-pie-overdue',
+  '--instrument-base',
+  '--instrument-base-rim',
+  '--instrument-rim',
   '--good',
   '--warn',
   '--danger',
   '--chart-grid',
+  '--star-white',
+  '--star-accent',
+  '--star-opacity',
+  '--grid-opacity',
+  '--grid-blend-mode',
   '--panel-shadow',
 ]
 
+function hexLuminance(hex: string): number {
+  const match = hex.match(/^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i)
+  if (!match) return 0
+
+  const [r, g, b] = match.slice(1).map((value) => {
+    const channel = Number.parseInt(value, 16) / 255
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
 describe('dashboard themes', () => {
-  it('exposes exactly six selectable themes including light palettes', () => {
+  it('exposes exactly five selectable big-screen themes', () => {
     const themeIds = themes.map((theme) => theme.id)
 
     expect(themeIds).toEqual(selectableThemeIds)
     expect(THEME_IDS).toEqual(selectableThemeIds)
-    expect(themeIds.filter((themeId) => themeId === 'light-medical')).toHaveLength(1)
+    expect(new Set(themeIds)).toHaveProperty('size', 5)
   })
 
   it('defines complete runtime CSS variables for each selectable theme', () => {
@@ -50,6 +94,27 @@ describe('dashboard themes', () => {
       for (const key of requiredVariableKeys) {
         expect(theme!.variables[key], `${themeId} ${key}`).toBeTruthy()
       }
+    }
+  })
+
+  it('declares exactly the required variable keys with no stray or misspelled tokens', () => {
+    const required = [...requiredVariableKeys].sort()
+
+    for (const theme of themes) {
+      const actual = Object.keys(theme.variables).sort()
+      // 索引签名允许任意 --xxx 通过类型检查,故用集合相等在测试层拦截拼写错误/遗漏
+      expect(actual, theme.id).toEqual(required)
+    }
+  })
+
+  it('places one light theme before four dark big-screen themes', () => {
+    const [first, ...darkThemes] = themes
+
+    expect(first.id).toBe('light-medical')
+    expect(hexLuminance(first.variables['--bg'])).toBeGreaterThan(0.82)
+
+    for (const theme of darkThemes) {
+      expect(hexLuminance(theme.variables['--bg']), theme.id).toBeLessThan(0.04)
     }
   })
 })

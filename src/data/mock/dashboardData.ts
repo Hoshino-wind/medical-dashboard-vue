@@ -46,11 +46,17 @@ export const dashboardData: DashboardData = {
     { name: '心电图机', value: 92.6, count: 68 },
     { name: '注射泵', value: 94.7, count: 717 },
     { name: '输液泵', value: 94.8, count: 210 },
+    { name: '除颤监护仪', value: 95.6, count: 86 },
+    { name: '呼吸机', value: 96.3, count: 128 },
+    { name: '麻醉机', value: 93.8, count: 54 },
   ],
   ultrasound: [
     { name: '感染科重症监护', value: 100, count: 1 },
     { name: '风湿免疫科住院', value: 100, count: 1 },
     { name: '临床药学组', value: 100, count: 1 },
+    { name: '眼科门诊', value: 100, count: 46 },
+    { name: '健康管理中心', value: 66.7, count: 1 },
+    { name: '消毒供应中心', value: 0, count: 2 },
   ],
   repairStats: {
     labels: ['06-26', '06-27', '06-28', '06-29', '06-30', '07-01', '07-02'],

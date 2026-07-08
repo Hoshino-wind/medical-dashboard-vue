@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import CountUp from '../shared/CountUp.vue'
 import CubeBarChart from '../charts/CubeBarChart.vue'
 import LineAreaChart from '../charts/LineAreaChart.vue'
 import type { BarChartData, LineChartData } from '@/types/dashboard'
@@ -44,7 +45,7 @@ const lineFooter = computed(() => {
     <div v-if="lineFooter" class="line-chart-footer">
       <div>
         <span>{{ lineFooter.label }}</span>
-        <b>{{ lineFooter.value.toLocaleString() }}</b>
+        <b><CountUp :value="lineFooter.value" /></b>
         <em>{{ lineFooter.unit }}</em>
       </div>
       <div class="line-chart-trend" :class="`is-${lineFooter.direction}`">

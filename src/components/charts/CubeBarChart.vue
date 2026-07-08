@@ -156,64 +156,65 @@ const option = computed(() => {
   const text = token('--text')
   const muted = token('--muted')
   const grid = token('--chart-grid')
-  const accent = token('--accent')
-  const accent2 = token('--accent-2')
-  const accent3 = token('--accent-3')
+  const dataBar = token('--data-bar')
+  const dataBarSecondary = token('--data-bar-secondary')
+  const instrumentBase = token('--instrument-base')
+  const instrumentBaseRim = token('--instrument-base-rim')
   const surface = token('--surface')
   const surfaceStrong = token('--surface-strong')
   const themed = colorWithAlpha
-  const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(20)} ${themed(accent, 0.3)};`
+  const isLight = props.theme.id.startsWith('light-')
+  const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(18)} ${themed(dataBar, isLight ? 0.08 : 0.24)};`
 
-  // 克制玻璃质感:柱体收敛到单一青蓝色系(去掉 accent3 紫的混入),降饱和、弱化荧光高光,
-  // 让 3D 柱从"糖果塑料感"变成"精密玻璃"——保留全部 3D 几何,只调材质配色。
+  // 主题青蓝只负责框架;柱体和底座分开成数据绿与中性仪器材质,避免整张图同色发光。
   const glassLeftFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}b2` },
-    { offset: 0.5, color: `${accent}66` },
-    { offset: 1, color: `${accent}16` },
+    { offset: 0, color: colorWithAlpha(dataBarSecondary, isLight ? 0.58 : 0.76) },
+    { offset: 0.5, color: colorWithAlpha(dataBar, isLight ? 0.28 : 0.4) },
+    { offset: 1, color: colorWithAlpha(dataBar, isLight ? 0.06 : 0.1) },
   ])
   const glassRightFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent}80` },
-    { offset: 0.55, color: `${accent}40` },
-    { offset: 1, color: `${accent}12` },
+    { offset: 0, color: colorWithAlpha(instrumentBase, isLight ? 0.48 : 0.64) },
+    { offset: 0.55, color: colorWithAlpha(dataBar, isLight ? 0.16 : 0.26) },
+    { offset: 1, color: colorWithAlpha(dataBar, isLight ? 0.04 : 0.08) },
   ])
   const topCapFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-    { offset: 0, color: `${accent2}d4` },
-    { offset: 1, color: `${accent}96` },
+    { offset: 0, color: colorWithAlpha(instrumentBaseRim, isLight ? 0.58 : 0.86) },
+    { offset: 1, color: colorWithAlpha(dataBarSecondary, isLight ? 0.42 : 0.62) },
   ])
   const liquidFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}96` },
-    { offset: 0.78, color: `${accent2}38` },
-    { offset: 1, color: `${accent}14` },
+    { offset: 0, color: colorWithAlpha(dataBarSecondary, isLight ? 0.42 : 0.58) },
+    { offset: 0.78, color: colorWithAlpha(dataBar, isLight ? 0.14 : 0.24) },
+    { offset: 1, color: colorWithAlpha(dataBar, isLight ? 0.04 : 0.08) },
   ])
   const liquidSideFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: `${accent2}6e` },
-    { offset: 1, color: `${accent}12` },
+    { offset: 0, color: colorWithAlpha(dataBar, isLight ? 0.28 : 0.46) },
+    { offset: 1, color: colorWithAlpha(dataBar, isLight ? 0.04 : 0.08) },
   ])
   const liquidTopFill = new echarts.graphic.RadialGradient(0.5, 0.55, 0.72, [
-    { offset: 0, color: `${accent2}aa` },
-    { offset: 0.6, color: `${accent2}44` },
-    { offset: 1, color: `${accent}10` },
+    { offset: 0, color: colorWithAlpha(instrumentBaseRim, 0.68) },
+    { offset: 0.6, color: colorWithAlpha(dataBarSecondary, 0.3) },
+    { offset: 1, color: colorWithAlpha(dataBar, 0.06) },
   ])
   const baseLeftFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-    { offset: 0, color: themed(accent3, 0.22) },
-    { offset: 0.52, color: themed(accent, 0.18) },
+    { offset: 0, color: themed(instrumentBaseRim, 0.13) },
+    { offset: 0.52, color: themed(instrumentBase, 0.2) },
     { offset: 1, color: themed(surface, 0.24) },
   ])
   const baseDeckFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-    { offset: 0, color: themed(accent3, 0.64) },
-    { offset: 0.36, color: themed(accent, 0.78) },
-    { offset: 0.72, color: themed(accent, 0.5) },
-    { offset: 1, color: themed(accent3, 0.26) },
+    { offset: 0, color: themed(instrumentBaseRim, 0.28) },
+    { offset: 0.36, color: themed(instrumentBase, 0.44) },
+    { offset: 0.72, color: themed(instrumentBase, 0.3) },
+    { offset: 1, color: themed(surfaceStrong, 0.22) },
   ])
   const baseFrontFill = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-    { offset: 0, color: themed(accent, 0.46) },
-    { offset: 0.3, color: themed(accent3, 0.28) },
+    { offset: 0, color: themed(instrumentBaseRim, 0.2) },
+    { offset: 0.3, color: themed(instrumentBase, 0.18) },
     { offset: 0.72, color: themed(surfaceStrong, 0.34) },
     { offset: 1, color: themed(surface, 0.18) },
   ])
   const baseRightFill = new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-    { offset: 0, color: themed(accent3, 0.36) },
-    { offset: 0.58, color: themed(accent, 0.22) },
+    { offset: 0, color: themed(instrumentBaseRim, 0.14) },
+    { offset: 0.58, color: themed(instrumentBase, 0.18) },
     { offset: 1, color: themed(surface, 0.16) },
   ])
   return {
@@ -326,7 +327,7 @@ const option = computed(() => {
               fill: text,
               fontSize: 12,
               fontWeight: 900,
-              textBorderColor: `${accent2}18`,
+              textBorderColor: themed(dataBar, 0.16),
               textBorderWidth: 1,
             },
             silent: true,
@@ -344,7 +345,7 @@ const option = computed(() => {
                 fill: text,
                 fontSize: 14,
                 fontWeight: 900,
-                textBorderColor: `${accent2}1f`,
+                textBorderColor: themed(dataBar, 0.18),
                 textBorderWidth: 1,
               },
               silent: true,
@@ -372,7 +373,7 @@ const option = computed(() => {
               shape,
               style: {
                 fill: glassLeftFill,
-                stroke: `${accent2}5f`,
+                stroke: colorWithAlpha(instrumentBaseRim, 0.38),
                 lineWidth: 1,
               },
             },
@@ -381,7 +382,7 @@ const option = computed(() => {
               shape,
               style: {
                 fill: glassRightFill,
-                stroke: `${accent}42`,
+                stroke: colorWithAlpha(instrumentBase, 0.34),
                 lineWidth: 1,
               },
             },
@@ -390,7 +391,7 @@ const option = computed(() => {
               shape: { x: barX, y: top[1] },
               style: {
                 fill: topCapFill,
-                stroke: `${accent2}aa`,
+                stroke: colorWithAlpha(instrumentBaseRim, 0.64),
                 lineWidth: 1,
               },
             },
@@ -399,7 +400,7 @@ const option = computed(() => {
               shape: liquidShape,
               style: {
                 fill: liquidFill,
-                stroke: `${accent2}72`,
+                stroke: colorWithAlpha(dataBarSecondary, 0.45),
                 lineWidth: 1,
               },
             },
@@ -408,7 +409,7 @@ const option = computed(() => {
               shape: liquidShape,
               style: {
                 fill: liquidSideFill,
-                stroke: `${accent2}36`,
+                stroke: colorWithAlpha(dataBar, 0.28),
                 lineWidth: 1,
               },
             },
@@ -417,7 +418,7 @@ const option = computed(() => {
               shape: { x: barX, y: liquidTopY },
               style: {
                 fill: liquidTopFill,
-                stroke: `${accent2}d6`,
+                stroke: colorWithAlpha(instrumentBaseRim, 0.72),
                 lineWidth: 1,
               },
             },
@@ -432,7 +433,7 @@ const option = computed(() => {
                 fill: text,
                 fontSize: 15,
                 fontWeight: 900,
-                textBorderColor: `${accent2}24`,
+                textBorderColor: themed(dataBar, 0.2),
                 textBorderWidth: 1,
               },
             },
@@ -449,7 +450,7 @@ const option = computed(() => {
     tooltip: {
       trigger: 'item',
       backgroundColor: themed(surfaceStrong, 0.92),
-      borderColor: `${accent}cc`,
+      borderColor: themed(dataBar, 0.8),
       borderWidth: 1,
       padding: [8, 12],
       textStyle: { color: text, fontSize: 12, fontWeight: 700 },
@@ -459,7 +460,7 @@ const option = computed(() => {
         const i = params.dataIndex
         return series.reduce(
           (html, item) => `${html}<br/>${item.name}：${item.data[i] || 0}`,
-          `${labels[i]} 柱体 <b style="color:${accent2}">${barValues[i]}</b> 合计 <b style="color:${accent2}">${totals[i]}</b>`,
+          `${labels[i]} 柱体 <b style="color:${dataBarSecondary}">${barValues[i]}</b> 合计 <b style="color:${dataBarSecondary}">${totals[i]}</b>`,
         )
       },
     },

@@ -7,13 +7,7 @@ import type { Component } from 'vue'
  * moduleRegistry 中查找对应组件,而非用一长串 `v-if` 判断模块 id。
  */
 export type ModuleKind =
-  | 'overview'
-  | 'table'
-  | 'bar'
-  | 'line'
-  | 'availability'
-  | 'completion'
-  | 'health'
+  'overview' | 'table' | 'bar' | 'line' | 'availability' | 'completion' | 'health'
 
 /** 模块占位尺寸:wide 表示跨列布局 */
 export type ModuleSize = 'normal' | 'wide'
@@ -25,7 +19,7 @@ export type ModuleSize = 'normal' | 'wide'
  */
 export interface ModuleCatalogItem {
   id: string
-  /** 模块序号,显示在面板左上角,如 "01" */
+  /** 模块序号,用于配置页排序/预览展示,不再渲染在大屏卡片标题 */
   number: string
   title: string
   subtitle?: string

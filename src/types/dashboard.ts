@@ -63,7 +63,7 @@ export interface LineChartData {
   data: number[]
 }
 
-/** 设备健康态势 */
+/** 设备健康状态 */
 export interface HealthTrendData {
   online: number
   warning: number

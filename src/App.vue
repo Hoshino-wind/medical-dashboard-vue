@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { Monitor, Settings } from 'lucide-vue-next'
@@ -10,7 +10,21 @@ const { activeTheme } = storeToRefs(store)
 const route = useRoute()
 
 const themeStyle = computed(() => activeTheme.value.variables)
+const themeMode = computed(() => (activeTheme.value.id.startsWith('light-') ? 'light' : 'dark'))
 const isConfig = computed(() => route.name === 'config')
+
+watchEffect(() => {
+  if (typeof document === 'undefined') return
+
+  const root = document.documentElement
+
+  Object.entries(activeTheme.value.variables).forEach(([key, value]) => {
+    root.style.setProperty(key, value)
+  })
+  root.style.setProperty('color-scheme', themeMode.value)
+  root.dataset.themeId = activeTheme.value.id
+  root.dataset.themeMode = themeMode.value
+})
 
 /** RouterLink 自定义渲染为按钮,点击后失焦避免聚焦残留 */
 function navigateAndBlur(navigate: (e: MouseEvent) => void, e: MouseEvent) {
@@ -20,7 +34,13 @@ function navigateAndBlur(navigate: (e: MouseEvent) => void, e: MouseEvent) {
 </script>
 
 <template>
-  <div class="dashboard-shell" :class="{ 'config-mode': isConfig }" :style="themeStyle">
+  <div
+    class="dashboard-shell"
+    :class="{ 'config-mode': isConfig }"
+    :data-theme-mode="themeMode"
+    :data-theme-id="activeTheme.id"
+    :style="themeStyle"
+  >
     <div class="view-switch" :class="{ 'screen-mode': !isConfig }">
       <RouterLink to="/" custom v-slot="{ navigate, isActive }">
         <button

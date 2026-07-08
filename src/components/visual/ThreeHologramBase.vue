@@ -20,7 +20,7 @@ const props = withDefaults(
     density?: number
   }>(),
   {
-    tone: 'var(--accent)',
+    tone: 'var(--data-ring)',
     density: 1,
   },
 )

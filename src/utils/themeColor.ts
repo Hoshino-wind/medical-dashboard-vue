@@ -32,5 +32,16 @@ export function colorWithAlpha(color: string, alpha: number): string {
     return `rgba(${Number(r)}, ${Number(g)}, ${Number(b)}, ${normalizedAlpha})`
   }
 
+  const hsl = trimmed.match(/^hsla?\(\s*([0-9.]+)(?:deg)?\s*[,\s]\s*([0-9.]+)%\s*[,\s]\s*([0-9.]+)%/i)
+  if (hsl) {
+    const [, h, s, l] = hsl
+    return `hsla(${Number(h)}, ${Number(s)}%, ${Number(l)}%, ${normalizedAlpha})`
+  }
+
+  // 无法解析的颜色(如颜色名、var()、color-mix())无法套用 alpha。
+  // 静默返回原值会让本应半透明的填充变不透明且无迹可循,dev 下显式告警。
+  if (import.meta.env.DEV) {
+    console.warn(`[colorWithAlpha] 无法解析颜色「${trimmed}」,alpha 被忽略;请使用 hex / rgb(a) / hsl(a)`)
+  }
   return trimmed
 }

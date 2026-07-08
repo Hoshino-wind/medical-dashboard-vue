@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import CountUp from './CountUp.vue'
 
 const props = defineProps<{
   headers: string[]
@@ -7,9 +8,10 @@ const props = defineProps<{
 }>()
 
 function statusStyle(value: string): string {
-  if (value.includes('维修')) return 'color: var(--warn)'
-  if (value.includes('配件')) return 'color: var(--accent-3)'
-  return 'color: var(--good)'
+  if (value.includes('维修')) return 'color: color-mix(in srgb, var(--warn) 74%, var(--muted) 26%)'
+  if (value.includes('配件'))
+    return 'color: color-mix(in srgb, var(--accent-3) 74%, var(--muted) 26%)'
+  return 'color: color-mix(in srgb, var(--good) 72%, var(--muted) 28%)'
 }
 
 function rowIconClass(index: number): string {
@@ -55,10 +57,10 @@ watch(
       </table>
     </div>
     <div class="work-order-summary">
-      <div class="is-danger"><span>维修中</span><b>44</b><em>单</em></div>
-      <div class="is-purple"><span>配件运输中</span><b>18</b><em>单</em></div>
-      <div class="is-warn"><span>待处理</span><b>0</b><em>单</em></div>
-      <div class="is-good"><span>已维修</span><b>1,326</b><em>单</em></div>
+      <div class="is-danger"><span>维修中</span><b><CountUp :value="44" /></b><em>单</em></div>
+      <div class="is-purple"><span>配件运输中</span><b><CountUp :value="18" /></b><em>单</em></div>
+      <div class="is-warn"><span>待处理</span><b><CountUp :value="0" /></b><em>单</em></div>
+      <div class="is-good"><span>已维修</span><b><CountUp :value="1326" /></b><em>单</em></div>
     </div>
   </div>
 </template>

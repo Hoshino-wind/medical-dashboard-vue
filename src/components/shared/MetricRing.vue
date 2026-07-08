@@ -15,7 +15,7 @@ withDefaults(
   }>(),
   {
     size: pxToRem(118),
-    tone: 'var(--accent)',
+    tone: 'var(--data-ring)',
     insideLabel: '',
     showFooter: true,
     large: false,

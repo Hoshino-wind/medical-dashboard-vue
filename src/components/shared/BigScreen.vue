@@ -1,50 +1,127 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, type Component } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Bell, Database, Expand, MapPinned, Monitor, SwatchBook } from 'lucide-vue-next'
-import { useRouter } from 'vue-router'
+import { Expand, Monitor, SwatchBook } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
 import HeaderBar from './HeaderBar.vue'
 import ModuleRenderer from './ModuleRenderer.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useDashboardData } from '@/composables/useDashboardData'
 
-type FooterAction = {
+type TitleStyle = 'center' | 'left' | 'strip'
+
+type ScreenAction = {
   label: string
   icon: Component
-  badge?: string
+  kind?: 'fullscreen'
   route?: string
 }
 
 const store = useDashboardStore()
 const { orderedModules, activeTheme } = storeToRefs(store)
+const route = useRoute()
 const router = useRouter()
+const screenFrameRef = ref<HTMLElement | null>(null)
+const isFullscreen = ref(false)
+const isFauxFullscreen = ref(false)
 
 const { data } = useDashboardData()
 
 const layout = computed(() => store.config.layout)
+const titleStyle = computed<TitleStyle>(() => {
+  const value = route.query.titleStyle
+  return value === 'center' || value === 'strip' ? value : 'left'
+})
 
 const visibleModules = computed(() =>
   layout.value === '2x3' ? orderedModules.value.slice(0, 6) : orderedModules.value,
 )
 
-const footerActions: FooterAction[] = [
-  { label: '大屏模式', icon: Monitor },
-  { label: '全屏显示', icon: Expand },
-  { label: '数据导出', icon: Database },
-  { label: '设备地图', icon: MapPinned },
-  { label: '告警中心', icon: Bell, badge: '12' },
+const screenActions: ScreenAction[] = [
+  { label: '大屏模式', icon: Monitor, route: '/' },
+  { label: '全屏显示', icon: Expand, kind: 'fullscreen' },
   { label: '主题配置', icon: SwatchBook, route: '/config' },
 ]
 
-function runFooterAction(action: FooterAction) {
+function syncFullscreenState() {
+  isFullscreen.value =
+    (typeof document !== 'undefined' && Boolean(document.fullscreenElement)) ||
+    isFauxFullscreen.value
+}
+
+async function toggleFullscreen() {
+  if (typeof document === 'undefined') return
+
+  if (isFauxFullscreen.value) {
+    isFauxFullscreen.value = false
+    syncFullscreenState()
+    return
+  }
+
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen?.()
+      syncFullscreenState()
+      return
+    }
+
+    const target = screenFrameRef.value ?? document.documentElement
+    if (typeof target.requestFullscreen !== 'function') {
+      isFauxFullscreen.value = true
+      return
+    }
+
+    await target.requestFullscreen()
+
+    if (!document.fullscreenElement) {
+      isFauxFullscreen.value = true
+    }
+  } catch {
+    // Fullscreen can be denied by browser policy or embedded preview environments.
+    isFauxFullscreen.value = true
+  } finally {
+    syncFullscreenState()
+  }
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && isFauxFullscreen.value) {
+    isFauxFullscreen.value = false
+    syncFullscreenState()
+  }
+}
+
+function runScreenAction(action: ScreenAction) {
+  if (action.kind === 'fullscreen') {
+    void toggleFullscreen()
+    return
+  }
+
   if (action.route) {
     void router.push(action.route)
   }
 }
+
+onMounted(() => {
+  syncFullscreenState()
+  document.addEventListener('fullscreenchange', syncFullscreenState)
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('fullscreenchange', syncFullscreenState)
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
-  <main class="screen-frame" data-reference-design="medical-equipment-1920x1080">
+  <main
+    ref="screenFrameRef"
+    class="screen-frame"
+    :class="[`title-style-${titleStyle}`, { 'is-faux-fullscreen': isFauxFullscreen }]"
+    data-reference-design="medical-equipment-1920x1080"
+    :data-title-style="titleStyle"
+  >
     <HeaderBar :data="data.header" />
     <section class="screen-grid" :class="{ 'layout-2x3': layout === '2x3' }" :data-layout="layout">
       <ModuleRenderer
@@ -54,18 +131,18 @@ function runFooterAction(action: FooterAction) {
         :theme="activeTheme"
       />
     </section>
-    <footer class="screen-footer-nav" aria-label="大屏快捷操作">
+    <div class="screen-actions" aria-label="大屏快捷操作">
       <button
-        v-for="action in footerActions"
+        v-for="action in screenActions"
         :key="action.label"
-        class="screen-footer-action"
+        class="screen-action"
         type="button"
-        @click="runFooterAction(action)"
+        :aria-pressed="action.kind === 'fullscreen' ? isFullscreen : undefined"
+        @click="runScreenAction(action)"
       >
-        <component :is="action.icon" class="screen-footer-icon" aria-hidden="true" />
+        <component :is="action.icon" class="screen-action-icon" aria-hidden="true" />
         <span>{{ action.label }}</span>
-        <i v-if="action.badge" class="screen-footer-badge">{{ action.badge }}</i>
       </button>
-    </footer>
+    </div>
   </main>
 </template>

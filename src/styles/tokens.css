@@ -2,28 +2,62 @@
  * 设计 token 回退值。
  *
  * 主题 CSS 变量在运行时由 Theme.variables 通过根节点 :style 注入。
- * 此文件提供一套默认值(对应"深蓝科技"主题),作为兜底:
+ * 此文件提供一套默认值,作为兜底:
  *   - 主题 JS 尚未挂载时的首帧防闪烁;
  *   - 任何脱离主题上下文使用 var(--xxx) 的地方仍有合理取值。
  *
- * 注意:运行时主题会覆盖这些默认值。
+ * 取值与 data/themes.ts 中的 "深海指挥蓝"(deep-sea-instrument)逐字段一致,
+ * 保持单一事实来源;若该主题调整,这里需同步。运行时主题会覆盖这些默认值。
  */
 :root {
-  --bg: #07182c;
-  --bg-soft: #102a49;
-  --surface: rgba(12, 34, 64, 0.96);
-  --surface-strong: rgba(16, 46, 84, 0.98);
-  --surface-muted: rgba(19, 58, 99, 0.86);
-  --border: rgba(75, 139, 232, 0.48);
-  --border-strong: rgba(87, 160, 255, 0.74);
-  --text: #edf6ff;
-  --muted: #a4bad0;
-  --accent: #2b6dff;
-  --accent-2: #1a9bff;
-  --accent-3: #8b6dff;
-  --good: #2dfaa8;
-  --warn: #ffc857;
-  --danger: #ff5e78;
-  --chart-grid: rgba(141, 174, 210, 0.2);
-  --panel-shadow: 0 0.625rem 1.375rem rgba(2, 10, 24, 0.24);
+  --bg-top: #031425;
+  --bg: #020814;
+  --bg-soft: #062a47;
+  --bg-bottom: #041c34;
+  --backdrop: #031425;
+  --surface: rgba(3, 18, 34, 0.4);
+  --surface-strong: rgba(5, 28, 50, 0.52);
+  --surface-muted: rgba(8, 45, 70, 0.38);
+  --glass: rgba(4, 34, 58, 0.34);
+  --glass-strong: rgba(7, 54, 82, 0.48);
+  --glass-edge: rgba(56, 189, 248, 0.52);
+  --glass-highlight: rgba(125, 211, 252, 0.24);
+  --border: rgba(56, 189, 248, 0.42);
+  --border-strong: rgba(125, 211, 252, 0.72);
+  --text: #eef8ff;
+  --muted: #9fbfd2;
+  --accent: #16b8d9;
+  --accent-2: #7dd3fc;
+  --accent-3: #4f8cff;
+  --chart-primary: #16b8d9;
+  --chart-secondary: #4f8cff;
+  --chart-tertiary: #9d7cff;
+  --data-bar: #16b8d9;
+  --data-bar-secondary: #7dd3fc;
+  --data-maintenance-line: #9d7cff;
+  --data-inspection-line: #2dd4bf;
+  --data-ring: #38bdf8;
+  --data-ring-secondary: #4f8cff;
+  --data-pie-primary: #16b8d9;
+  --data-pie-pending: #9d7cff;
+  --data-health-pie-good: #2dd4bf;
+  --data-health-pie-warning: #f4c152;
+  --data-health-pie-repairing: #f06578;
+  --data-health-pie-pending: #8b7cf6;
+  --data-inspection-pie-finished: #16b8d9;
+  --data-inspection-pie-waiting: #7dd3fc;
+  --data-inspection-pie-overdue: #f06578;
+  --instrument-base: #33566c;
+  --instrument-base-rim: #b8cad6;
+  --instrument-rim: #e4fbff;
+  --good: #2dd48f;
+  --warn: #f4c152;
+  --danger: #f06578;
+  --chart-grid: rgba(110, 210, 245, 0.24);
+  --star-white: rgba(255, 255, 255, 0.7);
+  --star-accent: rgba(125, 211, 252, 0.6);
+  --star-opacity: 0.78;
+  --grid-opacity: 0.5;
+  --grid-blend-mode: screen;
+  --panel-shadow: 0 0 0 0.0625rem rgba(56, 189, 248, 0.14), 0 0.875rem 2.125rem rgba(0, 6, 14, 0.64), 0 0 1.375rem rgba(56, 189, 248, 0.15);
 }

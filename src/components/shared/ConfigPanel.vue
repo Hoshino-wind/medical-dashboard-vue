@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { ChevronDown, ChevronUp, GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from 'lucide-vue-next'
+import { Check, ChevronDown, ChevronUp, GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from 'lucide-vue-next'
 import { moduleCatalog } from '@/data/modules'
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
@@ -92,6 +92,7 @@ function moveDown(index: number) {
             :key="theme.id"
             class="theme-card text-left"
             :class="{ active: theme.id === config.themeId }"
+            :style="theme.variables"
             @click="store.setTheme(theme.id as ThemeId)"
           >
             <div class="flex items-center justify-between gap-3">
@@ -99,13 +100,19 @@ function moveDown(index: number) {
                 <div class="text-base font-black">{{ theme.name }}</div>
                 <div class="mt-1 text-xs text-[color:var(--muted)]">{{ theme.description }}</div>
               </div>
-              <div class="flex gap-1">
-                <span
-                  v-for="color in theme.preview"
-                  :key="color"
-                  class="h-8 w-8 rounded-full border border-white/20"
-                  :style="{ background: color }"
-                ></span>
+              <div class="theme-card-right">
+                <span v-if="theme.id === config.themeId" class="theme-current-badge">
+                  <Check class="h-3 w-3" />
+                  当前
+                </span>
+                <div class="flex gap-1">
+                  <span
+                    v-for="color in theme.preview"
+                    :key="color"
+                    class="h-8 w-8 rounded-full border border-[color:var(--border)]"
+                    :style="{ background: color }"
+                  ></span>
+                </div>
               </div>
             </div>
           </button>

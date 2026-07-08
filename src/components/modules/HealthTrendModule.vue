@@ -12,26 +12,12 @@ const props = defineProps<{
 
 const healthHeaders = ['设备范围', '健康状态', '数量', '处置建议']
 
-// 同色系明度分层：以主题亮蓝为基准派生蓝青梯度，取代原先绿/黄/红/紫多色相拼盘
-function shade(hex: string, amount: number): string {
-  const value = hex.trim().replace('#', '')
-  const full = value.length === 3 ? value.replace(/(.)/g, '$1$1') : value
-  const r = Number.parseInt(full.slice(0, 2), 16)
-  const g = Number.parseInt(full.slice(2, 4), 16)
-  const b = Number.parseInt(full.slice(4, 6), 16)
-  const target = amount >= 0 ? 255 : 0
-  const k = Math.min(1, Math.abs(amount))
-  const mix = (channel: number) => Math.round(channel + (target - channel) * k)
-  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`
-}
-
 const pieItems = computed(() => {
-  const base = props.theme.variables['--accent-2']
   return [
-    { name: '运行正常', value: props.data.online, color: shade(base, 0.34) },
-    { name: '维保预警', value: props.data.warning, color: base },
-    { name: '维修中', value: props.data.repairing, color: shade(base, -0.42) },
-    { name: '即将保养', value: props.data.pending, color: shade(base, -0.2) },
+    { name: '运行正常', value: props.data.online, color: props.theme.variables['--data-health-pie-good'] },
+    { name: '维保预警', value: props.data.warning, color: props.theme.variables['--data-health-pie-warning'] },
+    { name: '维修中', value: props.data.repairing, color: props.theme.variables['--data-health-pie-repairing'] },
+    { name: '即将保养', value: props.data.pending, color: props.theme.variables['--data-health-pie-pending'] },
   ]
 })
 
@@ -69,12 +55,12 @@ function rowIconClass(index: number): string {
       </table>
     </div>
 
-    <aside class="pie-summary-panel health-pie-panel" aria-label="设备健康态势">
-      <div class="pie-summary-title">设备健康态势</div>
+    <aside class="pie-summary-panel health-pie-panel" aria-label="设备健康状态">
+      <div class="pie-summary-title">设备健康状态</div>
       <HealthPieChart
         :items="pieItems"
         :total="pieTotal"
-        :tone="theme.variables['--accent']"
+        :tone="theme.variables['--data-health-pie-good']"
         :theme="theme"
       />
     </aside>

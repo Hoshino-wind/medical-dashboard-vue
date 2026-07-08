@@ -19,7 +19,7 @@ const props = withDefaults(
   {
     unit: '台',
     size: pxToRem(118),
-    tone: 'var(--accent)',
+    tone: 'var(--data-ring)',
     insideLabel: '',
     showFooter: true,
     large: false,
@@ -33,17 +33,71 @@ let raf = 0
 const RING_R = 50
 const CIRCUMFERENCE = 2 * Math.PI * RING_R
 
+interface GaugePalette {
+  tone: string
+  toneSoft: string
+  toneBright: string
+  track: string
+}
+
+const GAUGE_PALETTES = [
+  {
+    max: 30,
+    tone: '#e65b73',
+    toneSoft: '#f18a9b',
+    toneBright: '#ffd6dd',
+    track: '#dfe8ec',
+  },
+  {
+    max: 60,
+    tone: '#f2b84b',
+    toneSoft: '#f7cb74',
+    toneBright: '#ffefc9',
+    track: '#dfe8ec',
+  },
+  {
+    max: 80,
+    tone: '#e6b94a',
+    toneSoft: '#f0d27e',
+    toneBright: '#fff1c8',
+    track: '#dfe8ec',
+  },
+  {
+    max: 95,
+    tone: '#24c78e',
+    toneSoft: '#7ee1bd',
+    toneBright: '#d8f6eb',
+    track: '#dfe8ec',
+  },
+  {
+    max: Number.POSITIVE_INFINITY,
+    tone: '#24c78e',
+    toneSoft: '#8de6c6',
+    toneBright: '#ddf5f8',
+    track: '#dfe8ec',
+  },
+] satisfies Array<GaugePalette & { max: number }>
+
 // 每个实例唯一 id，避免多仪表盘共存时 SVG <defs> id 冲突
 const uid = `gg-${Math.random().toString(36).slice(2, 8)}`
 
-const strokeDashoffset = computed(
-  () => CIRCUMFERENCE * (1 - (animated.value || 0) / 100),
-)
+const strokeDashoffset = computed(() => CIRCUMFERENCE * (1 - (animated.value || 0) / 100))
+
+const palette = computed(() => {
+  const normalized = Math.max(0, Math.min(100, props.value || 0))
+  return (
+    GAUGE_PALETTES.find((item) => normalized < item.max) ??
+    GAUGE_PALETTES[GAUGE_PALETTES.length - 1]
+  )
+})
 
 const rootStyle = computed(() => ({
   '--gauge-size': props.size,
   '--gauge-value': animated.value,
-  '--gauge-tone': props.tone,
+  '--gauge-tone': palette.value.tone,
+  '--gauge-tone-soft': palette.value.toneSoft,
+  '--gauge-tone-bright': palette.value.toneBright,
+  '--gauge-track-tone': palette.value.track,
   '--gauge-base-density': props.baseDensity ?? (props.large ? 1.12 : 0.92),
 }))
 
@@ -72,7 +126,11 @@ onUnmounted(() => cancelAnimationFrame(raf))
 </script>
 
 <template>
-  <div class="hologram-gauge" :class="{ 'is-large': large }" :style="rootStyle">
+  <div
+    class="hologram-gauge"
+    :class="{ 'is-large': large, 'has-inside-label': insideLabel }"
+    :style="rootStyle"
+  >
     <div class="hologram-gauge-stage">
       <HologramGaugeBase />
 
@@ -81,8 +139,9 @@ onUnmounted(() => cancelAnimationFrame(raf))
           <defs>
             <linearGradient :id="`ring-progress-${uid}`" x1="0" y1="0" x2="1" y2="1">
               <stop class="gauge-grad-a" offset="0" />
-              <stop class="gauge-grad-b" offset="0.55" />
-              <stop class="gauge-grad-c" offset="1" />
+              <stop class="gauge-grad-b" offset="0.36" />
+              <stop class="gauge-grad-c" offset="0.72" />
+              <stop class="gauge-grad-d" offset="1" />
             </linearGradient>
           </defs>
           <circle class="gauge-ring-track" cx="60" cy="60" :r="RING_R" />

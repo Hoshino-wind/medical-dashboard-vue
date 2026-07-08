@@ -26,9 +26,9 @@ const resolvedProps = computed(() => entry.value.resolveProps(props.module, ctx.
 
 <template>
   <PanelShell
-    :number="module.number"
     :title="module.title"
     :subtitle="module.subtitle"
+    :variant="module.kind"
     :class="{ 'module-wide': module.size === 'wide' }"
   >
     <component :is="entry.component" v-bind="resolvedProps" />

@@ -8,9 +8,11 @@ import type { Theme } from '@/types/theme'
 const TAU = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
 const OUTER_RADIUS = 1
-const INNER_RADIUS = 0.42
+const INNER_RADIUS = 0.56
 const CAMERA_BASE_SIZE = 1.05
 const MAX_PIXEL_RATIO = 1.6
+const LIGHT_PIE_SIDE = new THREE.Color('#d8f1f4')
+const LIGHT_PIE_EDGE = new THREE.Color('#bfe8f0')
 
 const props = withDefaults(
   defineProps<{
@@ -22,10 +24,12 @@ const props = withDefaults(
     accent?: string
     surface?: string
     text?: string
+    autoRotate?: boolean
   }>(),
   {
     height: pxToRem(150),
     thickness: 8,
+    autoRotate: true,
   },
 )
 
@@ -58,10 +62,11 @@ const tooltipStyle = computed(() => ({
 
 const shellStyle = computed(() => ({
   height: props.height,
-  '--pie-tone': props.tone ?? props.theme?.variables['--accent'] ?? 'var(--accent)',
-  '--pie-accent': props.accent ?? props.theme?.variables['--accent-2'] ?? 'var(--accent-2)',
+  '--pie-tone': props.tone ?? props.theme?.variables['--data-pie-primary'] ?? 'var(--data-pie-primary)',
+  '--pie-accent': props.accent ?? props.theme?.variables['--data-pie-pending'] ?? 'var(--data-pie-pending)',
   '--pie-surface':
-    props.surface ?? props.theme?.variables['--surface-strong'] ?? 'var(--surface-strong)',
+    props.surface ?? props.theme?.variables['--instrument-base'] ?? 'var(--instrument-base)',
+  '--pie-edge': props.theme?.variables['--glass-edge'] ?? 'var(--glass-edge)',
   '--pie-text': props.text ?? props.theme?.variables['--text'] ?? 'var(--text)',
 }))
 
@@ -72,11 +77,19 @@ let rootGroup: THREE.Group | null = null
 let observer: ResizeObserver | null = null
 let hoveredGroup: THREE.Group | null = null
 let segmentMeshes: SegmentMesh[] = []
+let animationFrame = 0
+let lastFrameTime = 0
+let motionQuery: MediaQueryList | null = null
 
 const raycaster = new THREE.Raycaster()
 const pointer = new THREE.Vector2()
 
+function isLightTheme(): boolean {
+  return props.theme?.id.startsWith('light-') ?? false
+}
+
 function pieDepth(): number {
+  if (isLightTheme()) return Math.max(0.14, Math.min(0.24, props.thickness * 0.026))
   return Math.max(0.24, Math.min(0.42, props.thickness * 0.04))
 }
 
@@ -131,13 +144,32 @@ function runtimeColor(value: string | undefined, token: keyof Theme['variables']
   return getComputedStyle(host.value).getPropertyValue(variableName).trim() || fallback
 }
 
-function makeAnnularSectorGeometry(start: number, end: number, depth: number): THREE.ExtrudeGeometry {
+// 浅色主题:保留扇区色相,压低饱和、提高明度,得到适配白底玻璃的顶面亮基色
+function lightPieBright(base: THREE.Color): THREE.Color {
+  const hsl = { h: 0, s: 0, l: 0 }
+  base.getHSL(hsl)
+  return new THREE.Color().setHSL(hsl.h, Math.min(1, hsl.s * 0.8), Math.min(0.82, hsl.l + 0.22))
+}
+
+// 顶面由内到外的深基色:比亮基色略深、略饱和,拉出层次但仍属白底玻璃
+function lightPieDeep(base: THREE.Color): THREE.Color {
+  const hsl = { h: 0, s: 0, l: 0 }
+  base.getHSL(hsl)
+  return new THREE.Color().setHSL(hsl.h, Math.min(1, hsl.s * 0.9), Math.min(0.64, hsl.l + 0.06))
+}
+
+function makeAnnularSectorShape(start: number, end: number): THREE.Shape {
   const shape = new THREE.Shape()
   shape.moveTo(Math.cos(start) * OUTER_RADIUS, Math.sin(start) * OUTER_RADIUS)
   shape.absarc(0, 0, OUTER_RADIUS, start, end, false)
   shape.lineTo(Math.cos(end) * INNER_RADIUS, Math.sin(end) * INNER_RADIUS)
   shape.absarc(0, 0, INNER_RADIUS, end, start, true)
   shape.closePath()
+  return shape
+}
+
+function makeAnnularSectorGeometry(start: number, end: number, depth: number): THREE.ExtrudeGeometry {
+  const shape = makeAnnularSectorShape(start, end)
 
   const geometry = new THREE.ExtrudeGeometry(shape, {
     depth,
@@ -153,31 +185,92 @@ function makeAnnularSectorGeometry(start: number, end: number, depth: number): T
   return geometry
 }
 
+function gradientColorAt(angle: number, radius: number, base: THREE.Color): THREE.Color {
+  const y = Math.sin(angle) * radius
+  const ratio = Math.max(0, Math.min(1, (y + OUTER_RADIUS) / (OUTER_RADIUS * 2)))
+  return lightPieDeep(base).lerp(lightPieBright(base), ratio)
+}
+
+function makeTopGradientMesh(start: number, end: number, depth: number, base: THREE.Color): THREE.Mesh {
+  const arc = Math.max(0.01, end - start)
+  const steps = Math.max(18, Math.ceil((arc / TAU) * 128))
+  const positions: number[] = []
+  const colors: number[] = []
+  const indices: number[] = []
+
+  for (let index = 0; index <= steps; index += 1) {
+    const ratio = index / steps
+    const angle = start + arc * ratio
+    const outerColor = gradientColorAt(angle, OUTER_RADIUS, base)
+    const innerColor = gradientColorAt(angle, INNER_RADIUS, base).lerp(lightPieDeep(base), 0.1)
+
+    positions.push(Math.cos(angle) * OUTER_RADIUS, Math.sin(angle) * OUTER_RADIUS, depth / 2 + 0.012)
+    colors.push(outerColor.r, outerColor.g, outerColor.b)
+
+    positions.push(Math.cos(angle) * INNER_RADIUS, Math.sin(angle) * INNER_RADIUS, depth / 2 + 0.012)
+    colors.push(innerColor.r, innerColor.g, innerColor.b)
+  }
+
+  for (let index = 0; index < steps; index += 1) {
+    const outerCurrent = index * 2
+    const innerCurrent = outerCurrent + 1
+    const outerNext = outerCurrent + 2
+    const innerNext = outerCurrent + 3
+    indices.push(outerCurrent, outerNext, innerNext, outerCurrent, innerNext, innerCurrent)
+  }
+
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
+  geometry.setIndex(indices)
+  geometry.computeVertexNormals()
+
+  return new THREE.Mesh(
+    geometry,
+    new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.98,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    }),
+  )
+}
+
 function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): THREE.Group {
   const start = START_ANGLE + segment.startRatio * TAU + gap
   const end = START_ANGLE + segment.endRatio * TAU - gap
   const midAngle = (start + end) / 2
-  const color = resolveColor(segment.color)
-  const sideColor = color.clone().multiplyScalar(0.55)
-  const rimColor = color.clone().offsetHSL(0, 0.04, 0.18)
+  const isLight = isLightTheme()
+  const sourceColor = resolveColor(segment.color)
+  const color = isLight ? lightPieDeep(sourceColor) : sourceColor
+  const rimTheme = resolveColor(runtimeColor(undefined, '--instrument-rim', '#d7fbff'))
+  const sideColor = isLight
+    ? lightPieBright(sourceColor).lerp(LIGHT_PIE_SIDE, 0.55)
+    : color.clone().offsetHSL(0, -0.03, -0.18).multiplyScalar(0.82)
+  const rimColor = isLight
+    ? lightPieBright(sourceColor).lerp(LIGHT_PIE_EDGE, 0.4)
+    : color.clone().lerp(rimTheme, 0.08).offsetHSL(0, 0.03, 0.08)
   const geometry = makeAnnularSectorGeometry(start, Math.max(start + 0.01, end), depth)
 
   const mesh = new THREE.Mesh(geometry, [
     new THREE.MeshStandardMaterial({
-      color,
-      emissive: color.clone().multiplyScalar(0.16),
-      metalness: 0.22,
-      roughness: 0.34,
+      color: isLight
+        ? lightPieBright(sourceColor)
+        : color.clone().lerp(rimTheme, 0.02).offsetHSL(0, 0.1, 0.05),
+      emissive: color.clone().multiplyScalar(isLight ? 0.006 : 0.11),
+      metalness: isLight ? 0.08 : 0.16,
+      roughness: isLight ? 0.6 : 0.36,
       transparent: true,
-      opacity: 0.98,
+      opacity: isLight ? 0.32 : 0.96,
     }),
     new THREE.MeshStandardMaterial({
       color: sideColor,
-      emissive: color.clone().multiplyScalar(0.06),
-      metalness: 0.12,
-      roughness: 0.44,
+      emissive: sideColor.clone().multiplyScalar(isLight ? 0.006 : 0.04),
+      metalness: isLight ? 0.02 : 0.12,
+      roughness: isLight ? 0.76 : 0.52,
       transparent: true,
-      opacity: 0.96,
+      opacity: isLight ? 0.34 : 0.88,
     }),
   ]) as unknown as SegmentMesh
 
@@ -191,7 +284,7 @@ function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): TH
     new THREE.LineBasicMaterial({
       color: rimColor,
       transparent: true,
-      opacity: 0.18,
+      opacity: isLight ? 0.05 : 0.17,
     }),
   )
 
@@ -201,7 +294,7 @@ function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): TH
     new THREE.MeshBasicMaterial({
       color: rimColor,
       transparent: true,
-      opacity: 0.18,
+      opacity: isLight ? 0.025 : 0.12,
       side: THREE.DoubleSide,
       depthWrite: false,
     }),
@@ -209,21 +302,28 @@ function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): TH
   innerGlow.position.z = depth / 2 + 0.012
 
   group.userData = { midAngle }
+  const topGradient = isLight
+    ? makeTopGradientMesh(start, Math.max(start + 0.01, end), depth, sourceColor)
+    : null
   group.add(mesh, edges, innerGlow)
+  if (topGradient) group.add(topGradient)
   return group
 }
 
 function makeCenterCap(depth: number, toneColor: THREE.Color, accentColor: THREE.Color, surfaceColor: THREE.Color): THREE.Mesh {
-  const geometry = new THREE.CylinderGeometry(INNER_RADIUS * 0.82, INNER_RADIUS * 0.9, depth * 0.92, 96)
+  const isLight = isLightTheme()
+  const topRadius = INNER_RADIUS * (isLight ? 0.5 : 0.82)
+  const bottomRadius = INNER_RADIUS * (isLight ? 0.58 : 0.9)
+  const geometry = new THREE.CylinderGeometry(topRadius, bottomRadius, depth * 0.82, 96)
   geometry.rotateX(Math.PI / 2)
   const material = new THREE.MeshStandardMaterial({
-    color: surfaceColor.clone().lerp(toneColor, 0.34),
-    emissive: accentColor.clone().multiplyScalar(0.72),
-    emissiveIntensity: 0.28,
-    metalness: 0.34,
-    roughness: 0.28,
+    color: isLight ? new THREE.Color('#f4fbfc') : surfaceColor.clone().lerp(toneColor, 0.12),
+    emissive: accentColor.clone().multiplyScalar(isLight ? 0.004 : 0.16),
+    emissiveIntensity: isLight ? 0.004 : 0.1,
+    metalness: isLight ? 0.04 : 0.2,
+    roughness: isLight ? 0.82 : 0.46,
     transparent: true,
-    opacity: 0.74,
+    opacity: isLight ? 0.16 : 0.56,
   })
   const mesh = new THREE.Mesh(geometry, material)
   mesh.position.z = 0.018
@@ -233,12 +333,13 @@ function makeCenterCap(depth: number, toneColor: THREE.Color, accentColor: THREE
 function buildScene() {
   disposeScene()
 
+  const isLight = isLightTheme()
   const depth = pieDepth()
   const segments = buildPie3DSegments(props.items)
   const gap = segments.length > 1 ? 0.014 : 0
-  const toneColor = resolveColor(runtimeColor(props.tone, '--accent', '#000000'))
-  const accentColor = resolveColor(runtimeColor(props.accent, '--accent-2', '#000000'))
-  const surfaceColor = resolveColor(runtimeColor(props.surface, '--surface-strong', '#000000'))
+  const toneColor = resolveColor(runtimeColor(props.tone, '--data-pie-primary', '#20e8ff'))
+  const accentColor = resolveColor(runtimeColor(props.accent, '--data-pie-pending', '#9df5ff'))
+  const surfaceColor = resolveColor(runtimeColor(props.surface, '--instrument-base', '#33566c'))
   const mutedColor = resolveColor(runtimeColor(undefined, '--surface-muted', '#000000'))
 
   scene = new THREE.Scene()
@@ -246,17 +347,17 @@ function buildScene() {
   camera.position.set(0, -2.65, 2.05)
   camera.lookAt(0, 0, 0)
 
-  scene.add(new THREE.AmbientLight(toneColor.clone().offsetHSL(0, 0, 0.1), 1.05))
+  scene.add(new THREE.AmbientLight(toneColor.clone().offsetHSL(0, -0.04, 0.08), isLight ? 0.48 : 0.88))
 
-  const keyLight = new THREE.DirectionalLight(toneColor.clone().offsetHSL(0, 0.03, 0.16), 2.1)
+  const keyLight = new THREE.DirectionalLight(toneColor.clone().offsetHSL(0, -0.02, 0.12), isLight ? 0.62 : 1.28)
   keyLight.position.set(-1.5, -2.6, 3.2)
   scene.add(keyLight)
 
-  const rimLight = new THREE.DirectionalLight(accentColor.clone().offsetHSL(0, 0.04, 0.14), 1.75)
+  const rimLight = new THREE.DirectionalLight(accentColor.clone().offsetHSL(0, 0.04, 0.1), isLight ? 0.22 : 0.96)
   rimLight.position.set(2.4, 1.8, 2.4)
   scene.add(rimLight)
 
-  const frontLight = new THREE.PointLight(accentColor, 1.25, 6)
+  const frontLight = new THREE.PointLight(accentColor, isLight ? 0.08 : 0.58, 6)
   frontLight.position.set(0, -1.5, 1.2)
   scene.add(frontLight)
 
@@ -315,13 +416,62 @@ function renderScene() {
   renderer.render(scene, camera)
 }
 
+function prefersReducedMotion(): boolean {
+  return motionQuery?.matches ?? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function shouldRotate(): boolean {
+  return props.autoRotate && !prefersReducedMotion()
+}
+
+function stopRotation() {
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame)
+    animationFrame = 0
+  }
+  lastFrameTime = 0
+}
+
+function tickRotation(timestamp: number) {
+  if (!rootGroup || !shouldRotate()) {
+    animationFrame = 0
+    lastFrameTime = 0
+    return
+  }
+
+  if (!lastFrameTime) lastFrameTime = timestamp
+  const delta = Math.min(48, timestamp - lastFrameTime)
+  lastFrameTime = timestamp
+  rootGroup.rotation.z += delta * 0.00016
+  renderScene()
+  animationFrame = requestAnimationFrame(tickRotation)
+}
+
+function startRotation() {
+  stopRotation()
+  if (!shouldRotate()) return
+  animationFrame = requestAnimationFrame(tickRotation)
+}
+
+function onMotionPreferenceChange() {
+  if (shouldRotate()) {
+    startRotation()
+    return
+  }
+
+  stopRotation()
+  renderScene()
+}
+
 function mountScene() {
   ensureRenderer()
   if (!renderer) return
   tooltip.visible = false
+  stopRotation()
   buildScene()
   resize()
   renderScene()
+  startRotation()
 }
 
 function resetHover() {
@@ -381,6 +531,8 @@ function onPointerMove(event: PointerEvent) {
 
 onMounted(() => {
   nextTick(() => {
+    motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    motionQuery.addEventListener('change', onMotionPreferenceChange)
     mountScene()
     observer = new ResizeObserver(resize)
     if (host.value) observer.observe(host.value)
@@ -388,12 +540,15 @@ onMounted(() => {
 })
 
 watch(
-  () => [props.items, props.thickness, props.theme, props.tone, props.accent, props.surface],
+  () => [props.items, props.thickness, props.theme, props.tone, props.accent, props.surface, props.autoRotate],
   () => nextTick(mountScene),
   { deep: true },
 )
 
 onUnmounted(() => {
+  stopRotation()
+  motionQuery?.removeEventListener('change', onMotionPreferenceChange)
+  motionQuery = null
   observer?.disconnect()
   disposeScene()
   renderer?.dispose()
@@ -441,9 +596,9 @@ onUnmounted(() => {
   z-index: 4;
   min-width: 7.25rem;
   padding: 0.4375rem 0.625rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--pie-accent) 58%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--pie-edge) 74%, transparent);
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--pie-surface) 92%, transparent);
+  background: color-mix(in srgb, var(--pie-surface) 72%, #020814);
   color: var(--pie-text);
   font-size: 0.75rem;
   font-weight: 800;

@@ -1,4 +1,103 @@
 /* Chart containers */
+.chart-shell {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart-canvas {
+  height: 100%;
+}
+
+.chart-loading-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--chart-primary) 9%, transparent),
+      transparent 62%
+    );
+  opacity: 1;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+
+.chart-shell.is-ready .chart-loading-layer {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.chart-loading-pulse {
+  position: absolute;
+  width: min(8.75rem, 42%);
+  height: 0.125rem;
+  border-radius: 62.4375rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--chart-primary) 86%, transparent),
+    color-mix(in srgb, var(--accent-2) 92%, transparent),
+    transparent
+  );
+  box-shadow: 0 0 0.875rem color-mix(in srgb, var(--chart-primary) 28%, transparent);
+  animation: chart-loading-pulse 1.2s ease-in-out infinite;
+}
+
+.chart-loading-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+  height: 1rem;
+}
+
+.chart-loading-bars i {
+  display: block;
+  width: 0.1875rem;
+  height: 0.35rem;
+  border-radius: 62.4375rem;
+  background: color-mix(in srgb, var(--accent-2) 88%, transparent);
+  box-shadow: 0 0 0.5rem color-mix(in srgb, var(--chart-primary) 34%, transparent);
+  animation: chart-loading-bar 0.72s ease-in-out infinite;
+}
+
+.chart-loading-bars i:nth-child(2) {
+  animation-delay: 0.12s;
+}
+
+.chart-loading-bars i:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+@keyframes chart-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scaleX(0.72);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes chart-loading-bar {
+  50% {
+    height: 0.95rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-loading-pulse,
+  .chart-loading-bars i {
+    animation: none;
+  }
+}
+
 .cube-bar-chart {
   position: relative;
   width: 100%;
@@ -31,22 +130,22 @@
 .cube-bar-legend i {
   width: 0.625rem;
   height: 0.625rem;
-  border-radius: 0.125rem;
+  border-radius: 0.1875rem;
 }
 
 .cube-bar-legend .is-all {
-  color: var(--accent);
-  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 75%, #000));
+  color: color-mix(in srgb, var(--data-bar) 94%, var(--text) 6%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--data-bar) 76%, var(--bg)), color-mix(in srgb, var(--data-bar) 42%, var(--bg)));
 }
 
 .cube-bar-legend .is-onsite {
-  color: var(--accent-3);
-  background: linear-gradient(135deg, var(--accent-3), color-mix(in srgb, var(--accent-3) 75%, #000));
+  color: color-mix(in srgb, var(--data-bar-secondary) 94%, var(--text) 6%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--data-bar-secondary) 76%, var(--bg)), color-mix(in srgb, var(--data-bar-secondary) 42%, var(--bg)));
 }
 
 .cube-bar-legend .is-factory {
-  color: var(--accent-2);
-  background: linear-gradient(135deg, var(--accent-2), color-mix(in srgb, var(--accent-2) 75%, #000));
+  color: color-mix(in srgb, var(--data-pie-pending) 94%, var(--text) 6%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--data-pie-pending) 76%, var(--bg)), color-mix(in srgb, var(--data-pie-pending) 42%, var(--bg)));
 }
 
 .chart-bar {
@@ -82,11 +181,11 @@
   height: 43%;
   clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
   background:
-    linear-gradient(90deg, transparent 0 4%, color-mix(in srgb, var(--accent-2) 42%, transparent) 4.5% 5%, transparent 5.5% 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent-2) 48%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
-  border-top: 0.0625rem solid color-mix(in srgb, var(--accent-2) 78%, transparent);
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--accent) 38%, transparent);
-  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--accent-2) 18%, transparent);
+    linear-gradient(90deg, transparent 0 4%, color-mix(in srgb, var(--instrument-base-rim) 18%, transparent) 4.5% 5%, transparent 5.5% 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--instrument-base-rim) 18%, transparent), color-mix(in srgb, var(--instrument-base) 14%, transparent));
+  border-top: 0.0625rem solid color-mix(in srgb, var(--instrument-base-rim) 30%, transparent);
+  border-bottom: 0.0625rem solid color-mix(in srgb, var(--instrument-base) 22%, transparent);
+  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--glass-highlight) 12%, transparent);
 }
 
 .cube-bar-base-front {
@@ -99,15 +198,15 @@
   align-items: center;
   height: 66%;
   padding: 0 0.25rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--accent) 62%, transparent);
-  border-top-color: color-mix(in srgb, var(--accent-2) 72%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 40%, transparent);
+  border-top-color: color-mix(in srgb, var(--instrument-base-rim) 34%, transparent);
   border-radius: 0 0 0.4375rem 0.4375rem;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 12% 88%, color-mix(in srgb, var(--accent) 16%, transparent)),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--bg-soft) 76%, transparent));
+    linear-gradient(90deg, color-mix(in srgb, var(--instrument-base-rim) 7%, transparent), transparent 12% 88%, color-mix(in srgb, var(--instrument-base) 12%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--instrument-base) 18%, transparent), color-mix(in srgb, var(--bg-soft) 76%, transparent));
   box-shadow:
-    inset 0 0.0625rem 0.5rem color-mix(in srgb, var(--accent-2) 20%, transparent),
-    inset 0 -0.625rem 0.875rem color-mix(in srgb, var(--accent) 12%, transparent);
+    inset 0 0.0625rem 0.5rem color-mix(in srgb, var(--instrument-base-rim) 8%, transparent),
+    inset 0 -0.625rem 0.875rem color-mix(in srgb, var(--instrument-base) 10%, transparent);
 }
 
 .cube-bar-base-front span {
@@ -147,7 +246,7 @@
   border-top: 0.0625rem solid color-mix(in srgb, var(--border) 34%, transparent);
   color: var(--muted);
   background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--glass-highlight) 12%, transparent), transparent);
 }
 
 .line-chart-footer > div {
@@ -194,4 +293,39 @@
 .line-chart-trend.is-down b,
 .line-chart-trend.is-down strong {
   color: var(--good);
+}
+
+.dashboard-shell[data-theme-mode='light'] .chart-loading-layer {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.dashboard-shell[data-theme-mode='light'] .chart-loading-pulse,
+.dashboard-shell[data-theme-mode='light'] .chart-loading-bars i {
+  box-shadow: none;
+}
+
+.dashboard-shell[data-theme-mode='light'] .cube-bar-base-top {
+  background:
+    linear-gradient(90deg, transparent 0 4%, color-mix(in srgb, var(--border) 36%, transparent) 4.5% 5%, transparent 5.5% 100%),
+    linear-gradient(180deg, color-mix(in srgb, var(--instrument-base-rim) 10%, #ffffff), color-mix(in srgb, var(--bg-soft) 64%, #ffffff));
+  border-top-color: color-mix(in srgb, var(--border) 64%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--border) 42%, transparent);
+  box-shadow: none;
+}
+
+.dashboard-shell[data-theme-mode='light'] .cube-bar-base-front {
+  border-color: color-mix(in srgb, var(--border) 72%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--instrument-base-rim) 3%, transparent), transparent 12% 88%, color-mix(in srgb, var(--instrument-base) 4%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--instrument-base) 9%, #ffffff), color-mix(in srgb, var(--bg-soft) 52%, #ffffff));
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.88);
+}
+
+.dashboard-shell[data-theme-mode='light'] .line-chart-footer {
+  border-top-color: color-mix(in srgb, var(--border) 72%, transparent);
+  background: color-mix(in srgb, var(--bg-soft) 28%, #ffffff);
+}
+
+.dashboard-shell[data-theme-mode='light'] .line-chart-footer > div:first-child {
+  border-right-color: color-mix(in srgb, var(--border) 64%, transparent);
 }

@@ -25,13 +25,13 @@
   font-weight: 900;
   text-align: left;
   padding: 0.32rem 0.375rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--border-strong) 62%, transparent);
+  border-bottom: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 76%, transparent);
   white-space: nowrap;
 }
 
 .data-table td {
   padding: 0.32rem 0.375rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-bottom: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 48%, transparent);
   color: var(--text);
   font-weight: 760;
   white-space: nowrap;
@@ -60,37 +60,39 @@
   height: 1.0625rem;
   flex: none;
   place-items: center;
-  border-radius: 0.3125rem;
-  color: #fff;
+  border: 0.0625rem solid color-mix(in srgb, currentColor 38%, transparent);
+  border-radius: 0.25rem;
   font-size: 0.5625rem;
   font-weight: 950;
   line-height: 1;
-  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, #fff 22%, transparent);
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 14%, transparent),
+    0 0 0.625rem color-mix(in srgb, currentColor 8%, transparent);
 }
 
 .table-row-icon.is-blue {
-  background: linear-gradient(135deg, #1fa8ff, #095cff);
-  color: #36d9ff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--chart-primary) 28%, var(--surface-strong)), color-mix(in srgb, var(--chart-primary) 16%, var(--bg)));
+  color: color-mix(in srgb, var(--chart-primary) 74%, var(--muted) 26%);
 }
 
 .table-row-icon.is-purple {
-  background: linear-gradient(135deg, #c64fff, #5b4dff);
-  color: #bd75ff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent-3) 26%, var(--surface-strong)), color-mix(in srgb, var(--accent-3) 14%, var(--bg)));
+  color: color-mix(in srgb, var(--accent-3) 72%, var(--muted) 28%);
 }
 
 .table-row-icon.is-red {
-  background: linear-gradient(135deg, #ff6b83, #f32749);
-  color: #ff6275;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--danger) 28%, var(--surface-strong)), color-mix(in srgb, var(--danger) 14%, var(--bg)));
+  color: color-mix(in srgb, var(--danger) 72%, var(--muted) 28%);
 }
 
 .table-row-icon.is-orange {
-  background: linear-gradient(135deg, #ffb84a, #e17515);
-  color: #ffb545;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--warn) 28%, var(--surface-strong)), color-mix(in srgb, var(--warn) 14%, var(--bg)));
+  color: color-mix(in srgb, var(--warn) 72%, var(--muted) 28%);
 }
 
 .table-row-icon.is-cyan {
-  background: linear-gradient(135deg, #32e5ff, #0d8aff);
-  color: #36e3ff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--chart-secondary) 26%, var(--surface-strong)), color-mix(in srgb, var(--chart-secondary) 14%, var(--bg)));
+  color: color-mix(in srgb, var(--chart-secondary) 72%, var(--muted) 28%);
 }
 
 .data-table th:nth-child(1),
@@ -128,12 +130,13 @@
 }
 
 .data-table tbody tr:hover {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: color-mix(in srgb, var(--chart-primary) 10%, transparent);
 }
 
 .data-table tbody tr.is-active {
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  box-shadow: inset 0.1875rem 0 0 var(--accent-2);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--chart-primary) 14%, transparent), color-mix(in srgb, var(--surface-strong) 12%, transparent));
+  box-shadow: inset 0.1875rem 0 0 color-mix(in srgb, var(--chart-primary) 76%, var(--instrument-rim) 16%);
 }
 
 .row-rotate-move {
@@ -156,11 +159,13 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   overflow: hidden;
-  border: 0.0625rem solid color-mix(in srgb, var(--border) 42%, transparent);
-  clip-path: polygon(0.5rem 0, calc(100% - 0.5rem) 0, 100% 50%, calc(100% - 0.5rem) 100%, 0.5rem 100%, 0 50%);
+  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 52%, transparent);
+  border-radius: 0.375rem;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent), color-mix(in srgb, var(--surface-muted) 62%, transparent), color-mix(in srgb, var(--accent) 8%, transparent));
-  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--accent-2) 10%, transparent);
+    linear-gradient(90deg, color-mix(in srgb, var(--chart-primary) 9%, transparent), color-mix(in srgb, var(--surface-strong) 12%, transparent), color-mix(in srgb, var(--chart-secondary) 7%, transparent));
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 18%, transparent),
+    0 0 0.875rem color-mix(in srgb, var(--chart-primary) 10%, transparent);
 }
 
 .work-order-summary > div {
@@ -197,17 +202,70 @@
 }
 
 .work-order-summary .is-danger b {
-  color: var(--danger);
+  color: color-mix(in srgb, var(--danger) 76%, var(--muted) 24%);
+}
+
+.work-order-summary .is-danger {
+  --status-tone: var(--danger);
+  animation: status-alert-flicker 2.65s ease-in-out infinite;
 }
 
 .work-order-summary .is-purple b {
-  color: var(--accent-3);
+  color: color-mix(in srgb, var(--accent-3) 76%, var(--muted) 24%);
 }
 
 .work-order-summary .is-warn b {
-  color: var(--warn);
+  color: color-mix(in srgb, var(--warn) 76%, var(--muted) 24%);
+}
+
+.work-order-summary .is-warn {
+  --status-tone: var(--warn);
+  animation: status-alert-flicker 3.2s ease-in-out infinite;
 }
 
 .work-order-summary .is-good b {
-  color: var(--good);
+  color: color-mix(in srgb, var(--good) 76%, var(--muted) 24%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .data-table th {
+  border-bottom-color: color-mix(in srgb, var(--border) 82%, transparent);
+  background: color-mix(in srgb, var(--bg-soft) 26%, #ffffff);
+  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .data-table td {
+  border-bottom-color: color-mix(in srgb, var(--border) 52%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .data-table tbody tr:hover {
+  background: color-mix(in srgb, var(--chart-primary) 3%, #ffffff);
+}
+
+.dashboard-shell[data-theme-mode='light'] .data-table tbody tr.is-active {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--chart-primary) 5%, transparent), transparent 68%),
+    color-mix(in srgb, var(--bg-soft) 24%, #ffffff);
+  box-shadow: inset 0.1875rem 0 0 color-mix(in srgb, var(--chart-primary) 68%, var(--border) 32%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .table-row-icon {
+  box-shadow: none;
+}
+
+.dashboard-shell[data-theme-mode='light'] .table-row-icon.is-blue,
+.dashboard-shell[data-theme-mode='light'] .table-row-icon.is-purple,
+.dashboard-shell[data-theme-mode='light'] .table-row-icon.is-red,
+.dashboard-shell[data-theme-mode='light'] .table-row-icon.is-orange,
+.dashboard-shell[data-theme-mode='light'] .table-row-icon.is-cyan {
+  background: color-mix(in srgb, currentColor 5.5%, #ffffff);
+}
+
+.dashboard-shell[data-theme-mode='light'] .work-order-summary {
+  border-color: color-mix(in srgb, var(--border) 86%, transparent);
+  background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--bg-soft) 24%, #ffffff));
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
+}
+
+.dashboard-shell[data-theme-mode='light'] .work-order-summary > div {
+  border-right-color: color-mix(in srgb, var(--border) 72%, transparent);
 }

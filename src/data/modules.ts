@@ -10,7 +10,7 @@ export const moduleCatalog: ModuleCatalogItem[] = [
   { id: 'inspectionOrders', number: '05', title: '巡检工单', kind: 'completion', size: 'wide' },
   { id: 'maintenanceStats', number: '06', title: '保养统计', subtitle: '近7天', kind: 'line', size: 'normal' },
   { id: 'ultrasound', number: '07', title: '超声设备可用率', kind: 'availability', size: 'normal' },
-  { id: 'healthTrend', number: '08', title: '设备健康态势', kind: 'health', size: 'wide' },
+  { id: 'healthTrend', number: '08', title: '设备健康状态', kind: 'health', size: 'wide' },
   { id: 'inspectionStats', number: '09', title: '巡检统计', subtitle: '近7天', kind: 'line', size: 'normal' },
 ]
 

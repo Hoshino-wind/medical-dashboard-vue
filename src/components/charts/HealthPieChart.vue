@@ -19,22 +19,32 @@ defineProps<{
 }>()
 
 const chartHeight = pxToRem(166)
+
+function themeColor(theme: Theme | undefined, token: `--${string}`, fallback: string): string {
+  return theme?.variables[token] ?? fallback
+}
+
+function isLightTheme(theme: Theme | undefined): boolean {
+  return theme?.id.startsWith('light-') ?? false
+}
 </script>
 
 <template>
   <div class="health-pie-chart">
     <ThreePiePedestal
       class="health-pie-base"
-      :color="tone ?? 'var(--accent)'"
-      accent="var(--accent-2)"
-      :intensity="1.16"
+      :color="themeColor(theme, '--instrument-base', '#33566c')"
+      :accent="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
+      :intensity="isLightTheme(theme) ? 0.78 : 1.16"
     />
     <div class="health-pie-core">
       <Pie3D
         :items="items"
         :height="chartHeight"
         :theme="theme"
-        :tone="tone ?? theme?.variables['--accent']"
+        :tone="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
+        :accent="themeColor(theme, '--data-health-pie-warning', '#6ef5ff')"
+        :surface="themeColor(theme, '--instrument-base', '#33566c')"
       />
     </div>
     <div class="health-pie-heart" aria-hidden="true">

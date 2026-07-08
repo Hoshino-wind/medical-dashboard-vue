@@ -21,6 +21,7 @@ const overviewRingSize = pxToRem(176)
         label="设备可用率"
         :count="data.available"
         :size="overviewRingSize"
+        tone="var(--data-ring)"
         inside-label="设备可用率"
         :show-footer="false"
         large
@@ -28,10 +29,10 @@ const overviewRingSize = pxToRem(176)
     </div>
     <div class="overview-metrics">
       <div class="overview-stat with-icon span-2">
-        <MonitorCog class="overview-stat-icon text-[color:var(--accent)]" />
+        <MonitorCog class="overview-stat-icon text-[color:var(--data-pie-primary)]" />
         <div>
           <div class="kpi-label">设备总数</div>
-          <div class="overview-value text-[color:var(--accent)]">
+          <div class="overview-value text-[color:var(--data-pie-primary)]">
             <CountUp :value="data.total" /><span>台</span>
           </div>
         </div>
@@ -45,7 +46,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon">
+      <div class="overview-stat with-icon is-alert is-danger">
         <Wrench class="overview-stat-icon text-[color:var(--danger)]" />
         <div>
           <div class="kpi-label">维修中</div>
@@ -54,7 +55,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon">
+      <div class="overview-stat with-icon is-alert is-warn">
         <ClipboardList class="overview-stat-icon text-[color:var(--warn)]" />
         <div>
           <div class="kpi-label">待保养</div>
@@ -64,10 +65,10 @@ const overviewRingSize = pxToRem(176)
         </div>
       </div>
       <div class="overview-stat with-icon span-2">
-        <Activity class="overview-stat-icon text-[color:var(--accent-2)]" />
+        <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
         <div>
           <div class="kpi-label">待巡检</div>
-          <div class="overview-value text-[color:var(--accent-2)]">
+          <div class="overview-value text-[color:var(--data-inspection-line)]">
             <CountUp :value="data.inspectionDue" /><span>台</span>
           </div>
         </div>

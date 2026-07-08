@@ -4,6 +4,7 @@ import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
+import { colorWithAlpha } from '@/utils/themeColor'
 
 const props = withDefaults(
   defineProps<{
@@ -26,10 +27,26 @@ const option = computed(() => {
   const text = token('--text')
   const muted = token('--muted')
   const grid = token('--chart-grid')
-  const accent = token('--accent')
-  const accent2 = token('--accent-2')
-  const accent3 = token('--accent-3')
-  const lineColor = props.variant === 'inspection' ? accent2 : accent3
+  const lineColor =
+    props.variant === 'inspection'
+      ? token('--data-inspection-line')
+      : token('--data-maintenance-line')
+  const pointColor =
+    props.variant === 'inspection'
+      ? token('--data-ring-secondary')
+      : token('--data-pie-pending')
+  const isLight = props.theme.id.startsWith('light-')
+  const areaStops = isLight
+    ? [
+        { offset: 0, color: colorWithAlpha(lineColor, 0.2) },
+        { offset: 0.55, color: colorWithAlpha(lineColor, 0.08) },
+        { offset: 1, color: colorWithAlpha(lineColor, 0) },
+      ]
+    : [
+        { offset: 0, color: colorWithAlpha(lineColor, 0.78) },
+        { offset: 0.55, color: colorWithAlpha(lineColor, 0.32) },
+        { offset: 1, color: colorWithAlpha(lineColor, 0) },
+      ]
   const yMax = props.variant === 'inspection' ? 50000 : 12000
   const yInterval = props.variant === 'inspection' ? 10000 : 4000
 
@@ -63,11 +80,11 @@ const option = computed(() => {
         z: 3,
         itemStyle: {
           color: lineColor,
-          borderColor: accent2,
-          borderWidth: 1.4,
+          borderColor: pointColor,
+          borderWidth: 2,
         },
         lineStyle: {
-          width: 3,
+          width: isLight ? 3 : 3.6,
           cap: 'round',
         },
         areaStyle: {
@@ -77,25 +94,21 @@ const option = computed(() => {
             y: 0,
             x2: 0,
             y2: 1,
-            colorStops: [
-              { offset: 0, color: `${lineColor}aa` },
-              { offset: 0.55, color: `${lineColor}3a` },
-              { offset: 1, color: `${lineColor}00` },
-            ],
+            colorStops: areaStops,
           },
         },
       },
     ],
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(6, 20, 48, 0.92)',
-      borderColor: `${accent}cc`,
+      backgroundColor: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(2, 12, 28, 0.9)',
+      borderColor: colorWithAlpha(lineColor, isLight ? 0.36 : 0.8),
       borderWidth: 1,
       padding: [8, 12],
       textStyle: { color: text, fontSize: 12, fontWeight: 700 },
       axisPointer: {
-        lineStyle: { color: `${accent2}99`, width: 1, type: 'dashed' },
-        shadowStyle: { color: `${accent}14` },
+        lineStyle: { color: colorWithAlpha(lineColor, isLight ? 0.34 : 0.6), width: 1, type: 'dashed' },
+        shadowStyle: { color: colorWithAlpha(lineColor, isLight ? 0.05 : 0.08) },
       },
       extraCssText: tooltipExtraCssText,
     },
