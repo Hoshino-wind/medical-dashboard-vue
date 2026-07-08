@@ -83,21 +83,20 @@
   position: absolute;
   z-index: 2;
   inset: calc(var(--gauge-size, 7.375rem) * 0.039);
-  border: calc(var(--gauge-size, 7.375rem) * 0.088) solid var(--gauge-tone-soft);
+  /* 满环不再用纯色环覆盖渐变:边框透明,仅靠 box-shadow 做完成态内外发光,
+     底层渐变 SVG 照常透出,满环也能看到渐变 */
+  border: calc(var(--gauge-size, 7.375rem) * 0.088) solid transparent;
   border-radius: inherit;
   opacity: 0;
   pointer-events: none;
   box-shadow:
-    0 0 1.05rem color-mix(in srgb, var(--gauge-tone) 34%, transparent),
-    inset 0 0 0.75rem color-mix(in srgb, var(--gauge-tone-bright) 18%, transparent);
+    0 0 0.85rem color-mix(in srgb, var(--gauge-tone-bright) 40%, transparent),
+    0 0 1.7rem color-mix(in srgb, var(--gauge-tone) 30%, transparent),
+    inset 0 0 0.7rem color-mix(in srgb, var(--gauge-tone-bright) 16%, transparent);
 }
 
 .hologram-gauge.is-complete .hologram-gauge-ring::after {
   opacity: 1;
-}
-
-.hologram-gauge.is-complete .hologram-gauge-svg {
-  opacity: 0;
 }
 
 .hologram-gauge-svg {
@@ -133,13 +132,14 @@
   stroke-linecap: butt;
 }
 
-/* 单调由深到浅的渐变，避免中段出现亮带导致过渡不流畅 */
+/* 由深到浅的单调渐变:起点在档位色基础上压深,终点用最亮档位色,
+   拉大两端明度跨度,让渐变更明显(同色系,不出现杂色亮带) */
 .gauge-grad-a {
-  stop-color: var(--gauge-tone);
+  stop-color: color-mix(in srgb, var(--gauge-tone) 82%, black 18%);
 }
 
 .gauge-grad-b {
-  stop-color: color-mix(in srgb, var(--gauge-tone) 58%, var(--gauge-tone-soft) 42%);
+  stop-color: var(--gauge-tone);
 }
 
 .gauge-grad-c {
@@ -167,8 +167,10 @@
 }
 
 .hologram-gauge.has-inside-label .hologram-gauge-content {
-  display: block;
-  min-height: calc(var(--gauge-size, 7.375rem) * 0.38);
+  display: grid;
+  min-height: calc(var(--gauge-size, 7.375rem) * 0.34);
+  align-content: center;
+  gap: calc(var(--gauge-size, 7.375rem) * 0.035);
 }
 
 .hologram-gauge-label {
@@ -184,10 +186,8 @@
 }
 
 .hologram-gauge.has-inside-label .hologram-gauge-label {
-  position: absolute;
-  right: 0;
-  bottom: calc(50% + 1.45rem);
-  left: 0;
+  position: static;
+  font-size: calc(0.625rem * var(--dashboard-font-scale, 1.45));
 }
 
 .hologram-gauge-value {
@@ -198,11 +198,9 @@
 }
 
 .hologram-gauge.has-inside-label .hologram-gauge-value {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  left: 0;
-  transform: translateY(-50%);
+  position: static;
+  font-size: calc(var(--gauge-size, 7.375rem) * 0.17);
+  transform: none;
 }
 
 .hologram-gauge-footer {
@@ -259,10 +257,12 @@
   font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
 }
 
-@media (max-width: 73.75rem) {
-  .hologram-gauge.is-large .hologram-gauge-stage {
-    height: calc(var(--gauge-size, 11rem) * 1.46);
-  }
+.hologram-gauge.is-large.has-inside-label .hologram-gauge-value {
+  font-size: calc(var(--gauge-size, 11rem) * 0.18);
+}
+
+.hologram-gauge.is-large.has-inside-label .hologram-gauge-label {
+  font-size: calc(0.625rem * var(--dashboard-font-scale, 1.45));
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-base {
@@ -293,21 +293,35 @@
   opacity: 0.85;
 }
 
-/* 浅色主题：档位色在白底偏浅（绿≈2.2:1），保留色相往深压，环才够对比、不再“消失” */
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge-ring {
+  box-shadow:
+    0 0.28rem 0.55rem color-mix(in srgb, var(--bg) 12%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--gauge-tone) 8%, transparent),
+    inset 0 0 0.65rem color-mix(in srgb, var(--gauge-tone-bright) 12%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge-ring::after {
+  box-shadow:
+    0 0 0.6rem color-mix(in srgb, var(--gauge-tone-bright) 22%, transparent),
+    0 0 1rem color-mix(in srgb, var(--gauge-tone) 14%, transparent),
+    inset 0 0 0.55rem color-mix(in srgb, var(--gauge-tone-bright) 10%, transparent);
+}
+
+/* 浅色主题：以 #1677ff 这类清爽医疗蓝为基准，往白底浅蓝混合，避免环形发沉。 */
 .dashboard-shell[data-theme-mode='light'] .gauge-grad-a {
-  stop-color: color-mix(in srgb, var(--gauge-tone) 66%, black 34%);
+  stop-color: color-mix(in srgb, var(--gauge-tone) 78%, #ffffff 22%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-grad-b {
-  stop-color: color-mix(in srgb, var(--gauge-tone) 76%, black 24%);
+  stop-color: color-mix(in srgb, var(--gauge-tone) 58%, var(--gauge-tone-soft) 42%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-grad-c {
-  stop-color: color-mix(in srgb, var(--gauge-tone) 82%, black 18%);
+  stop-color: color-mix(in srgb, var(--gauge-tone) 36%, var(--gauge-tone-soft) 64%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-grad-d {
-  stop-color: color-mix(in srgb, var(--gauge-tone) 80%, black 20%);
+  stop-color: color-mix(in srgb, var(--gauge-tone) 18%, var(--gauge-tone-bright) 82%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-value {

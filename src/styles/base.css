@@ -18,6 +18,23 @@ body,
   text-rendering: optimizeLegibility;
 }
 
+/*
+ * 大屏根字号等比缩放。
+ *
+ * 设计基准 1920×1080,内部尺寸全部用 rem 表达。根字号随 16:9 内切框的
+ * 宽度联动:frameWidth / 1920 × 16px = frameWidth / 120。其中 frameWidth
+ * 与 .screen-frame 的 width 表达式(见 layout.css)同源,保证内容与外框
+ * 严格同步缩放——1920 宽时 1rem=16px,更小/更大的屏幕整体等比缩放,
+ * 不再出现小屏溢出、大屏字小留白。
+ */
+html {
+  font-size: 16px;
+}
+
+html:has(.dashboard-shell:not(.config-mode)) {
+  font-size: calc(min(100vw, 100vh * 16 / 9) / 120);
+}
+
 body {
   min-height: 100vh;
   background:

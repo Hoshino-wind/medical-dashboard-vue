@@ -131,7 +131,7 @@
 
 .screen-grid {
   display: grid;
-  grid-template-columns: 0.98fr 1.43fr 1.04fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1.16fr 0.98fr 1fr;
   gap: 0.55rem;
   height: auto;
@@ -209,7 +209,7 @@
 
 .dashboard-shell[data-theme-mode='light'] {
   background:
-    linear-gradient(180deg, #ffffff 0%, #f7fbff 44%, #ecf7fa 100%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 44%, var(--bg-bottom) 100%),
     var(--bg);
 }
 
@@ -236,7 +236,7 @@
 .dashboard-shell[data-theme-mode='light'] .screen-frame:fullscreen,
 .dashboard-shell[data-theme-mode='light'] .screen-frame.is-faux-fullscreen {
   background:
-    linear-gradient(180deg, #ffffff 0%, #f7fbff 44%, #ecf7fa 100%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg) 44%, var(--bg-bottom) 100%),
     var(--bg);
 }
 

@@ -19,7 +19,6 @@ const props = withDefaults(
   {
     unit: '台',
     size: pxToRem(118),
-    tone: 'var(--data-ring)',
     insideLabel: '',
     showFooter: true,
     large: false,
@@ -98,12 +97,23 @@ const strokeDashoffset = computed(() => {
 
 const isComplete = computed(() => Math.max(0, Math.min(100, animated.value || 0)) >= FULL_RING_THRESHOLD)
 
-const palette = computed(() => {
+const thresholdPalette = computed(() => {
   const normalized = Math.max(0, Math.min(100, props.value || 0))
   return (
     GAUGE_PALETTES.find((item) => normalized < item.max) ??
     GAUGE_PALETTES[GAUGE_PALETTES.length - 1]
   )
+})
+
+const palette = computed<GaugePalette>(() => {
+  if (!props.tone) return thresholdPalette.value
+
+  return {
+    tone: props.tone,
+    toneSoft: `color-mix(in srgb, ${props.tone} 58%, #ffffff 42%)`,
+    toneBright: `color-mix(in srgb, ${props.tone} 18%, #ffffff 82%)`,
+    track: thresholdPalette.value.track,
+  }
 })
 
 const rootStyle = computed(() => ({
@@ -158,8 +168,8 @@ onUnmounted(() => {
           <defs>
             <linearGradient :id="`ring-progress-${uid}`" x1="0" y1="0" x2="1" y2="1">
               <stop class="gauge-grad-a" offset="0" />
-              <stop class="gauge-grad-b" offset="0.5" />
-              <stop class="gauge-grad-c" offset="0.82" />
+              <stop class="gauge-grad-b" offset="0.42" />
+              <stop class="gauge-grad-c" offset="0.72" />
               <stop class="gauge-grad-d" offset="1" />
             </linearGradient>
           </defs>

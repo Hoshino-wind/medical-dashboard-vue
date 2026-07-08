@@ -90,6 +90,7 @@ const inspectionPieItems = computed(() => {
           :items="inspectionPieItems"
           :height="chartHeight"
           :thickness="7"
+          :rotation="150"
           :theme="theme"
           :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
           :accent="themeColor('--data-inspection-pie-waiting', '#7efcff')"
@@ -107,9 +108,6 @@ const inspectionPieItems = computed(() => {
       </div>
       <div class="is-purple">
         <span>待巡检</span><b><CountUp :value="data.waiting" /></b><em>单</em>
-      </div>
-      <div class="is-warn">
-        <span>逾期未检</span><b><CountUp :value="data.overdue" /></b><em>单</em>
       </div>
     </div>
   </div>

@@ -42,6 +42,7 @@ function isLightTheme(theme: Theme | undefined): boolean {
         :items="items"
         :height="chartHeight"
         :thickness="7"
+        :rotation="150"
         :theme="theme"
         :tone="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
         :accent="themeColor(theme, '--data-health-pie-warning', '#6ef5ff')"

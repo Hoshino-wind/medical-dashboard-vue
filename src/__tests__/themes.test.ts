@@ -133,4 +133,26 @@ describe('dashboard themes', () => {
       expect(hexLuminance(theme.variables['--bg']), theme.id).toBeLessThan(0.04)
     }
   })
+
+  it('keeps the light medical theme led by clinical blue with semantic state accents', () => {
+    const theme = themes.find((item) => item.id === 'light-medical')!
+
+    expect(theme.description).toBe('冷白天空蓝·白底运维')
+    expect(theme.preview).toEqual(['#f7fbff', '#1677ff', '#2fbf8f'])
+    expect(theme.variables['--accent']).toBe('#1677ff')
+    expect(theme.variables['--accent-2']).toBe('#69b1ff')
+    expect(theme.variables['--accent-3']).toBe('#9ccaff')
+    expect(theme.variables['--chart-primary']).toBe('#1677ff')
+    expect(theme.variables['--chart-secondary']).toBe('#69b1ff')
+    expect(theme.variables['--chart-tertiary']).toBe('#9ccaff')
+    expect(theme.variables['--data-ring']).toBe('#1677ff')
+    expect(theme.variables['--data-pie-primary']).toBe('#237804')
+    expect(theme.variables['--data-health-pie-good']).toBe('#237804')
+    expect(theme.variables['--data-inspection-pie-finished']).toBe('#237804')
+    expect(theme.variables['--data-inspection-line']).toBe('#20b486')
+    expect(theme.variables['--data-health-pie-pending']).toBe('#9ccaff')
+    expect(theme.variables['--good']).toBe('#2fbf8f')
+    expect(theme.variables['--warn']).toBe('#e8a43d')
+    expect(theme.variables['--danger']).toBe('#e86f80')
+  })
 })

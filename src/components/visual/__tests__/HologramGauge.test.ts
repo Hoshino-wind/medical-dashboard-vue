@@ -53,4 +53,17 @@ describe('HologramGauge', () => {
 
     wrapper.unmount()
   })
+
+  it('uses the provided tone for near-complete themed gauges', () => {
+    const wrapper = mount(HologramGauge, {
+      props: {
+        value: 99.9,
+        tone: '#1677ff',
+      },
+    })
+
+    expect(wrapper.attributes('style')).toContain('--gauge-tone: #1677ff')
+
+    wrapper.unmount()
+  })
 })

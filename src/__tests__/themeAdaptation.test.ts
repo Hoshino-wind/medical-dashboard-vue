@@ -86,6 +86,7 @@ describe('global theme adaptation', () => {
     expect(restoredHeaderTextBlocks.join('\n')).not.toContain('var(--dashboard-font-scale')
     expect(restoredPanelTitleBlocks.join('\n')).not.toContain('var(--dashboard-font-scale')
     expect(pieSummaryTitleBlock).not.toContain('var(--dashboard-font-scale')
+    expect(pieCenterValueBlock).toContain('font-size: 0.92rem')
     expect(gaugeValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(largeGaugeValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(overviewValueBlock).not.toContain('var(--dashboard-font-scale')
@@ -117,6 +118,46 @@ describe('global theme adaptation', () => {
     expect(bodyBlock).not.toContain('#041022')
   })
 
+  it('keeps the overview gauge label and value as a compact centered stack', () => {
+    const ringStyles = readSource('styles/rings.css')
+    const moduleStyles = readSource('styles/modules.css')
+    const contentBlock =
+      ringStyles.match(
+        /\.hologram-gauge\.has-inside-label \.hologram-gauge-content\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const labelBlock =
+      ringStyles.match(
+        /\.hologram-gauge\.has-inside-label \.hologram-gauge-label\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const valueBlock =
+      ringStyles.match(
+        /\.hologram-gauge\.has-inside-label \.hologram-gauge-value\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const largeInsideValueBlock =
+      ringStyles.match(
+        /\.hologram-gauge\.is-large\.has-inside-label \.hologram-gauge-value\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const overviewValueBlock =
+      moduleStyles.match(/\.overview-feature-ring \.hologram-gauge-value\s*\{[\s\S]*?\n\}/)?.[0] ??
+      ''
+    const overviewLabelBlock =
+      moduleStyles.match(/\.overview-feature-ring \.hologram-gauge-label\s*\{[\s\S]*?\n\}/)?.[0] ??
+      ''
+
+    expect(contentBlock).toContain('display: grid')
+    expect(contentBlock).toContain('align-content: center')
+    expect(contentBlock).not.toContain('display: block')
+    expect(labelBlock).toContain('position: static')
+    expect(labelBlock).toContain('0.625rem')
+    expect(labelBlock).not.toContain('bottom: calc')
+    expect(valueBlock).toContain('position: static')
+    expect(valueBlock).toContain('transform: none')
+    expect(valueBlock).toContain('0.17')
+    expect(largeInsideValueBlock).toContain('0.18')
+    expect(overviewValueBlock).toContain('font-size: 1.7rem')
+    expect(overviewLabelBlock).toContain('font-size: 0.56rem')
+  })
+
   it('uses theme tokens for the cube bar base instead of fixed blue and violet fills', () => {
     const cubeBar = readSource('components/charts/CubeBarChart.vue')
 
@@ -130,6 +171,38 @@ describe('global theme adaptation', () => {
 
     expect(pie3d).not.toMatch(/#(?:20f1d4|123e63|0a8fb7|2f8dff|45d8ff|53fff0|4defff|265d85)/i)
     expect(pie3d).not.toMatch(/rgba\(32,\s*241,\s*212/)
+  })
+
+  it('keeps 2.5D pie tooltip compact and inside the chart bounds', () => {
+    const pie3d = readSource('components/charts/Pie3D.vue')
+    const tooltipBlock = pie3d.match(/\.pie3d-three-tooltip\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+
+    expect(pie3d).toContain('const TOOLTIP_WIDTH = 92')
+    expect(pie3d).toContain('const TOOLTIP_MARGIN = 6')
+    expect(pie3d).toContain('function clampTooltipPosition')
+    expect(pie3d).toContain('Math.min(Math.max')
+    expect(pie3d).toContain('rect.width - TOOLTIP_WIDTH - TOOLTIP_MARGIN')
+    expect(tooltipBlock).toContain('font-size: 0.68rem')
+    expect(tooltipBlock).not.toContain('--dashboard-font-scale')
+    expect(tooltipBlock).toContain('min-width: 5.25rem')
+  })
+
+  it('keeps light-theme 2.5D pie fills slightly translucent', () => {
+    const pie3d = readSource('components/charts/Pie3D.vue')
+
+    expect(pie3d).toContain('const lightDepthOpacityBase = isLightTheme() ? 0.1 : 0.12')
+    expect(pie3d).toContain('const lightDepthOpacityRange = isLightTheme() ? 0.18 : 0.22')
+    expect(pie3d).toContain('opacity: isLightTheme() ? 0.76 : 0.94')
+    expect(pie3d).toContain('opacity: isLightTheme() ? 0.76 : 1')
+  })
+
+  it('renders 2.5D pie top faces as flat fills instead of gradients', () => {
+    const pie3d = readSource('components/charts/Pie3D.vue')
+
+    expect(pie3d).toContain(':fill="segment.topColor"')
+    expect(pie3d).not.toContain('<linearGradient')
+    expect(pie3d).not.toContain('gradientId')
+    expect(pie3d).not.toContain(':fill="`url(#${segment.')
   })
 
   it('renders pie charts as layered SVG 2.5D without WebGL materials', () => {
@@ -155,6 +228,17 @@ describe('global theme adaptation', () => {
     expect(pie3d).not.toContain('makeFloorShadow')
     expect(pie3d).not.toContain('rootGroup.add(makeFloorShadow')
     expect(inspectionPieShell).not.toContain('drop-shadow')
+  })
+
+  it('keeps each 3x3 dashboard row split into three equal-width cards', () => {
+    const layoutStyles = readSource('styles/layout.css')
+    const screenGridBlock = layoutStyles.match(/\.screen-grid\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const compactGridBlock =
+      layoutStyles.match(/\.screen-grid\.layout-2x3\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+
+    expect(screenGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    expect(screenGridBlock).not.toContain('0.98fr 1.43fr 1.04fr')
+    expect(compactGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
   })
 
   it('renders panel flowing borders with reduced-motion fallback', () => {
@@ -234,6 +318,31 @@ describe('global theme adaptation', () => {
     expect(tableStyles).toContain('.work-order-summary .is-danger')
     expect(tableStyles).toContain('.work-order-summary .is-warn')
     expect(`${moduleStyles}\n${tableStyles}`).not.toMatch(/scan-?line|panel-scan/i)
+  })
+
+  it('adapts repair work order summary colors to each status tone', () => {
+    const tableStyles = readSource('styles/tables.css')
+    const summaryBlock = tableStyles.match(/\.work-order-summary\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const itemBlock = tableStyles.match(/\.work-order-summary > div\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const labelBlock = tableStyles.match(/\.work-order-summary span\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const valueBlock = tableStyles.match(/\.work-order-summary b\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const unitBlock = tableStyles.match(/\.work-order-summary em\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const lightItemBlock =
+      tableStyles.match(
+        /\.dashboard-shell\[data-theme-mode='light'\] \.work-order-summary > div\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(summaryBlock).toContain('var(--surface-strong)')
+    expect(summaryBlock).not.toContain('var(--chart-primary) 9%')
+    expect(itemBlock).toContain('var(--status-tone')
+    expect(labelBlock).toContain('var(--status-tone')
+    expect(valueBlock).toContain('var(--status-tone')
+    expect(unitBlock).toContain('var(--status-tone')
+    expect(tableStyles).toContain('.work-order-summary .is-danger {\n  --status-tone: var(--danger);')
+    expect(tableStyles).toContain('.work-order-summary .is-purple {\n  --status-tone: var(--accent-3);')
+    expect(tableStyles).toContain('.work-order-summary .is-warn {\n  --status-tone: var(--warn);')
+    expect(tableStyles).toContain('.work-order-summary .is-good {\n  --status-tone: var(--good);')
+    expect(lightItemBlock).toContain('var(--status-tone')
   })
 
   it('renders a chart loading layer until ECharts finishes its first frame', () => {

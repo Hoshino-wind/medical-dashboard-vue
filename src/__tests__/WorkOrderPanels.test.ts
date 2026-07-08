@@ -54,7 +54,6 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('总数1482单')
     expect(wrapper.text()).toContain('已完成1411单')
     expect(wrapper.text()).toContain('待巡检71单')
-    expect(wrapper.text()).toContain('逾期未检12单')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
     expect(wrapper.find('.inspection-status-summary .is-total').exists()).toBe(true)
   })

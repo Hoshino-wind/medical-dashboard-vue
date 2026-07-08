@@ -5,7 +5,7 @@ import { pxToRem } from '@/utils/rem'
 import type { Theme } from '@/types/theme'
 
 const TAU = Math.PI * 2
-const START_ANGLE = -Math.PI / 2
+const BASE_START_ANGLE = -Math.PI / 2
 const VIEWBOX_WIDTH = 240
 const VIEWBOX_HEIGHT = 188
 const CENTER_X = 120
@@ -16,6 +16,10 @@ const INNER_RX = 41
 const INNER_RY = 16.5
 const DEPTH_STEP = 3.5
 const ARC_POINT_DENSITY = 112
+const TOOLTIP_WIDTH = 92
+const TOOLTIP_HEIGHT = 38
+const TOOLTIP_GAP = 8
+const TOOLTIP_MARGIN = 6
 
 const props = withDefaults(
   defineProps<{
@@ -28,13 +32,18 @@ const props = withDefaults(
     surface?: string
     text?: string
     autoRotate?: boolean
+    rotation?: number
   }>(),
   {
     height: pxToRem(150),
     thickness: 8,
     autoRotate: false,
+    rotation: 0,
   },
 )
+
+// 起始角度：基础 -90°（12 点方向）+ 顺时针旋转偏移（rotation 为正=顺时针）
+const startAngle = computed(() => BASE_START_ANGLE + (props.rotation * Math.PI) / 180)
 
 interface EllipsePoint {
   x: number
@@ -46,10 +55,7 @@ interface RenderedSegment extends Pie3DSegment {
   startAngle: number
   endAngle: number
   path: string
-  gradientId: string
   topColor: string
-  brightColor: string
-  deepColor: string
   depthColor: string
   strokeColor: string
   labelX: number
@@ -106,10 +112,14 @@ const depthLayerCount = computed(() => Math.max(4, Math.min(8, Math.round(props.
 const depthLayers = computed<DepthLayer[]>(() =>
   Array.from({ length: depthLayerCount.value }, (_, index) => {
     const layer = depthLayerCount.value - index
+    const lightDepthOpacityBase = isLightTheme() ? 0.1 : 0.12
+    const lightDepthOpacityRange = isLightTheme() ? 0.18 : 0.22
     return {
       key: `depth-${layer}`,
       offset: layer * DEPTH_STEP,
-      opacity: 0.12 + (index / Math.max(1, depthLayerCount.value - 1)) * 0.22,
+      opacity:
+        lightDepthOpacityBase +
+        (index / Math.max(1, depthLayerCount.value - 1)) * lightDepthOpacityRange,
     }
   }),
 )
@@ -133,8 +143,8 @@ const renderedSegments = computed<RenderedSegment[]>(() => {
   const gap = rawSegments.value.length > 1 ? 0.012 : 0
 
   return rawSegments.value.map((segment, index) => {
-    const startRaw = START_ANGLE + segment.startRatio * TAU
-    const endRaw = START_ANGLE + segment.endRatio * TAU
+    const startRaw = startAngle.value + segment.startRatio * TAU
+    const endRaw = startAngle.value + segment.endRatio * TAU
     const arc = Math.max(0, endRaw - startRaw)
     const segmentGap = Math.min(gap, Math.max(0, arc * 0.16))
     const start = startRaw + segmentGap
@@ -148,10 +158,7 @@ const renderedSegments = computed<RenderedSegment[]>(() => {
       startAngle: start,
       endAngle: Math.max(start + 0.001, end),
       path: annularSectorPath(start, Math.max(start + 0.001, end)),
-      gradientId: `pie3d-gradient-${componentUid}-${index}`,
       topColor: segment.color,
-      brightColor: colorMix(segment.color, 84, '#ffffff'),
-      deepColor: colorMix(segment.color, 74, '#04111f'),
       depthColor: colorMix(segment.color, isLightTheme() ? 64 : 48, isLightTheme() ? '#c3dbe1' : '#020814'),
       strokeColor: colorMix(segment.color, isLightTheme() ? 70 : 72, props.theme?.variables['--instrument-rim'] ?? '#d7fbff'),
       labelX: label.x,
@@ -204,7 +211,7 @@ function frontWallForSegment(segment: RenderedSegment): WallSegment[] {
       path: sideWallPath(start, end, OUTER_RX, OUTER_RY, totalDepth.value),
       fill: colorMix(segment.topColor, isLightTheme() ? 56 : 42, isLightTheme() ? '#b9d6df' : '#020814'),
       stroke: segment.strokeColor,
-      opacity: isLightTheme() ? 0.82 : 0.94,
+      opacity: isLightTheme() ? 0.76 : 0.94,
     },
   ]
 }
@@ -256,12 +263,31 @@ function annularSectorPath(start: number, end: number): string {
   ].join(' ')
 }
 
+function clampTooltipPosition(x: number, y: number, rect: DOMRect): { x: number; y: number } {
+  const maxX = rect.width - TOOLTIP_WIDTH - TOOLTIP_MARGIN
+  const maxY = rect.height - TOOLTIP_HEIGHT - TOOLTIP_MARGIN
+
+  return {
+    x: Math.min(Math.max(x, TOOLTIP_MARGIN), Math.max(TOOLTIP_MARGIN, maxX)),
+    y: Math.min(Math.max(y, TOOLTIP_MARGIN), Math.max(TOOLTIP_MARGIN, maxY)),
+  }
+}
+
 function moveTooltip(event: PointerEvent) {
   const rect = host.value?.getBoundingClientRect()
   if (!rect) return
 
-  tooltip.x = event.clientX - rect.left + 10
-  tooltip.y = event.clientY - rect.top - 10
+  const pointerX = event.clientX - rect.left
+  const rawX = pointerX + TOOLTIP_GAP
+  const rawY = event.clientY - rect.top - TOOLTIP_GAP
+  const x =
+    rawX + TOOLTIP_WIDTH + TOOLTIP_MARGIN > rect.width
+      ? pointerX - TOOLTIP_WIDTH - TOOLTIP_GAP
+      : rawX
+  const next = clampTooltipPosition(x, rawY, rect)
+
+  tooltip.x = next.x
+  tooltip.y = next.y
 }
 
 function showTooltip(segment: RenderedSegment, event: PointerEvent) {
@@ -274,13 +300,26 @@ function showTooltip(segment: RenderedSegment, event: PointerEvent) {
 }
 
 function showKeyboardTooltip(segment: RenderedSegment) {
+  const rect = host.value?.getBoundingClientRect()
   activeSegmentIndex.value = segment.index
   tooltip.visible = true
   tooltip.name = segment.name
   tooltip.value = segment.value
   tooltip.percent = total.value > 0 ? ((segment.value / total.value) * 100).toFixed(1) : '0.0'
-  tooltip.x = segment.labelX + 12
-  tooltip.y = segment.labelY - 16
+
+  if (!rect) {
+    tooltip.x = segment.labelX + TOOLTIP_GAP
+    tooltip.y = segment.labelY - TOOLTIP_GAP
+    return
+  }
+
+  const next = clampTooltipPosition(
+    segment.labelX * (rect.width / VIEWBOX_WIDTH) + TOOLTIP_GAP,
+    segment.labelY * (rect.height / VIEWBOX_HEIGHT) - TOOLTIP_GAP,
+    rect,
+  )
+  tooltip.x = next.x
+  tooltip.y = next.y
 }
 
 function hideTooltip() {
@@ -314,20 +353,6 @@ function hideTooltip() {
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <linearGradient
-          v-for="segment in renderedSegments"
-          :id="segment.gradientId"
-          :key="segment.gradientId"
-          x1="0"
-          y1="18"
-          x2="0"
-          y2="128"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0" :stop-color="segment.brightColor" />
-          <stop offset="0.48" :stop-color="segment.topColor" />
-          <stop offset="1" :stop-color="segment.deepColor" />
-        </linearGradient>
       </defs>
 
       <ellipse
@@ -376,9 +401,10 @@ function hideTooltip() {
           class="pie3d-top-segment"
           :class="{ 'is-active': activeSegmentIndex === segment.index }"
           :d="segment.path"
-          :fill="`url(#${segment.gradientId})`"
+          :fill="segment.topColor"
           :stroke="segment.strokeColor"
           stroke-width="1.15"
+          :style="{ opacity: isLightTheme() ? 0.76 : 1 }"
           tabindex="0"
           :data-segment-name="segment.name"
           @pointerenter="showTooltip(segment, $event)"
@@ -476,15 +502,17 @@ function hideTooltip() {
   left: 0;
   top: 0;
   z-index: 4;
-  min-width: 7.25rem;
-  padding: 0.4375rem 0.625rem;
+  box-sizing: border-box;
+  min-width: 5.25rem;
+  max-width: 5.75rem;
+  padding: 0.3125rem 0.4375rem;
   border: 0.0625rem solid color-mix(in srgb, var(--pie-edge) 74%, transparent);
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--pie-surface) 72%, #020814);
   color: var(--pie-text);
-  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 800;
-  line-height: 1.45;
+  font-size: 0.68rem;
+  font-weight: 780;
+  line-height: 1.32;
   pointer-events: none;
   white-space: nowrap;
 }
