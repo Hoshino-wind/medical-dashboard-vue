@@ -1,0 +1,278 @@
+生命支持设备可用率：
+const fakeList = [
+    { deviceName: '除颤仪', total: 4, percent: "90.0" },
+    { deviceName: '呼吸机', total: 3, percent: "90.0" },
+    { deviceName: '监护仪', total: 32, percent: "90.0" },
+    { deviceName: '心电图机', total: 2, percent: "90.0" },
+    { deviceName: '注射泵', total: 285, percent: "90.0" },
+    { deviceName: '输液泵', total: 99, percent: "90.0" },
+]
+
+设备分布台数占比：
+const fakedeviceDataRaw = [
+  { departmentName: '麻醉科', targetCount: 125, rate: 50.5 },
+  { departmentName: '放射科', targetCount: 68, rate: 50.5 },
+  { departmentName: '药剂科', targetCount: 98, rate: 50.5 },
+  { departmentName: '中心手术室', targetCount: 226, rate: 50.5 },
+  { departmentName: '检验科', targetCount: 86, rate: 50.5 },
+  { departmentName: '病理科住院', targetCount: 96, rate: 50.5 },
+  { departmentName: 'CCU', targetCount: 72, rate: 50.5 },
+  { departmentName: '血液科', targetCount: 54, rate: 50.5 },
+]
+
+设备总览：
+const deviceTotal = ref(0);
+const availableDevice = ref(0);
+const usageRate = ref('0'); // 使用率
+const repairing = ref(0);
+const toMaintain = ref(0);
+const toInspect = ref(0);
+
+保养工单：
+const fakeTableData = [
+  {
+    department: '紧急医学救援队',
+    equipName: '呼吸机',
+    // remainDays: '0天0小时23分',
+    remainDays: 0,
+    engineerName: '/'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '冷藏冷冻机',
+    remainDays: 10,
+    engineerName: '欧阳张三'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '耳鼻喉头颈综合治疗台',
+    remainDays: 6,
+    engineerName: '李四'
+  },
+  {
+    department: 'CCU',
+    equipName: '心肺转六系统 离心泵',
+    remainDays: 7,
+    engineerName: '张三'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '耳鼻喉头颈综合治疗台',
+    remainDays: 15,
+    engineerName: '/'
+  },
+  {
+    department: '检验科',
+    equipName: '全自动蛋白分析仪',
+    remainDays: 9,
+    engineerName: '张三'
+  },
+  // {
+  //   department: '放射科',
+  //   equipName: 'CT扫描仪',
+  //   remainDays: '1天2小时10分',
+  //   engineerName: '李四'
+  // },
+  // {
+  //   department: '药剂科',
+  //   equipName: '药品分装机',
+  //   remainDays: '0天1小时30分',
+  //   engineerName: '王五'
+  // },
+  // {
+  //   department: '放射科',
+  //   equipName: '核磁共振仪',
+  //   remainDays: '2天5小时15分',
+  //   engineerName: '李四'
+  // }
+]
+
+保养统计：
+const fakechartData = {
+  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
+  UpKeepTotal: [200, 180, 250, 160, 190, 220]
+}
+
+巡检统计：
+const fakechartData = {
+  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
+  InspectionTotal: [200, 180, 250, 160, 190, 220]
+}
+
+巡检工单：
+const fakeTableData = [
+  {
+    department: '紧急医学救援队',
+    equipName: '呼吸机',
+    // remainDays: '0天0小时23分',
+    remainDays: 0,
+    engineerName: '/'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '冷藏冷冻机',
+    remainDays: 0,
+    engineerName: '张三'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '耳鼻喉头颈综合治疗台',
+    remainDays: 10,
+    engineerName: '李四'
+  },
+  {
+    department: 'CCU',
+    equipName: '心肺转六系统 离心泵',
+    remainDays: 5,
+    engineerName: '张三'
+  },
+  {
+    department: '耳鼻咽喉科',
+    equipName: '耳鼻喉头颈综合治疗台',
+    remainDays: 20,
+    engineerName: '/'
+  },
+  {
+    department: '检验科',
+    equipName: '全自动蛋白分析仪',
+    remainDays: 7,
+    engineerName: '张三'
+  },
+  {
+    department: '放射科',
+    equipName: 'CT扫描仪',
+    remainDays: 17,
+    engineerName: '李四'
+  },
+  // {
+  //   department: '药剂科',
+  //   equipName: '药品分装机',
+  //   remainDays: '0天1小时30分',
+  //   engineerName: '王五'
+  // },
+  // {
+  //   department: '放射科',
+  //   equipName: '核磁共振仪',
+  //   remainDays: '2天5小时15分',
+  //   engineerName: '李四'
+  // },
+  // {
+  //   department: '药剂科',
+  //   equipName: '智能配药机',
+  //   remainDays: '0天3小时20分',
+  //   engineerName: '/'
+  // }
+]
+
+维修工单：
+const fakeTableData = [
+    {
+        department: "手术麻醉中心",
+        equipName: "史塞克台车",
+        repairCode: "00001",
+        repairReportDuration: "0天0小时23分",
+        repairDuration: "0天0小时23分",
+        responder: "/",
+        status: "待响应"
+    },
+    {
+        department: "检验科",
+        equipName: "全自动蛋白分析仪全自动蛋白分析仪",
+        repairCode: "ERB-202512404",
+        repairReportDuration: "0天4小时23分",
+        repairDuration: "0天4小时23分",
+        responder: "欧阳张三",
+        status: "超时"
+    },
+    // {
+    //     department: "手术麻醉中心",
+    //     equipName: "史塞克台车",
+    //     repairCode: "00003",
+    //     repairReportDuration: "7天10小时23分",
+    //     responder: "/",
+    //     status: "超时"
+    // },
+    {
+        department: "检验科",
+        equipName: "全自动蛋白分析仪",
+        repairCode: "00004",
+        repairReportDuration: "10天4小时23分",
+        repairDuration: "10天4小时23分",
+        responder: "张三",
+        status: "待响应"
+    },
+    {
+        department: "手术麻醉中心",
+        equipName: "史塞克台车",
+        repairCode: "00005",
+        repairReportDuration: "0天0小时23分",
+        repairDuration: "0天0小时23分",
+        responder: "/",
+        status: "待响应"
+    },
+    {
+        department: "检验科",
+        equipName: "全自动蛋白分析仪",
+        repairCode: "00006",
+        repairReportDuration: "3天4小时23分",
+        repairDuration: "3天4小时23分",
+        responder: "张三",
+        status: "维修中"
+    },
+    {
+        department: "放射科",
+        equipName: "CT扫描仪",
+        repairCode: "00007",
+        repairReportDuration: "11天2小时10分",
+        repairDuration: "11天2小时10分",
+        responder: "李四",
+        status: "维修中"
+    },
+    {
+        department: "药剂科",
+        equipName: "药品分装机",
+        repairCode: "00008",
+        repairReportDuration: "0天1小时30分",
+        repairDuration: "0天1小时30分",
+        responder: "王五",
+        status: "待响应"
+    },
+    {
+        department: "放射科",
+        equipName: "核磁共振仪",
+        repairCode: "00009",
+        repairReportDuration: "20天5小时15分",
+        repairDuration: "20天5小时15分",
+        responder: "李四",
+        status: "维修中"
+    },
+    {
+        department: "药剂科",
+        equipName: "智能配药机",
+        repairCode: "00010",
+        repairReportDuration: "0天3小时20分",
+        repairDuration: "0天3小时20分",
+        responder: "/",
+        status: "待响应"
+    }
+]
+
+超声设备可用率：
+const fakeList = [
+  { departmentName: '手术室', totalCount: 4, availabilityRate: '80.0' },
+  { departmentName: 'DSA', totalCount: 3, availabilityRate: '80.0' },
+  { departmentName: '呼吸机', totalCount: 32, availabilityRate: '90.0' },
+  { departmentName: '主动脉球囊反搏-测试省略', totalCount: 2, availabilityRate: '90.0' },
+  { departmentName: '监护仪', totalCount: 285, availabilityRate: '90.0' },
+  // { departmentName: '输液泵', totalCount: 99, availabilityRate: '90.0' },
+  // { departmentName: 'MRI', totalCount: 44, availabilityRate: '80.0' },
+  // { departmentName: 'ECMO1', totalCount: 3, availabilityRate: '90.0' }
+]
+
+报修统计：
+const fakechartData = {
+  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
+  FullyInsuredDeviceTotal: [23, 11, 26, 18, 22, 20],
+  TechnicalInsuredDeviceTotal: [10, 48, 32, 42, 38, 40],
+  FactoryInsureDeviceTotal: [12, 36, 24, 30, 34, 32]
+}
