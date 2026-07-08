@@ -127,18 +127,19 @@ describe('BigScreen reference layout', () => {
 
     expect(wrapper.find('footer').exists()).toBe(false)
     expect(wrapper.find('.screen-footer-nav').exists()).toBe(false)
-    expect(screenLabels).toEqual(['大屏模式', '全屏显示', '主题配置'])
+    expect(screenLabels).toEqual(['全屏显示', '主题配置'])
+    expect(screenLabels).not.toContain('大屏模式')
     expect(screenLabels).not.toContain('数据导出')
     expect(screenLabels).not.toContain('设备地图')
     expect(screenLabels).not.toContain('告警中心')
 
-    await screenButtons[1].trigger('click')
+    await screenButtons[0].trigger('click')
     await flushPromises()
 
     expect(Element.prototype.requestFullscreen).toHaveBeenCalledTimes(1)
     expect(requestFullscreenMock.mock.contexts[0]).toBe(wrapper.find('.screen-frame').element)
     expect(wrapper.find('.screen-frame').classes()).toContain('is-faux-fullscreen')
-    expect(screenButtons[1].attributes('aria-pressed')).toBe('true')
+    expect(screenButtons[0].attributes('aria-pressed')).toBe('true')
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await flushPromises()

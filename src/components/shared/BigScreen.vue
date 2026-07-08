@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, type Component } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Expand, Monitor, SwatchBook } from 'lucide-vue-next'
+import { Expand, SwatchBook } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import HeaderBar from './HeaderBar.vue'
 import ModuleRenderer from './ModuleRenderer.vue'
@@ -38,7 +38,6 @@ const visibleModules = computed(() =>
 )
 
 const screenActions: ScreenAction[] = [
-  { label: '大屏模式', icon: Monitor, route: '/' },
   { label: '全屏显示', icon: Expand, kind: 'fullscreen' },
   { label: '主题配置', icon: SwatchBook, route: '/config' },
 ]
