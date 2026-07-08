@@ -261,8 +261,29 @@
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-ring-track {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 34%, #ffffff);
-  opacity: 0.78;
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 52%, #ffffff);
+  opacity: 0.85;
+}
+
+/* 浅色主题：档位色在白底偏浅（绿≈2.2:1），保留色相往深压，环才够对比、不再“消失” */
+.dashboard-shell[data-theme-mode='light'] .gauge-grad-a {
+  stop-color: color-mix(in srgb, var(--gauge-tone) 66%, black 34%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-grad-b {
+  stop-color: color-mix(in srgb, var(--gauge-tone) 76%, black 24%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-grad-c {
+  stop-color: color-mix(in srgb, var(--gauge-tone) 82%, black 18%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-grad-d {
+  stop-color: color-mix(in srgb, var(--gauge-tone) 80%, black 20%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge-value {
+  color: color-mix(in srgb, var(--text) 90%, var(--gauge-tone) 10%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-label,
@@ -272,4 +293,68 @@
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-count {
   color: color-mix(in srgb, var(--text) 86%, var(--gauge-tone) 14%);
+}
+
+/*
+ * 浅色主题下全息底座（.gauge-base-*）的覆盖：亮部改用饱和档位色 + 加深轮廓，
+ * 避免近白线条在白底上隐形。放在全局这里而非 HologramGaugeBase.vue 的 scoped 样式，
+ * 因为 Vue scoped 会把 `:global(A) .b` 编译成只剩 `A`，使 opacity 误落到 .dashboard-shell。
+ */
+.dashboard-shell[data-theme-mode='light'] .gauge-base-glow {
+  opacity: 0.55;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-orbit {
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 62%, var(--gauge-tone));
+  opacity: 0.3;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-wall {
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 58%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-deck {
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 60%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-deck--top {
+  stroke: color-mix(in srgb, var(--gauge-tone) 46%, var(--instrument-base-rim));
+  opacity: 0.82;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-ring {
+  stroke: color-mix(in srgb, var(--gauge-tone) 55%, var(--instrument-base-rim));
+  opacity: 0.5;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-rim {
+  opacity: 0.85;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-segments path {
+  stroke: color-mix(in srgb, var(--gauge-tone) 82%, var(--instrument-base-rim));
+  opacity: 0.7;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-front {
+  stroke: var(--gauge-tone);
+  opacity: 0.78;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-scan {
+  stroke: var(--gauge-tone);
+  opacity: 0.6;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-core {
+  stroke: color-mix(in srgb, var(--gauge-tone) 70%, var(--instrument-base-rim));
+  opacity: 0.4;
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-dot {
+  fill: var(--gauge-tone);
+}
+
+.dashboard-shell[data-theme-mode='light'] .gauge-base-lglow {
+  opacity: 0.5;
 }

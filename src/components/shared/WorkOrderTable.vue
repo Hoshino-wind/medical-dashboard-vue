@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed } from 'vue'
 import CountUp from './CountUp.vue'
+import { usePagedList } from '@/composables/usePagedList'
 
 const props = defineProps<{
   headers: string[]
@@ -18,43 +19,54 @@ function rowIconClass(index: number): string {
   return ['is-blue', 'is-purple', 'is-red', 'is-orange', 'is-cyan'][index % 5]
 }
 
-const displayRows = ref<string[][]>(props.rows.slice())
-
-watch(
-  () => props.rows,
-  (value) => {
-    displayRows.value = value.slice()
-  },
+const { viewportRef, trackRef, renderPages, trackStyle, pageStart, onFlipEnd } = usePagedList(
+  computed(() => props.rows),
 )
 </script>
 
 <template>
   <div class="work-order-module">
     <div class="work-order-table-wrap">
-      <table class="data-table">
+      <table class="data-table paged-head-table">
         <thead>
           <tr>
             <th v-for="header in headers" :key="header">{{ header }}</th>
           </tr>
         </thead>
-        <transition-group tag="tbody" name="row-rotate">
-          <tr v-for="(row, index) in displayRows" :key="row[2]" :class="{ 'is-active': index === 0 }">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">
-              <span v-if="cellIndex === 0" class="table-cell-leading">
-                <span class="table-row-icon" :class="rowIconClass(index)">{{ index + 1 }}</span>
-                <span>{{ cell }}</span>
-              </span>
-              <span
-                v-if="cellIndex === row.length - 1"
-                class="status-pill"
-                :style="statusStyle(String(cell))"
-                >{{ cell }}</span
-              >
-              <span v-else-if="cellIndex !== 0">{{ cell }}</span>
-            </td>
-          </tr>
-        </transition-group>
       </table>
+      <div ref="viewportRef" class="paged-viewport">
+        <div ref="trackRef" class="paged-track" :style="trackStyle" @transitionend="onFlipEnd">
+          <div v-for="(page, pageIndex) in renderPages" :key="pageIndex" class="paged-page">
+            <table class="data-table">
+              <tbody>
+                <tr
+                  v-for="(row, rowIndex) in page"
+                  :key="rowIndex"
+                  :class="{ 'is-active': pageStart(pageIndex) + rowIndex === 0 }"
+                >
+                  <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                    <span v-if="cellIndex === 0" class="table-cell-leading">
+                      <span
+                        class="table-row-icon"
+                        :class="rowIconClass(pageStart(pageIndex) + rowIndex)"
+                        >{{ pageStart(pageIndex) + rowIndex + 1 }}</span
+                      >
+                      <span>{{ cell }}</span>
+                    </span>
+                    <span
+                      v-if="cellIndex === row.length - 1"
+                      class="status-pill"
+                      :style="statusStyle(String(cell))"
+                      >{{ cell }}</span
+                    >
+                    <span v-else-if="cellIndex !== 0">{{ cell }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="work-order-summary">
       <div class="is-danger"><span>维修中</span><b><CountUp :value="44" /></b><em>单</em></div>

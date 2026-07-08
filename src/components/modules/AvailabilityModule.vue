@@ -32,10 +32,15 @@ const renderPages = computed(() =>
   shouldLoop.value ? [...pages.value, pages.value[0]] : pages.value,
 )
 
+const pageStepPx = computed(() => (props.variant === 'ultrasound' ? 190 : 198))
+
 const scrollStyle = computed<Record<string, string>>(() => ({
   '--availability-page-count': String(pages.value.length),
   '--availability-scroll-duration': `${pages.value.length * 7.2}s`,
-  '--availability-scroll-easing': `steps(${pages.value.length}, end)`,
+  '--availability-page-step': pxToRem(pageStepPx.value),
+  '--availability-scroll-distance': pxToRem(-pageStepPx.value * pages.value.length),
+  // linear 连续平滑上滚(替代原先 steps 离散翻页,后者每页停 7.2s 几乎看不出在动)
+  '--availability-scroll-easing': 'linear',
 }))
 </script>
 
@@ -83,6 +88,7 @@ const scrollStyle = computed<Record<string, string>>(() => ({
 }
 
 .availability-window.is-looping .availability-track {
+  grid-auto-rows: var(--availability-page-step);
   animation: availability-page-scroll var(--availability-scroll-duration)
     var(--availability-scroll-easing) infinite;
 }
@@ -93,7 +99,7 @@ const scrollStyle = computed<Record<string, string>>(() => ({
   }
 
   to {
-    transform: translateY(calc(var(--availability-page-count) * -100%));
+    transform: translateY(var(--availability-scroll-distance));
   }
 }
 

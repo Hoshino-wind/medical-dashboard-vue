@@ -4,6 +4,7 @@ import Pie3D from '../charts/Pie3D.vue'
 import CountUp from '../shared/CountUp.vue'
 import ThreePiePedestal from '../visual/ThreePiePedestal.vue'
 import { pxToRem } from '@/utils/rem'
+import { usePagedList } from '@/composables/usePagedList'
 import type { InspectionOrders } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
@@ -14,6 +15,10 @@ const props = defineProps<{
 
 const inspectionHeaders = ['所属科室', '设备名称', '剩余时间', '负责人']
 const chartHeight = pxToRem(136)
+
+const { viewportRef, trackRef, renderPages, trackStyle, pageStart, onFlipEnd } = usePagedList(
+  computed(() => props.data.rows),
+)
 
 function themeColor(token: `--${string}`, fallback: string): string {
   return props.theme?.variables[token] ?? fallback
@@ -51,30 +56,42 @@ const inspectionPieItems = computed(() => {
 <template>
   <div class="inspection-order-grid">
     <div class="order-list-panel">
-      <table class="data-table compact-order-table inspection-order-table">
+      <table class="data-table compact-order-table inspection-order-table paged-head-table">
         <thead>
           <tr>
             <th v-for="header in inspectionHeaders" :key="header">{{ header }}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr
-            v-for="(row, index) in data.rows"
-            :key="`${row[0]}-${row[1]}-${index}`"
-            :class="{ 'is-active': index === 0 }"
-          >
-            <td>
-              <span class="table-cell-leading">
-                <span class="table-row-icon" :class="rowIconClass(index)">{{ index + 1 }}</span>
-                <span>{{ row[0] }}</span>
-              </span>
-            </td>
-            <td>{{ row[1] }}</td>
-            <td class="order-time-cell">{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-          </tr>
-        </tbody>
       </table>
+      <div ref="viewportRef" class="paged-viewport">
+        <div ref="trackRef" class="paged-track" :style="trackStyle" @transitionend="onFlipEnd">
+          <div v-for="(page, pageIndex) in renderPages" :key="pageIndex" class="paged-page">
+            <table class="data-table compact-order-table inspection-order-table">
+              <tbody>
+                <tr
+                  v-for="(row, rowIndex) in page"
+                  :key="rowIndex"
+                  :class="{ 'is-active': pageStart(pageIndex) + rowIndex === 0 }"
+                >
+                  <td>
+                    <span class="table-cell-leading">
+                      <span
+                        class="table-row-icon"
+                        :class="rowIconClass(pageStart(pageIndex) + rowIndex)"
+                        >{{ pageStart(pageIndex) + rowIndex + 1 }}</span
+                      >
+                      <span>{{ row[0] }}</span>
+                    </span>
+                  </td>
+                  <td>{{ row[1] }}</td>
+                  <td class="order-time-cell">{{ row[2] }}</td>
+                  <td>{{ row[3] }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月巡检完成率">

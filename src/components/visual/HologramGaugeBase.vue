@@ -265,31 +265,9 @@ const uid = `hgb-${Math.random().toString(36).slice(2, 8)}`
   }
 }
 
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-glow {
-  opacity: 0.5;
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-orbit {
-  opacity: 0.12;
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-wall {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 46%, transparent);
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-rim {
-  opacity: 0.7;
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-front {
-  opacity: 0.68;
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-scan {
-  opacity: 0.58;
-}
-
-:global(.dashboard-shell[data-theme-mode='light']) .gauge-base-lglow {
-  opacity: 0.5;
-}
+/*
+ * 浅色主题下 .gauge-base-* 的覆盖统一放在全局 styles/rings.css。
+ * 不能写在这里的 scoped <style> 中：Vue 会把 `:global(A) .b` 编译成只剩 `A`，
+ * 后代选择器被丢弃，导致 opacity 直接落到 .dashboard-shell 本身（整壳半透明发白）。
+ */
 </style>
