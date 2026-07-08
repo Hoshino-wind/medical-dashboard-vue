@@ -561,6 +561,16 @@
     linear-gradient(180deg, color-mix(in srgb, var(--bg-soft) 46%, transparent), var(--bg));
 }
 
+.config-live-scaler {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: center center;
+  will-change: transform;
+}
+
 .dashboard-shell.config-mode .config-live-preview .screen-frame {
   display: grid;
   width: 100%;

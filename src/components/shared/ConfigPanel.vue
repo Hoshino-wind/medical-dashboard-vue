@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { AlertCircle, Check, ChevronDown, LayoutGrid, RotateCcw, Save, X } from 'lucide-vue-next'
 import { themes } from '@/data/themes'
@@ -14,6 +14,22 @@ type ModuleDisplayType = 'table' | 'chart'
 const store = useDashboardStore()
 const { config, availableModules, selectedModules, selectedSlotModules, activeTheme, slotCount } =
   storeToRefs(store)
+
+// 效果预览等比缩小：基于 1920 基准宽度计算 scale
+const PREVIEW_BASE_WIDTH = 1920
+const PREVIEW_BASE_HEIGHT = 1080
+const previewRef = ref<HTMLElement | null>(null)
+const previewScale = ref(1)
+let previewObserver: ResizeObserver | undefined
+
+function measurePreview() {
+  const el = previewRef.value
+  if (!el) return
+  // 同时考虑宽高约束，确保完整显示（等比缩小）
+  const widthScale = el.clientWidth / PREVIEW_BASE_WIDTH
+  const heightScale = el.clientHeight / PREVIEW_BASE_HEIGHT
+  previewScale.value = Math.min(widthScale, heightScale)
+}
 
 const draggedModuleId = ref<string | null>(null)
 const draggedSlotIndex = ref<number | null>(null)
@@ -124,6 +140,19 @@ function handleComponentPoolDrop() {
   }
   clearDragState()
 }
+
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined') return
+  previewObserver = new ResizeObserver(measurePreview)
+  if (previewRef.value) {
+    previewObserver.observe(previewRef.value)
+    measurePreview()
+  }
+})
+
+onBeforeUnmount(() => {
+  previewObserver?.disconnect()
+})
 </script>
 
 <template>
@@ -277,8 +306,10 @@ function handleComponentPoolDrop() {
         <h2>效果预览</h2>
         <span>{{ activeTheme.name }} · {{ config.layout }}</span>
       </div>
-      <div class="config-live-preview">
-        <BigScreen />
+      <div ref="previewRef" class="config-live-preview">
+        <div class="config-live-scaler" :style="{ transform: `translate(-50%, -50%) scale(${previewScale})` }">
+          <BigScreen />
+        </div>
       </div>
     </section>
   </main>
