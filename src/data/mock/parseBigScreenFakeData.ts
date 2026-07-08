@@ -1,4 +1,10 @@
-import type { AvailabilityItem, BarChartData, LineChartData, OverviewData } from '@/types/dashboard'
+import type {
+  AvailabilityItem,
+  BarChartData,
+  DeviceDistributionItem,
+  LineChartData,
+  OverviewData,
+} from '@/types/dashboard'
 
 const SECTIONS = {
   lifeSupport: '生命支持设备可用率',
@@ -16,12 +22,6 @@ const SECTIONS = {
 const SECTION_TITLES = new Set<string>(Object.values(SECTIONS))
 
 type LooseRecord = Record<string, unknown>
-
-export interface DeviceDistributionItem {
-  name: string
-  count: number
-  rate: number
-}
 
 export interface ServiceOrderItem {
   department: string

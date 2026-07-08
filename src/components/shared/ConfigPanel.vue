@@ -1,244 +1,285 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Check, ChevronDown, ChevronUp, GripVertical, LayoutGrid, RotateCcw, Save, SwatchBook } from 'lucide-vue-next'
-import { moduleCatalog } from '@/data/modules'
+import { AlertCircle, Check, ChevronDown, LayoutGrid, RotateCcw, Save, X } from 'lucide-vue-next'
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
+import BigScreen from './BigScreen.vue'
 import type { LayoutType } from '@/types/config'
-import type { ThemeId } from '@/types/theme'
+import type { ModuleCatalogItem } from '@/types/module'
+import type { Theme, ThemeId } from '@/types/theme'
+
+type ModuleDisplayType = 'table' | 'chart'
 
 const store = useDashboardStore()
-const { config, orderedModules, activeTheme } = storeToRefs(store)
+const { config, availableModules, selectedModules, selectedSlotModules, activeTheme, slotCount } =
+  storeToRefs(store)
 
-const draggingIndex = ref<number | null>(null)
-const dragOverIndex = ref<number | null>(null)
+const draggedModuleId = ref<string | null>(null)
+const draggedSlotIndex = ref<number | null>(null)
+const dragOverSlot = ref<number | null>(null)
+const isComponentPoolActive = ref(false)
 const savedAt = ref('')
+const layoutWarning = ref('')
+let warningTimer: number | undefined
 
-const orderedIds = computed(() => orderedModules.value.map((item) => item.id))
+const tableModuleIds = new Set(['repairOrders', 'inspectionOrders', 'healthTrend'])
 
-function onDragStart(index: number) {
-  draggingIndex.value = index
+const slotItems = computed(() => selectedSlotModules.value)
+
+const configuredCount = computed(() => selectedModules.value.length)
+
+function moduleDisplayType(module: ModuleCatalogItem): ModuleDisplayType {
+  return tableModuleIds.has(module.id) ? 'table' : 'chart'
 }
 
-function onDragEnter(index: number) {
-  dragOverIndex.value = index
+function moduleTypeLabel(module: ModuleCatalogItem) {
+  return moduleDisplayType(module) === 'table' ? '表格' : '图形'
 }
 
-function onDrop(index: number) {
-  if (draggingIndex.value === null) return
-  if (draggingIndex.value === index) {
-    draggingIndex.value = null
-    dragOverIndex.value = null
-    return
+function moduleById(moduleId: string | null) {
+  return [...availableModules.value, ...selectedModules.value].find((module) => module.id === moduleId)
+}
+
+function themeLabel(theme: Theme) {
+  const aliases: Partial<Record<ThemeId, string>> = {
+    'deep-sea-instrument': '蓝黑',
+    'light-medical': '浅蓝',
+    'ink-blue-medical': '蓝绿',
+    'midnight-violet': '蓝紫',
+    'black-gold-blue': '黑金',
   }
-  store.moveModule(draggingIndex.value, index)
-  draggingIndex.value = null
-  dragOverIndex.value = null
+  return aliases[theme.id] ?? theme.name.replace(/^\d+\s*/, '')
 }
 
-function onDragEnd() {
-  draggingIndex.value = null
-  dragOverIndex.value = null
-}
-
-/**
- * "保存发布":配置在每次变更时已由 store 自动写入 localStorage,
- * 此处仅给出可视的发布确认反馈(时间戳)。
- */
 function publishConfig() {
   savedAt.value = new Date().toLocaleTimeString('zh-CN', { hour12: false })
 }
 
-function moveUp(index: number) {
-  if (index <= 0) return
-  store.moveModule(index, index - 1)
+function showLayoutWarning(message = '每一行只允许存在一个【表格】类型组件') {
+  layoutWarning.value = message
+  if (warningTimer) window.clearTimeout(warningTimer)
+  warningTimer = window.setTimeout(() => {
+    layoutWarning.value = ''
+  }, 2600)
 }
 
-function moveDown(index: number) {
-  if (index >= orderedModules.value.length - 1) return
-  store.moveModule(index, index + 1)
+function addModule(module: ModuleCatalogItem) {
+  const placed = store.addModuleToLayout(module.id)
+  if (!placed) {
+    showLayoutWarning(
+      moduleDisplayType(module) === 'table'
+        ? '每一行只允许存在一个【表格】类型组件'
+        : '当前布局没有可用区域',
+    )
+  }
+}
+
+function handleAvailableDragStart(moduleId: string) {
+  draggedModuleId.value = moduleId
+  draggedSlotIndex.value = null
+}
+
+function handleSlotDragStart(index: number, module: ModuleCatalogItem | null) {
+  if (!module) return
+  draggedSlotIndex.value = index
+  draggedModuleId.value = module.id
+}
+
+function handleSlotDrop(index: number) {
+  let placed = true
+  if (draggedModuleId.value) {
+    if (draggedSlotIndex.value !== null) {
+      placed = store.moveSelectedModule(
+        draggedSlotIndex.value,
+        index,
+      )
+    } else {
+      placed = store.placeModuleInSlot(draggedModuleId.value, index)
+    }
+  }
+
+  if (!placed) {
+    const draggedModule = moduleById(draggedModuleId.value)
+    showLayoutWarning(
+      draggedModule && moduleDisplayType(draggedModule) !== 'table'
+        ? '当前布局没有可用区域'
+        : '每一行只允许存在一个【表格】类型组件',
+    )
+  }
+
+  clearDragState()
+}
+
+function clearDragState() {
+  draggedModuleId.value = null
+  draggedSlotIndex.value = null
+  dragOverSlot.value = null
+  isComponentPoolActive.value = false
+}
+
+function handleComponentPoolDrop() {
+  if (draggedSlotIndex.value !== null) {
+    store.removeModuleFromLayout(draggedSlotIndex.value)
+  }
+  clearDragState()
 }
 </script>
 
 <template>
-  <main class="screen-frame">
-    <div class="mb-4 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-black">大屏配置</h1>
-        <div class="mt-1 text-sm text-[color:var(--muted)]">主题、布局、模块顺序(自动持久化)</div>
-      </div>
-      <div class="flex gap-2">
-        <button class="app-button" @click="store.resetConfig()">
-          <RotateCcw class="h-4 w-4" />
-          重置
-        </button>
-        <button class="app-button active" @click="publishConfig">
-          <Save class="h-4 w-4" />
-          保存发布
-        </button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-[22.5rem_1fr_22.5rem] gap-4 max-[73.75rem]:grid-cols-1">
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-number"><SwatchBook class="h-4 w-4" /></span>
-          <h2 class="text-[0.9375rem]">主题样式</h2>
+  <main class="screen-frame config-workbench">
+    <section class="config-shell panel">
+      <div class="config-shell-header">
+        <div class="config-shell-title">
+          <ChevronDown class="h-4 w-4" aria-hidden="true" />
+          <span>配置信息</span>
         </div>
-        <div class="panel-body grid gap-3">
-          <button
-            v-for="theme in themes"
-            :key="theme.id"
-            class="theme-card text-left"
-            :class="{ active: theme.id === config.themeId }"
-            :style="theme.variables"
-            @click="store.setTheme(theme.id as ThemeId)"
-          >
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <div class="text-base font-black">{{ theme.name }}</div>
-                <div class="mt-1 text-xs text-[color:var(--muted)]">{{ theme.description }}</div>
-              </div>
-              <div class="theme-card-right">
-                <span v-if="theme.id === config.themeId" class="theme-current-badge">
-                  <Check class="h-3 w-3" />
-                  当前
-                </span>
-                <div class="flex gap-1">
-                  <span
-                    v-for="color in theme.preview"
-                    :key="color"
-                    class="h-8 w-8 rounded-full border border-[color:var(--border)]"
-                    :style="{ background: color }"
-                  ></span>
-                </div>
-              </div>
-            </div>
+        <div class="config-rule-toast" :class="{ visible: layoutWarning }" role="status">
+          <AlertCircle class="h-4 w-4" aria-hidden="true" />
+          <span>{{ layoutWarning || '每一行只允许存在一个【表格】类型组件' }}</span>
+        </div>
+        <div class="config-shell-actions">
+          <span class="config-save-state">{{ savedAt ? `已发布 ${savedAt}` : '自动保存' }}</span>
+          <button class="app-button" type="button" @click="store.clearSelectedModules()">
+            <X class="h-4 w-4" />
+            清空布局
+          </button>
+          <button class="app-button" type="button" @click="store.resetConfig()">
+            <RotateCcw class="h-4 w-4" />
+            重置
           </button>
         </div>
-      </section>
+      </div>
 
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-number"><GripVertical class="h-4 w-4" /></span>
-          <h2 class="text-[0.9375rem]">模块顺序</h2>
-        </div>
-        <div class="panel-body">
-          <div class="mb-3 grid grid-cols-2 gap-2">
+      <div class="config-workbench-grid">
+        <section class="config-column config-column-components" aria-label="可选业务组件">
+          <h2>可选业务组件</h2>
+          <div
+            class="config-column-box component-picker"
+            :class="{ 'is-drop-target': isComponentPoolActive }"
+            @dragenter.prevent="isComponentPoolActive = draggedSlotIndex !== null"
+            @dragover.prevent="isComponentPoolActive = draggedSlotIndex !== null"
+            @drop.prevent="handleComponentPoolDrop"
+          >
             <button
-              class="app-button"
-              :class="{ active: config.layout === '2x3' }"
-              @click="store.setLayout('2x3' as LayoutType)"
-            >
-              <LayoutGrid class="h-4 w-4" />
-              2行3列
-            </button>
-            <button
-              class="app-button"
-              :class="{ active: config.layout === '3x3' }"
-              @click="store.setLayout('3x3' as LayoutType)"
-            >
-              <LayoutGrid class="h-4 w-4" />
-              3行3列
-            </button>
-          </div>
-          <div class="grid gap-2">
-            <div
-              v-for="(item, index) in orderedModules"
-              :key="item.id"
-              class="drag-row"
-              :class="{
-                dragging: draggingIndex === index,
-                'drag-over': dragOverIndex === index && draggingIndex !== index,
-              }"
+              v-for="module in availableModules"
+              :key="module.id"
+              class="business-component-card"
+              :class="`is-${moduleDisplayType(module)}`"
+              type="button"
               draggable="true"
-              @dragstart="onDragStart(index)"
-              @dragenter="onDragEnter(index)"
-              @dragover.prevent
-              @drop="onDrop(index)"
-              @dragend="onDragEnd"
+              :data-testid="`available-${module.id}`"
+              @click="addModule(module)"
+              @dragstart="handleAvailableDragStart(module.id)"
+              @dragend="clearDragState"
             >
-              <GripVertical class="h-4 w-4 text-[color:var(--muted)]" />
-              <span class="panel-number">{{ item.number }}</span>
-              <div class="min-w-0">
-                <div class="truncate text-sm font-black">{{ item.title }}</div>
-                <div class="mt-1 text-[0.6875rem] text-[color:var(--muted)]">{{ item.kind }}</div>
-              </div>
-              <div class="text-right text-xs text-[color:var(--muted)]">位置 {{ index + 1 }}</div>
-              <div class="order-actions">
-                <button
-                  class="icon-button"
-                  :data-testid="`move-up-${item.id}`"
-                  :disabled="index === 0"
-                  title="上移"
-                  @click.stop="moveUp(index)"
-                >
-                  <ChevronUp class="h-3.5 w-3.5" />
-                </button>
-                <button
-                  class="icon-button"
-                  :data-testid="`move-down-${item.id}`"
-                  :disabled="index === orderedModules.length - 1"
-                  title="下移"
-                  @click.stop="moveDown(index)"
-                >
-                  <ChevronDown class="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <span class="component-type-badge">{{ moduleTypeLabel(module) }}</span>
+              <span class="component-card-title">{{ module.title }}</span>
+            </button>
+            <div v-if="availableModules.length === 0" class="component-empty-state">
+              所有组件已放入布局
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-number">预</span>
-          <h2 class="text-[0.9375rem]">配置预览</h2>
-        </div>
-        <div class="panel-body">
-          <div class="rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-3">
-            <div class="mb-3 flex items-center justify-between">
-              <div>
-                <div class="text-sm font-black">{{ activeTheme.name }}</div>
-                <div class="text-xs text-[color:var(--muted)]">{{ config.layout }}</div>
-              </div>
-              <div class="text-xs text-[color:var(--good)]">
-                {{ savedAt ? `已发布 ${savedAt}` : '未发布' }}
-              </div>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div
-                v-for="id in orderedIds.slice(0, config.layout === '2x3' ? 6 : 9)"
-                :key="id"
-                class="config-preview-tile grid aspect-[1.55] place-items-center rounded-xl border border-[color:var(--border)] bg-[color:var(--surface-strong)] text-center text-[0.6875rem] font-black"
+        <section class="config-column config-column-layout" aria-label="大屏布局">
+          <h2>大屏布局</h2>
+          <div
+            class="layout-slot-board"
+            :class="{ 'layout-slot-board-2x3': config.layout === '2x3' }"
+          >
+            <button
+              v-for="(module, index) in slotItems"
+              :key="index"
+              class="layout-slot"
+              :class="[
+                module ? `is-${moduleDisplayType(module)}` : 'is-empty',
+                { 'is-drag-over': dragOverSlot === index },
+              ]"
+              type="button"
+              :draggable="Boolean(module)"
+              :data-testid="`layout-slot-${index}`"
+              @click="module ? store.removeModuleFromLayout(index) : undefined"
+              @dragstart="handleSlotDragStart(index, module)"
+              @dragenter.prevent="dragOverSlot = index"
+              @dragover.prevent
+              @drop.prevent="handleSlotDrop(index)"
+              @dragend="clearDragState"
+            >
+              <span v-if="module" class="layout-slot-title">{{ module.title }}</span>
+              <span v-else class="layout-slot-empty">将业务组件拖动至此处</span>
+            </button>
+          </div>
+          <button class="config-publish-button" type="button" @click="publishConfig">
+            <Save class="h-4 w-4" />
+            保存并发布
+          </button>
+        </section>
+
+        <section class="config-column config-column-properties" aria-label="大屏属性">
+          <h2>大屏属性</h2>
+          <div class="config-column-box property-panel">
+            <fieldset class="property-group">
+              <legend>布局设置</legend>
+              <label class="property-radio">
+                <input
+                  type="radio"
+                  name="layout"
+                  value="2x3"
+                  :checked="config.layout === '2x3'"
+                  @change="store.setLayout('2x3' as LayoutType)"
+                />
+                <span>2行3列</span>
+              </label>
+              <label class="property-radio">
+                <input
+                  type="radio"
+                  name="layout"
+                  value="3x3"
+                  :checked="config.layout === '3x3'"
+                  @change="store.setLayout('3x3' as LayoutType)"
+                />
+                <span>3行3列</span>
+              </label>
+            </fieldset>
+
+            <fieldset class="property-group">
+              <legend>背景主题设置</legend>
+              <label
+                v-for="theme in themes"
+                :key="theme.id"
+                class="property-radio theme-radio"
+                :class="{ active: theme.id === config.themeId }"
               >
-                <div>
-                  <div class="text-sm text-[color:var(--accent-2)]">
-                    {{ moduleCatalog.find((item) => item.id === id)?.number }}
-                  </div>
-                  <div class="mt-1 max-w-[5rem] truncate text-[0.625rem] text-[color:var(--muted)]">
-                    {{ moduleCatalog.find((item) => item.id === id)?.title }}
-                  </div>
-                </div>
-              </div>
+                <input
+                  type="radio"
+                  name="theme"
+                  :value="theme.id"
+                  :checked="theme.id === config.themeId"
+                  @change="store.setTheme(theme.id as ThemeId)"
+                />
+                <span>{{ themeLabel(theme) }}</span>
+                <Check v-if="theme.id === config.themeId" class="h-3.5 w-3.5" aria-hidden="true" />
+              </label>
+            </fieldset>
+
+            <div class="property-summary">
+              <LayoutGrid class="h-4 w-4" aria-hidden="true" />
+              <span>{{ configuredCount }}/{{ slotCount }} 已配置</span>
             </div>
           </div>
+        </section>
+      </div>
+    </section>
 
-          <div class="mt-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-muted)] p-4">
-            <div class="text-sm font-black">配置 JSON</div>
-            <pre class="mt-3 max-h-[16.25rem] overflow-auto rounded-xl bg-black/20 p-3 text-[0.6875rem] leading-5 text-[color:var(--muted)]">{{ JSON.stringify(
-              {
-                themeId: config.themeId,
-                layout: config.layout,
-                moduleOrder: orderedIds,
-              },
-              null,
-              2,
-            ) }}</pre>
-          </div>
-        </div>
-      </section>
-    </div>
+    <section class="config-preview-panel panel" aria-label="效果预览">
+      <div class="config-preview-header">
+        <h2>效果预览</h2>
+        <span>{{ activeTheme.name }} · {{ config.layout }}</span>
+      </div>
+      <div class="config-live-preview">
+        <BigScreen />
+      </div>
+    </section>
   </main>
 </template>

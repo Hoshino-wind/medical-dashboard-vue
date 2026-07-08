@@ -45,6 +45,13 @@ export interface AvailabilityItem {
   count: number
 }
 
+/** 设备分布台数占比条目 */
+export interface DeviceDistributionItem {
+  name: string
+  count: number
+  rate: number
+}
+
 /** 报修统计的多系列数据 */
 export interface ChartSeries {
   name: string
@@ -81,6 +88,7 @@ export interface DashboardData {
   inspectionOrders: InspectionOrders
   lifeSupport: AvailabilityItem[]
   ultrasound: AvailabilityItem[]
+  deviceDistribution: DeviceDistributionItem[]
   repairStats: BarChartData
   maintenanceStats: LineChartData
   inspectionStats: LineChartData

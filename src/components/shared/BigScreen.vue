@@ -18,7 +18,7 @@ type ScreenAction = {
 }
 
 const store = useDashboardStore()
-const { orderedModules, activeTheme } = storeToRefs(store)
+const { selectedSlotModules, activeTheme } = storeToRefs(store)
 const route = useRoute()
 const router = useRouter()
 const screenFrameRef = ref<HTMLElement | null>(null)
@@ -34,7 +34,7 @@ const titleStyle = computed<TitleStyle>(() => {
 })
 
 const visibleModules = computed(() =>
-  layout.value === '2x3' ? orderedModules.value.slice(0, 6) : orderedModules.value,
+  selectedSlotModules.value.slice(0, layout.value === '2x3' ? 6 : 9),
 )
 
 const screenActions: ScreenAction[] = [
@@ -124,12 +124,14 @@ onBeforeUnmount(() => {
   >
     <HeaderBar :data="data.header" />
     <section class="screen-grid" :class="{ 'layout-2x3': layout === '2x3' }" :data-layout="layout">
-      <ModuleRenderer
-        v-for="item in visibleModules"
-        :key="item.id"
-        :module="item"
-        :theme="activeTheme"
-      />
+      <template v-for="(item, index) in visibleModules" :key="item?.id ?? `empty-${index}`">
+        <ModuleRenderer
+          v-if="item"
+          :module="item"
+          :theme="activeTheme"
+        />
+        <div v-else class="screen-grid-empty" aria-hidden="true"></div>
+      </template>
     </section>
     <div class="screen-actions" aria-label="大屏快捷操作">
       <button

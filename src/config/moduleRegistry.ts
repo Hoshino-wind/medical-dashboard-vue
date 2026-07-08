@@ -21,6 +21,9 @@ const CompletionModule = defineAsyncComponent(
 const HealthTrendModule = defineAsyncComponent(
   () => import('@/components/modules/HealthTrendModule.vue'),
 )
+const DeviceDistributionModule = defineAsyncComponent(
+  () => import('@/components/modules/DeviceDistributionModule.vue'),
+)
 
 /**
  * 模块渲染注册表 —— 配置驱动的核心。
@@ -99,5 +102,9 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   health: {
     component: HealthTrendModule,
     resolveProps: (_module, ctx) => ({ data: ctx.data.healthTrend, theme: ctx.theme }),
+  },
+  distribution: {
+    component: DeviceDistributionModule,
+    resolveProps: (_module, ctx) => ({ items: ctx.data.deviceDistribution }),
   },
 }

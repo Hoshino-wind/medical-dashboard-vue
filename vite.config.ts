@@ -16,6 +16,12 @@ export default defineConfig({
   test: {
     // 组件测试基于 jsdom,挂载 Vue 组件需要 DOM 环境
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
     globals: true,
+    setupFiles: ['./src/__tests__/setup.ts'],
   },
 })

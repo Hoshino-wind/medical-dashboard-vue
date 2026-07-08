@@ -7,7 +7,14 @@ import type { Component } from 'vue'
  * moduleRegistry 中查找对应组件,而非用一长串 `v-if` 判断模块 id。
  */
 export type ModuleKind =
-  'overview' | 'table' | 'bar' | 'line' | 'availability' | 'completion' | 'health'
+  | 'overview'
+  | 'table'
+  | 'bar'
+  | 'line'
+  | 'availability'
+  | 'completion'
+  | 'health'
+  | 'distribution'
 
 /** 模块占位尺寸:wide 表示跨列布局 */
 export type ModuleSize = 'normal' | 'wide'

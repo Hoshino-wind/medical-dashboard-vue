@@ -7,5 +7,6 @@ export type LayoutType = '2x3' | '3x3'
 export interface DashboardConfig {
   themeId: ThemeId
   layout: LayoutType
+  selectedModuleIds: Array<string | null>
   moduleOrder: string[]
 }

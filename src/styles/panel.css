@@ -92,6 +92,10 @@
   animation-delay: 560ms;
 }
 
+.screen-grid > .panel:nth-child(10) {
+  animation-delay: 630ms;
+}
+
 /* 四边流光边框 */
 .panel-border-flow {
   position: absolute;

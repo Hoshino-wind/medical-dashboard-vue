@@ -77,7 +77,7 @@ function hexLuminance(hex: string): number {
 }
 
 describe('dashboard themes', () => {
-  it('keeps the default 3x3 module titles aligned with the layout reference', () => {
+  it('keeps the default module titles aligned with the layout reference', () => {
     expect(moduleCatalog.map((item) => item.title)).toEqual([
       '设备总览',
       '维修工单',
@@ -88,6 +88,7 @@ describe('dashboard themes', () => {
       '超声设备可用率',
       '保养工单',
       '巡检统计',
+      '设备分布台数占比',
     ])
   })
 

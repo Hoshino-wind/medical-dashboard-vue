@@ -1,8 +1,9 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import BigScreen from '@/components/shared/BigScreen.vue'
+import { useDashboardStore } from '@/stores/dashboard'
 
 const originalRequestFullscreen = Element.prototype.requestFullscreen
 
@@ -22,7 +23,11 @@ afterEach(() => {
 })
 
 describe('BigScreen reference layout', () => {
-  it('marks the default screen as aligned to the 1920x1080 3x3 reference', async () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  it('marks the default screen as aligned to the 1920x1080 reference', async () => {
     const router = makeRouter()
     router.push('/')
     await router.isReady()
@@ -41,7 +46,35 @@ describe('BigScreen reference layout', () => {
       'medical-equipment-1920x1080',
     )
     expect(wrapper.find('.screen-grid').attributes('data-layout')).toBe('3x3')
+    expect(wrapper.findAll('module-renderer-stub')).toHaveLength(9)
+    expect(wrapper.text()).not.toContain('设备分布台数占比')
     expect(wrapper.find('.footer-kpi-bar').exists()).toBe(false)
+  })
+
+  it('renders the distribution module only after it is moved into the visible 3x3 slots', async () => {
+    const router = makeRouter()
+    router.push('/')
+    await router.isReady()
+    const pinia = createPinia()
+    const store = useDashboardStore(pinia)
+    store.moveModule(9, 8)
+
+    const wrapper = mount(BigScreen, {
+      global: {
+        plugins: [pinia, router],
+        stubs: {
+          HeaderBar: true,
+          ModuleRenderer: {
+            props: ['module'],
+            template: '<article class="module-stub">{{ module.title }}</article>',
+          },
+        },
+      },
+    })
+
+    expect(wrapper.findAll('.module-stub')).toHaveLength(9)
+    expect(wrapper.text()).toContain('设备分布台数占比')
+    expect(wrapper.text()).not.toContain('巡检统计')
   })
 
   it('provides a theme configuration action that opens the config route', async () => {
@@ -75,11 +108,9 @@ describe('BigScreen reference layout', () => {
     router.push('/')
     await router.isReady()
 
-    let fullscreenTarget: Element | null = null
-    Element.prototype.requestFullscreen = vi.fn(function (this: Element) {
-      fullscreenTarget = this
-      return Promise.resolve()
-    })
+    const requestFullscreenMock = vi.fn<() => Promise<void>>().mockResolvedValue(undefined)
+    Element.prototype.requestFullscreen =
+      requestFullscreenMock as typeof Element.prototype.requestFullscreen
 
     const wrapper = mount(BigScreen, {
       global: {
@@ -105,7 +136,7 @@ describe('BigScreen reference layout', () => {
     await flushPromises()
 
     expect(Element.prototype.requestFullscreen).toHaveBeenCalledTimes(1)
-    expect(fullscreenTarget).toBe(wrapper.find('.screen-frame').element)
+    expect(requestFullscreenMock.mock.contexts[0]).toBe(wrapper.find('.screen-frame').element)
     expect(wrapper.find('.screen-frame').classes()).toContain('is-faux-fullscreen')
     expect(screenButtons[1].attributes('aria-pressed')).toBe('true')
 

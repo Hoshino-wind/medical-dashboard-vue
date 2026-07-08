@@ -75,6 +75,12 @@ export const dashboardData: DashboardData = {
     { name: '健康管理中心', value: 66.7, count: 1 },
     { name: '消毒供应中心', value: 0, count: 2 },
   ],
+  deviceDistribution: [
+    { name: '手术中心', count: 1886, rate: 11.31 },
+    { name: '检验科公共', count: 757, rate: 4.54 },
+    { name: '消毒供应中心', count: 586, rate: 3.52 },
+    { name: '重症医学科一区住院', count: 579, rate: 3.47 },
+  ],
   repairStats: {
     labels: ['06-26', '06-27', '06-28', '06-29', '06-30', '07-01', '07-02'],
     series: [
