@@ -21,7 +21,7 @@ export interface PagedListOptions {
  */
 export function usePagedList<T>(source: Ref<readonly T[]>, options: PagedListOptions = {}) {
   const holdMs = options.holdMs ?? 3600
-  const flipMs = options.flipMs ?? 620
+  const flipMs = options.flipMs ?? 720
 
   const viewportRef = ref<HTMLElement | null>(null)
   const trackRef = ref<HTMLElement | null>(null)
@@ -47,8 +47,9 @@ export function usePagedList<T>(source: Ref<readonly T[]>, options: PagedListOpt
   )
 
   const trackStyle = computed<Record<string, string>>(() => ({
-    transform: `translateY(-${currentPage.value * 100}%)`,
-    transition: animating.value ? `transform ${flipMs}ms cubic-bezier(0.4, 0, 0.2, 1)` : 'none',
+    // translate3d 强制独立合成层,翻页位移交给 GPU,避免主线程繁忙时掉帧
+    transform: `translate3d(0, -${currentPage.value * 100}%, 0)`,
+    transition: animating.value ? `transform ${flipMs}ms cubic-bezier(0.65, 0, 0.35, 1)` : 'none',
   }))
 
   /** renderPages 里第 pageIndex 页首行对应的全局起始序号(克隆页折回第 1 页) */
@@ -94,8 +95,13 @@ export function usePagedList<T>(source: Ref<readonly T[]>, options: PagedListOpt
     }, holdMs)
   }
 
-  /** 翻到克隆页(视觉上=第 1 页)后,瞬时无动画归零,实现无缝循环 */
-  function onFlipEnd() {
+  /**
+   * 翻到克隆页(视觉上=第 1 页)后,瞬时无动画归零,实现无缝循环。
+   * 只处理轨道自身的 transform 过渡 —— 过滤掉行 background/transform 过渡冒泡上来的
+   * transitionend,避免误触发归零导致跳动。
+   */
+  function onFlipEnd(event: TransitionEvent) {
+    if (event.target !== trackRef.value || event.propertyName !== 'transform') return
     if (currentPage.value < pages.value.length) return
     animating.value = false
     currentPage.value = 0

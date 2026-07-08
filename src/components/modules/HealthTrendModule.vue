@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import CountUp from '../shared/CountUp.vue'
 import HealthPieChart from '../charts/HealthPieChart.vue'
+import { usePagedList } from '@/composables/usePagedList'
 import type { HealthTrendData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
@@ -11,6 +12,10 @@ const props = defineProps<{
 }>()
 
 const healthHeaders = ['设备范围', '健康状态', '数量', '处置建议']
+
+const { viewportRef, trackRef, renderPages, trackStyle, pageStart, onFlipEnd } = usePagedList(
+  computed(() => props.data.rows),
+)
 
 const pieItems = computed(() => {
   return [
@@ -33,26 +38,42 @@ function rowIconClass(index: number): string {
 <template>
   <div class="health-status-grid">
     <div class="order-list-panel health-status-list">
-      <table class="data-table compact-order-table health-status-table">
+      <table class="data-table compact-order-table health-status-table paged-head-table">
         <thead>
           <tr>
             <th v-for="header in healthHeaders" :key="header">{{ header }}</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(row, index) in data.rows" :key="`${row[0]}-${row[1]}-${index}`" :class="{ 'is-active': index === 0 }">
-            <td>
-              <span class="table-cell-leading">
-                <span class="table-row-icon" :class="rowIconClass(index)">{{ index + 1 }}</span>
-                <span>{{ row[0] }}</span>
-              </span>
-            </td>
-            <td>{{ row[1] }}</td>
-            <td class="order-time-cell">{{ row[2] }}</td>
-            <td>{{ row[3] }}</td>
-          </tr>
-        </tbody>
       </table>
+      <div ref="viewportRef" class="paged-viewport">
+        <div ref="trackRef" class="paged-track" :style="trackStyle" @transitionend="onFlipEnd">
+          <div v-for="(page, pageIndex) in renderPages" :key="pageIndex" class="paged-page">
+            <table class="data-table compact-order-table health-status-table">
+              <tbody>
+                <tr
+                  v-for="(row, rowIndex) in page"
+                  :key="rowIndex"
+                  :class="{ 'is-active': pageStart(pageIndex) + rowIndex === 0 }"
+                >
+                  <td>
+                    <span class="table-cell-leading">
+                      <span
+                        class="table-row-icon"
+                        :class="rowIconClass(pageStart(pageIndex) + rowIndex)"
+                        >{{ pageStart(pageIndex) + rowIndex + 1 }}</span
+                      >
+                      <span>{{ row[0] }}</span>
+                    </span>
+                  </td>
+                  <td>{{ row[1] }}</td>
+                  <td class="order-time-cell">{{ row[2] }}</td>
+                  <td>{{ row[3] }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <aside class="pie-summary-panel health-pie-panel" aria-label="设备健康状态">
