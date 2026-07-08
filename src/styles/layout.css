@@ -186,7 +186,7 @@
     ),
     color-mix(in srgb, var(--surface-strong) 68%, transparent);
   color: inherit;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--dashboard-font-scale, 1.45));
   font-weight: 850;
   white-space: nowrap;
   box-shadow:

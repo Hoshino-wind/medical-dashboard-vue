@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const healthHeaders = ['设备范围', '健康状态', '数量', '处置建议']
 
-const { viewportRef, trackRef, renderPages, trackStyle, pageStart, onFlipEnd } = usePagedList(
+const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedList(
   computed(() => props.data.rows),
 )
 
@@ -30,9 +30,6 @@ const pieTotal = computed(
   () => props.data.online + props.data.warning + props.data.repairing + props.data.pending,
 )
 
-function rowIconClass(index: number): string {
-  return ['is-blue', 'is-orange', 'is-red', 'is-purple'][index % 4]
-}
 </script>
 
 <template>
@@ -50,21 +47,8 @@ function rowIconClass(index: number): string {
           <div v-for="(page, pageIndex) in renderPages" :key="pageIndex" class="paged-page">
             <table class="data-table compact-order-table health-status-table">
               <tbody>
-                <tr
-                  v-for="(row, rowIndex) in page"
-                  :key="rowIndex"
-                  :class="{ 'is-active': pageStart(pageIndex) + rowIndex === 0 }"
-                >
-                  <td>
-                    <span class="table-cell-leading">
-                      <span
-                        class="table-row-icon"
-                        :class="rowIconClass(pageStart(pageIndex) + rowIndex)"
-                        >{{ pageStart(pageIndex) + rowIndex + 1 }}</span
-                      >
-                      <span>{{ row[0] }}</span>
-                    </span>
-                  </td>
+                <tr v-for="(row, rowIndex) in page" :key="rowIndex">
+                  <td>{{ row[0] }}</td>
                   <td>{{ row[1] }}</td>
                   <td class="order-time-cell">{{ row[2] }}</td>
                   <td>{{ row[3] }}</td>

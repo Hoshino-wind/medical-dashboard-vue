@@ -62,7 +62,7 @@ withDefaults(
   max-width: calc(var(--gauge-size, 8.25rem) * 0.9);
   margin: 0;
   color: color-mix(in srgb, var(--text) 92%, transparent);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--dashboard-font-scale, 1.45));
   font-weight: 800;
   line-height: 0.95;
   text-overflow: ellipsis;
@@ -72,12 +72,12 @@ withDefaults(
 .availability-metric-ring :deep(.hologram-gauge-count) {
   flex: none;
   color: var(--text);
-  font-size: 0.76rem;
+  font-size: calc(0.76rem * var(--dashboard-font-scale, 1.45));
   line-height: 0.95;
 }
 
 .availability-metric-ring :deep(.hologram-gauge-count span) {
   margin-left: 0.125rem;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--dashboard-font-scale, 1.45));
 }
 </style>

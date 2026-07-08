@@ -120,7 +120,10 @@ describe('work order style panels', () => {
     const wrapper = mount(WorkOrderTable, {
       props: {
         headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
-        rows: [['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中']],
+        rows: [
+          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
+          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '待接修'],
+        ],
       },
       global: {
         stubs: {
@@ -131,8 +134,113 @@ describe('work order style panels', () => {
 
     expect(wrapper.find('.work-order-summary').text()).toContain('维修中44单')
     expect(wrapper.find('.work-order-summary').text()).toContain('配件运输中18单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('待处理0单')
+    expect(wrapper.find('.work-order-summary').text()).toContain('待接修1单')
     expect(wrapper.find('.work-order-summary').text()).toContain('已维修1326单')
+  })
+
+  it('pins pending repair orders before the scrolling repair list with distinct status colors and no vertical warning stripes', () => {
+    const tableStyles = readFileSync(join(testDir, '../styles/tables.css'), 'utf8')
+    const wrapper = mount(WorkOrderTable, {
+      props: {
+        headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
+        rows: [
+          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
+          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '待接修'],
+          ['放射科', 'DR 摄影系统', 'ERB-3', '8小时', '赵敏', '配件运输中'],
+          ['急诊科', '除颤仪', 'ERB-4', '3小时', '陈诚', '待接修'],
+        ],
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+        },
+      },
+    })
+
+    const pinnedTable = wrapper.find('.work-order-pinned-table')
+    const scrollingViewport = wrapper.find('.paged-viewport')
+
+    expect(pinnedTable.exists()).toBe(true)
+    expect(pinnedTable.findAll('tbody tr.is-pending-repair')).toHaveLength(2)
+    expect(pinnedTable.text()).toContain('待接修')
+    expect(scrollingViewport.text()).not.toContain('待接修')
+    expect(scrollingViewport.text()).toContain('维修中')
+    expect(scrollingViewport.text()).toContain('配件运输中')
+    expect(tableStyles).toContain('.work-order-pinned-table .is-pending-repair')
+    expect(
+      pinnedTable.find('.status-pill').attributes('style'),
+    ).toContain('var(--warn)')
+    expect(
+      scrollingViewport.find('.status-pill').attributes('style'),
+    ).toContain('var(--danger)')
+    expect(
+      tableStyles.match(/\.work-order-pinned-table \.is-pending-repair td\s*\{[\s\S]*?\n\}/)?.[0] ?? '',
+    ).not.toContain('inset 0.1875rem 0 0')
+  })
+
+  it('renders list rows without row number badges or a default active first row', () => {
+    const repairOrders = mount(WorkOrderTable, {
+      props: {
+        headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
+        rows: [
+          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
+          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '已维修'],
+        ],
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+        },
+      },
+    })
+    const inspectionOrders = mount(CompletionModule, {
+      props: {
+        data: {
+          rate: 95.2,
+          total: 1482,
+          finished: 1411,
+          waiting: 71,
+          overdue: 12,
+          rows: [
+            ['临床药学组', '微量分析天平', '29天', '刘民华'],
+            ['临床药学组', '分析天平', '29天', '刘民华'],
+          ],
+        },
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+          Pie3D: PieStub,
+        },
+      },
+    })
+    const maintenanceOrders = mount(HealthTrendModule, {
+      props: {
+        theme: themes[1],
+        data: {
+          online: 15744,
+          warning: 68,
+          repairing: 44,
+          pending: 102,
+          score: 96.8,
+          rows: [
+            ['全院设备', '运行正常', '15,744台', '稳定'],
+            ['生命支持设备', '维保预警', '68台', '需排查'],
+          ],
+        },
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+          HealthPieChart: PieStub,
+        },
+      },
+    })
+
+    for (const wrapper of [repairOrders, inspectionOrders, maintenanceOrders]) {
+      expect(wrapper.findAll('.table-row-icon')).toHaveLength(0)
+      expect(wrapper.findAll('tbody tr.is-active')).toHaveLength(0)
+    }
   })
 
   it('uses CountUp for remaining static summary sources', () => {

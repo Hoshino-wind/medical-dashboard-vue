@@ -18,7 +18,7 @@ defineProps<{
   theme?: Theme
 }>()
 
-const chartHeight = pxToRem(166)
+const chartHeight = pxToRem(136)
 
 function themeColor(theme: Theme | undefined, token: `--${string}`, fallback: string): string {
   return theme?.variables[token] ?? fallback
@@ -35,12 +35,13 @@ function isLightTheme(theme: Theme | undefined): boolean {
       class="health-pie-base"
       :color="themeColor(theme, '--instrument-base', '#33566c')"
       :accent="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
-      :intensity="isLightTheme(theme) ? 0.78 : 1.16"
+      :intensity="isLightTheme(theme) ? 0.72 : 0.96"
     />
     <div class="health-pie-core">
       <Pie3D
         :items="items"
         :height="chartHeight"
+        :thickness="7"
         :theme="theme"
         :tone="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
         :accent="themeColor(theme, '--data-health-pie-warning', '#6ef5ff')"

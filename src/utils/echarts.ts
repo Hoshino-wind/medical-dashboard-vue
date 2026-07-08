@@ -15,7 +15,7 @@
  * graphic(LinearGradient / RadialGradient / extendShape / registerShape)
  * 与类型 ECharts / EChartsOption 均由 echarts/core 直接导出,无需额外 use。
  *
- * Pie3D 使用 Three.js 真实挤出环图,不占用 ECharts pie/gl 注册。
+ * Pie3D 使用 SVG 2.5D 环图,不占用 ECharts pie/gl 注册。
  *
  * 未来若新增图表类型(如 BarChart / PieChart / 散点 / 雷达),
  * 只需在下方 use() 数组追加对应模块,组件层无需任何改动。

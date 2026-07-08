@@ -14,6 +14,90 @@ function readSource(relativePath: string): string {
 }
 
 describe('global theme adaptation', () => {
+  it('scales dashboard text through shared multipliers while keeping chart and percentage values readable', () => {
+    const tokenStyles = readSource('styles/tokens.css')
+    const cssWithTextSizes = [
+      'styles/layout.css',
+      'styles/header.css',
+      'styles/panel.css',
+      'styles/rings.css',
+      'styles/modules.css',
+      'styles/tables.css',
+      'styles/charts.css',
+      'styles/config.css',
+      'components/charts/Pie3D.vue',
+      'components/visual/AvailabilityMetricRing.vue',
+    ]
+    const fontSizeDeclarations = cssWithTextSizes.flatMap((path) =>
+      Array.from(readSource(path).matchAll(/font-size:\s*([^;]+);/g), (match) => ({
+        path,
+        value: match[1],
+      })),
+    )
+    const ringStyles = readSource('styles/rings.css')
+    const headerStyles = readSource('styles/header.css')
+    const moduleStyles = readSource('styles/modules.css')
+    const panelStyles = readSource('styles/panel.css')
+    const tableStyles = readSource('styles/tables.css')
+    const cubeBar = readSource('components/charts/CubeBarChart.vue')
+    const lineArea = readSource('components/charts/LineAreaChart.vue')
+    const restoredHeaderTextBlocks = [
+      '.brand-main',
+      '.brand-cn',
+      '.brand-clock',
+      '.hospital-name',
+      '.hospital-subtitle',
+      '.title-frame h1',
+    ].map((selector) => headerStyles.match(new RegExp(`${selector.replace('.', '\\.')}\\s*\\{[\\s\\S]*?\\n\\}`))?.[0] ?? '')
+    const restoredPanelTitleBlocks = [
+      panelStyles.match(/\.panel-header h2\s*\{[\s\S]*?\n\}/)?.[0] ?? '',
+      panelStyles.match(/\.panel-title-suffix\s*\{[\s\S]*?\n\}/)?.[0] ?? '',
+    ]
+    const gaugeValueBlock =
+      ringStyles.match(/\.hologram-gauge-value\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const largeGaugeValueBlock =
+      ringStyles.match(/\.hologram-gauge\.is-large \.hologram-gauge-value\s*\{[\s\S]*?\n\}/)?.[0] ??
+      ''
+    const overviewValueBlock =
+      moduleStyles.match(/\.overview-feature-ring \.hologram-gauge-value\s*\{[\s\S]*?\n\}/)?.[0] ??
+      ''
+    const pieCenterValueBlock =
+      moduleStyles.match(/\.pie-center-value\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const pieSummaryTitleBlock =
+      moduleStyles.match(/\.pie-summary-title\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const compactTableBlock =
+      moduleStyles.match(/\.compact-order-table\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const dataTableBlock = tableStyles.match(/\.data-table\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+
+    expect(tokenStyles).toContain('--dashboard-font-scale: 1.45')
+    expect(tokenStyles).toContain('--dashboard-list-font-scale: 1.18')
+    expect(fontSizeDeclarations.length).toBeGreaterThan(20)
+    expect(
+      fontSizeDeclarations.filter((declaration) =>
+        declaration.value.includes('var(--dashboard-font-scale'),
+      ).length,
+    ).toBeGreaterThan(20)
+    expect(dataTableBlock).toContain('var(--dashboard-list-font-scale')
+    expect(dataTableBlock).not.toContain('var(--dashboard-font-scale')
+    expect(compactTableBlock).toContain('var(--dashboard-list-font-scale')
+    expect(compactTableBlock).not.toContain('var(--dashboard-font-scale')
+    expect(restoredHeaderTextBlocks.every(Boolean)).toBe(true)
+    expect(restoredPanelTitleBlocks.every(Boolean)).toBe(true)
+    expect(restoredHeaderTextBlocks.join('\n')).not.toContain('var(--dashboard-font-scale')
+    expect(restoredPanelTitleBlocks.join('\n')).not.toContain('var(--dashboard-font-scale')
+    expect(pieSummaryTitleBlock).not.toContain('var(--dashboard-font-scale')
+    expect(gaugeValueBlock).not.toContain('var(--dashboard-font-scale')
+    expect(largeGaugeValueBlock).not.toContain('var(--dashboard-font-scale')
+    expect(overviewValueBlock).not.toContain('var(--dashboard-font-scale')
+    expect(pieCenterValueBlock).not.toContain('var(--dashboard-font-scale')
+    expect(cubeBar).not.toContain('chartFontSize(')
+    expect(cubeBar).toContain('fontSize: 11')
+    expect(cubeBar).toContain('fontSize: 12')
+    expect(cubeBar).toContain('fontSize: 14')
+    expect(cubeBar).toContain('fontSize: 15')
+    expect(lineArea).toContain('chartFontSize(')
+  })
+
   it('uses theme-driven SVG stops for the top header frame', () => {
     const header = readSource('components/shared/HeaderBar.vue')
 
@@ -41,22 +125,28 @@ describe('global theme adaptation', () => {
     expect(cubeBar).not.toContain('baseNavy')
   })
 
-  it('uses theme tokens for the 3D pie lighting and tooltip instead of fixed cyan lighting', () => {
+  it('uses theme tokens for the 2.5D pie colors and tooltip instead of fixed cyan lighting', () => {
     const pie3d = readSource('components/charts/Pie3D.vue')
 
     expect(pie3d).not.toMatch(/#(?:20f1d4|123e63|0a8fb7|2f8dff|45d8ff|53fff0|4defff|265d85)/i)
     expect(pie3d).not.toMatch(/rgba\(32,\s*241,\s*212/)
   })
 
-  it('auto-rotates 3D pie charts with a reduced-motion guard', () => {
+  it('renders pie charts as layered SVG 2.5D without WebGL materials', () => {
     const pie3d = readSource('components/charts/Pie3D.vue')
 
-    expect(pie3d).toContain('requestAnimationFrame(tickRotation)')
-    expect(pie3d).toContain('prefers-reduced-motion: reduce')
-    expect(pie3d).toContain('autoRotate')
+    expect(pie3d).toContain('<svg')
+    expect(pie3d).toContain('pie3d-depth-layer')
+    expect(pie3d).toContain('pie3d-top-segment')
+    expect(pie3d).toContain('data-segment-name')
+    expect(pie3d).toContain('tooltip.visible')
+    expect(pie3d).not.toContain('WebGLRenderer')
+    expect(pie3d).not.toContain('MeshStandardMaterial')
+    expect(pie3d).not.toContain('Raycaster')
+    expect(pie3d).not.toContain('requestAnimationFrame(tickRotation)')
   })
 
-  it('removes the lower glow from 3D pie charts', () => {
+  it('keeps lower glow out of 2.5D pie charts', () => {
     const pie3d = readSource('components/charts/Pie3D.vue')
     const moduleStyles = readSource('styles/modules.css')
     const inspectionPieShell =
@@ -231,6 +321,39 @@ describe('global theme adaptation', () => {
     expect(pedestal).toContain("cssColorToThree('var(--instrument-base-rim)'")
     expect(healthBaseBlock).toContain('display: block')
     expect(healthBaseBlock).not.toContain('display: none')
+  })
+
+  it('uses the same 2.5D pie geometry with simplified pedestals', () => {
+    const healthPie = readSource('components/charts/HealthPieChart.vue')
+    const completionModule = readSource('components/modules/CompletionModule.vue')
+    const moduleStyles = readSource('styles/modules.css')
+    const healthCoreBlock =
+      moduleStyles.match(/\.health-pie-panel\s+\.health-pie-core\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const healthBaseBlock =
+      moduleStyles.match(/\.health-pie-panel\s+\.health-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const inspectionPieBlock =
+      moduleStyles.match(/\.inspection-pie-shell\s+\.pie3d-three-shell\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const inspectionBaseBlock =
+      moduleStyles.match(/\.inspection-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
+
+    expect(healthPie).toContain('const chartHeight = pxToRem(136)')
+    expect(healthPie).toContain(':thickness="7"')
+    expect(healthPie).not.toContain('label-deck')
+    expect(completionModule).toContain('const chartHeight = pxToRem(136)')
+    expect(completionModule).toContain(':thickness="7"')
+    expect(completionModule).not.toContain('label-deck')
+    expect(healthCoreBlock).toContain('width: 12.85rem')
+    expect(healthCoreBlock).toContain('height: 8.5rem')
+    expect(healthCoreBlock).toContain('transform: translateY(0)')
+    expect(inspectionPieBlock).toContain('width: 12.85rem')
+    expect(inspectionPieBlock).toContain('height: 8.5rem')
+    expect(inspectionPieBlock).toContain('transform: translateY(0)')
+    expect(healthBaseBlock).toContain('width: min(16.25rem, 124%)')
+    expect(healthBaseBlock).toContain('height: 6.25rem')
+    expect(healthBaseBlock).toContain('bottom: -0.2rem')
+    expect(inspectionBaseBlock).toContain('width: min(16.25rem, 124%)')
+    expect(inspectionBaseBlock).toContain('height: 6.25rem')
+    expect(inspectionBaseBlock).toContain('bottom: -0.2rem')
   })
 
   it('extracts the hologram base component and positions it below the ring', () => {

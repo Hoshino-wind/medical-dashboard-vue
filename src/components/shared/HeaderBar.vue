@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <header class="dashboard-header grid grid-cols-[32.5rem_1fr_32.5rem] items-center gap-3">
+  <header class="dashboard-header">
     <svg
       class="header-tech-frame"
       viewBox="0 0 1400 84"
@@ -111,7 +111,7 @@ defineProps<{
         <span class="brand-cn">上云赋</span>
       </div>
       <div class="brand-clock">
-        <div>{{ data.updatedAt }}　星期三</div>
+        <div>{{ data.updatedAt }} 星期三</div>
       </div>
     </div>
 

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { moduleCatalog } from '@/data/modules'
 import { themes } from '@/data/themes'
 import { THEME_IDS, type ThemeVariables } from '@/types/theme'
 
@@ -76,6 +77,20 @@ function hexLuminance(hex: string): number {
 }
 
 describe('dashboard themes', () => {
+  it('keeps the default 3x3 module titles aligned with the layout reference', () => {
+    expect(moduleCatalog.map((item) => item.title)).toEqual([
+      '设备总览',
+      '维修工单',
+      '报修统计',
+      '生命支持设备可用率',
+      '巡检工单',
+      '保养统计',
+      '超声设备可用率',
+      '保养工单',
+      '巡检统计',
+    ])
+  })
+
   it('exposes exactly five selectable big-screen themes', () => {
     const themeIds = themes.map((theme) => theme.id)
 

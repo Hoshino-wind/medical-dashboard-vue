@@ -10,7 +10,7 @@
   background: color-mix(in srgb, var(--glass-strong) 76%, transparent);
   color: var(--text);
   padding: 0 0.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--dashboard-font-scale, 1.45));
   font-weight: 800;
 }
 
@@ -98,7 +98,7 @@
   background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
   color: color-mix(in srgb, var(--accent) 76%, var(--text) 24%);
   padding: 0 0.5rem;
-  font-size: 0.6875rem;
+  font-size: calc(0.6875rem * var(--dashboard-font-scale, 1.45));
   font-weight: 900;
   line-height: 1;
   box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--glass-highlight) 22%, transparent);
@@ -240,7 +240,7 @@
     width: 100%;
     max-width: 100%;
     padding-left: 0;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
     text-align: center;
     transform: none;
   }
@@ -272,7 +272,7 @@
 
   .dashboard-header h1 {
     max-width: 100%;
-    font-size: 1.45rem;
+    font-size: calc(1.45rem * var(--dashboard-font-scale, 1.45));
     line-height: 1.15;
     text-align: center;
     white-space: normal;
@@ -289,10 +289,10 @@
   }
 
   .overview-value {
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--dashboard-font-scale, 1.45));
   }
 
   .data-table {
-    font-size: 0.6875rem;
+    font-size: calc(0.6875rem * var(--dashboard-font-scale, 1.45));
   }
 }
