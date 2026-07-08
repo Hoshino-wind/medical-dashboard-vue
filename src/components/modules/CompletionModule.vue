@@ -16,16 +16,12 @@ const props = defineProps<{
 const inspectionHeaders = ['所属科室', '设备名称', '剩余时间', '负责人']
 const chartHeight = pxToRem(136)
 
-const { viewportRef, trackRef, renderPages, trackStyle, pageStart, onFlipEnd } = usePagedList(
+const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedList(
   computed(() => props.data.rows),
 )
 
 function themeColor(token: `--${string}`, fallback: string): string {
   return props.theme?.variables[token] ?? fallback
-}
-
-function rowIconClass(index: number): string {
-  return ['is-blue', 'is-purple', 'is-red', 'is-orange', 'is-cyan'][index % 5]
 }
 
 function isLightTheme(theme: Theme | undefined): boolean {
@@ -68,21 +64,8 @@ const inspectionPieItems = computed(() => {
           <div v-for="(page, pageIndex) in renderPages" :key="pageIndex" class="paged-page">
             <table class="data-table compact-order-table inspection-order-table">
               <tbody>
-                <tr
-                  v-for="(row, rowIndex) in page"
-                  :key="rowIndex"
-                  :class="{ 'is-active': pageStart(pageIndex) + rowIndex === 0 }"
-                >
-                  <td>
-                    <span class="table-cell-leading">
-                      <span
-                        class="table-row-icon"
-                        :class="rowIconClass(pageStart(pageIndex) + rowIndex)"
-                        >{{ pageStart(pageIndex) + rowIndex + 1 }}</span
-                      >
-                      <span>{{ row[0] }}</span>
-                    </span>
-                  </td>
+                <tr v-for="(row, rowIndex) in page" :key="rowIndex">
+                  <td>{{ row[0] }}</td>
                   <td>{{ row[1] }}</td>
                   <td class="order-time-cell">{{ row[2] }}</td>
                   <td>{{ row[3] }}</td>
@@ -102,7 +85,6 @@ const inspectionPieItems = computed(() => {
           :color="themeColor('--instrument-base', '#33566c')"
           :accent="themeColor('--data-inspection-pie-finished', '#20e8ff')"
           :intensity="isLightTheme(theme) ? 0.72 : 0.96"
-          label-deck
         />
         <Pie3D
           :items="inspectionPieItems"

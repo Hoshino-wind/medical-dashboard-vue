@@ -114,7 +114,7 @@
   align-items: center;
   gap: 1.25rem;
   color: var(--text);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
   font-weight: 800;
   line-height: 1;
   pointer-events: none;
@@ -212,7 +212,7 @@
 .cube-bar-base-front span {
   min-width: 0;
   color: var(--text);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
   font-weight: 900;
   line-height: 1;
   text-align: center;
@@ -263,25 +263,25 @@
 }
 
 .line-chart-footer span {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
   font-weight: 850;
 }
 
 .line-chart-footer b {
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;
   font-style: normal;
 }
 
 .line-chart-footer em {
-  font-size: 0.6875rem;
+  font-size: calc(0.6875rem * var(--dashboard-font-scale, 1.45));
   font-style: normal;
   font-weight: 850;
 }
 
 .line-chart-trend strong {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;
 }
 

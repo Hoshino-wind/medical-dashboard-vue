@@ -7,6 +7,10 @@
 
 .dashboard-header {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(28rem, 0.9fr) minmax(42rem, 1.4fr) minmax(24rem, 0.8fr);
+  align-items: center;
+  gap: 0.75rem;
   isolation: isolate;
 }
 
@@ -199,6 +203,7 @@
   height: 3.625rem;
   align-items: center;
   gap: 1.55rem;
+  overflow: hidden;
   border-top: 0.0625rem solid transparent;
   border-bottom: 0.0625rem solid transparent;
   background: transparent;
@@ -395,6 +400,7 @@
   position: relative;
   display: flex;
   width: min(100%, 47.5rem);
+  min-width: 0;
   height: 4.12rem;
   align-items: center;
   justify-content: center;
@@ -535,7 +541,7 @@
 
 @media (max-width: 90rem) {
   .dashboard-header {
-    grid-template-columns: minmax(23rem, 0.95fr) minmax(31rem, 1.25fr) minmax(20rem, 0.9fr);
+    grid-template-columns: minmax(17rem, 0.72fr) minmax(38rem, 1.45fr) minmax(16rem, 0.62fr);
     gap: 0.5rem;
   }
 

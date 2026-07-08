@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import * as THREE from 'three'
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, getCurrentInstance, reactive, ref } from 'vue'
 import { buildPie3DSegments, type Pie3DInputItem, type Pie3DSegment } from '@/utils/pie3dSegments'
 import { pxToRem } from '@/utils/rem'
 import type { Theme } from '@/types/theme'
 
 const TAU = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
-const OUTER_RADIUS = 1
-const INNER_RADIUS = 0.56
-const CAMERA_BASE_SIZE = 1.05
-const MAX_PIXEL_RATIO = 1.6
-const LIGHT_PIE_SIDE = new THREE.Color('#d8f1f4')
-const LIGHT_PIE_EDGE = new THREE.Color('#bfe8f0')
+const VIEWBOX_WIDTH = 240
+const VIEWBOX_HEIGHT = 188
+const CENTER_X = 120
+const CENTER_Y = 61
+const OUTER_RX = 78
+const OUTER_RY = 34
+const INNER_RX = 41
+const INNER_RY = 16.5
+const DEPTH_STEP = 3.5
+const ARC_POINT_DENSITY = 112
 
 const props = withDefaults(
   defineProps<{
@@ -29,20 +32,48 @@ const props = withDefaults(
   {
     height: pxToRem(150),
     thickness: 8,
-    autoRotate: true,
+    autoRotate: false,
   },
 )
 
-type SegmentMesh = THREE.Mesh & {
-  userData: {
-    group: THREE.Group
-    midAngle: number
-    segment: Pie3DSegment
-  }
+interface EllipsePoint {
+  x: number
+  y: number
+}
+
+interface RenderedSegment extends Pie3DSegment {
+  index: number
+  startAngle: number
+  endAngle: number
+  path: string
+  gradientId: string
+  topColor: string
+  brightColor: string
+  deepColor: string
+  depthColor: string
+  strokeColor: string
+  labelX: number
+  labelY: number
+}
+
+interface WallSegment {
+  key: string
+  path: string
+  fill: string
+  stroke: string
+  opacity: number
+}
+
+interface DepthLayer {
+  key: string
+  offset: number
+  opacity: number
 }
 
 const host = ref<HTMLDivElement | null>(null)
-const canvas = ref<HTMLCanvasElement | null>(null)
+const activeSegmentIndex = ref<number | null>(null)
+const componentUid = getCurrentInstance()?.uid ?? 0
+const filterId = `pie3d-ambient-shadow-${componentUid}`
 const total = computed(() =>
   props.items.reduce((sum, item) => (Number.isFinite(item.value) && item.value > 0 ? sum + item.value : sum), 0),
 )
@@ -70,507 +101,309 @@ const shellStyle = computed(() => ({
   '--pie-text': props.text ?? props.theme?.variables['--text'] ?? 'var(--text)',
 }))
 
-let renderer: THREE.WebGLRenderer | null = null
-let scene: THREE.Scene | null = null
-let camera: THREE.OrthographicCamera | null = null
-let rootGroup: THREE.Group | null = null
-let observer: ResizeObserver | null = null
-let hoveredGroup: THREE.Group | null = null
-let segmentMeshes: SegmentMesh[] = []
-let animationFrame = 0
-let lastFrameTime = 0
-let motionQuery: MediaQueryList | null = null
+const depthLayerCount = computed(() => Math.max(4, Math.min(8, Math.round(props.thickness))))
 
-const raycaster = new THREE.Raycaster()
-const pointer = new THREE.Vector2()
+const depthLayers = computed<DepthLayer[]>(() =>
+  Array.from({ length: depthLayerCount.value }, (_, index) => {
+    const layer = depthLayerCount.value - index
+    return {
+      key: `depth-${layer}`,
+      offset: layer * DEPTH_STEP,
+      opacity: 0.12 + (index / Math.max(1, depthLayerCount.value - 1)) * 0.22,
+    }
+  }),
+)
+
+const rawSegments = computed<Pie3DSegment[]>(() => {
+  const segments = buildPie3DSegments(props.items)
+  if (segments.length > 0) return segments
+
+  return [
+    {
+      name: '暂无数据',
+      value: 1,
+      color: props.theme?.variables['--surface-muted'] ?? 'var(--surface-muted)',
+      startRatio: 0,
+      endRatio: 1,
+    },
+  ]
+})
+
+const renderedSegments = computed<RenderedSegment[]>(() => {
+  const gap = rawSegments.value.length > 1 ? 0.012 : 0
+
+  return rawSegments.value.map((segment, index) => {
+    const startRaw = START_ANGLE + segment.startRatio * TAU
+    const endRaw = START_ANGLE + segment.endRatio * TAU
+    const arc = Math.max(0, endRaw - startRaw)
+    const segmentGap = Math.min(gap, Math.max(0, arc * 0.16))
+    const start = startRaw + segmentGap
+    const end = endRaw - segmentGap
+    const mid = (start + end) / 2
+    const label = pointOnTiltedEllipse(mid, (OUTER_RX + INNER_RX) / 2, (OUTER_RY + INNER_RY) / 2)
+
+    return {
+      ...segment,
+      index,
+      startAngle: start,
+      endAngle: Math.max(start + 0.001, end),
+      path: annularSectorPath(start, Math.max(start + 0.001, end)),
+      gradientId: `pie3d-gradient-${componentUid}-${index}`,
+      topColor: segment.color,
+      brightColor: colorMix(segment.color, 84, '#ffffff'),
+      deepColor: colorMix(segment.color, 74, '#04111f'),
+      depthColor: colorMix(segment.color, isLightTheme() ? 64 : 48, isLightTheme() ? '#c3dbe1' : '#020814'),
+      strokeColor: colorMix(segment.color, isLightTheme() ? 70 : 72, props.theme?.variables['--instrument-rim'] ?? '#d7fbff'),
+      labelX: label.x,
+      labelY: label.y,
+    }
+  })
+})
+
+const chartLabel = computed(() =>
+  renderedSegments.value
+    .map((segment) => `${segment.name} ${segment.value}`)
+    .join('，'),
+)
+
+const centerCapPath = computed(() => closedTiltedEllipsePath(INNER_RX - 3, INNER_RY - 1.5, 0.8))
+const innerRimPath = computed(() => closedTiltedEllipsePath(INNER_RX, INNER_RY, 0))
+const totalDepth = computed(() => depthLayerCount.value * DEPTH_STEP)
+const frontWallSegments = computed<WallSegment[]>(() =>
+  renderedSegments.value.flatMap((segment) => frontWallForSegment(segment)),
+)
 
 function isLightTheme(): boolean {
   return props.theme?.id.startsWith('light-') ?? false
 }
 
-function pieDepth(): number {
-  if (isLightTheme()) return Math.max(0.14, Math.min(0.24, props.thickness * 0.026))
-  return Math.max(0.24, Math.min(0.42, props.thickness * 0.04))
+function colorMix(color: string, colorPercent: number, mixColor: string): string {
+  return `color-mix(in srgb, ${color} ${colorPercent}%, ${mixColor})`
 }
 
-function disposeMaterial(material: THREE.Material | THREE.Material[] | undefined) {
-  if (Array.isArray(material)) {
-    material.forEach((item) => item.dispose())
-    return
+function pointOnTiltedEllipse(angle: number, rx: number, ry: number, yOffset = 0): EllipsePoint {
+  const sin = Math.sin(angle)
+  const frontRatio = (sin + 1) / 2
+  const xPerspective = 0.86 + frontRatio * 0.3
+  const yPerspective = 0.68 + frontRatio * 0.3
+
+  return {
+    x: CENTER_X + Math.cos(angle) * rx * xPerspective,
+    y: CENTER_Y + sin * ry * yPerspective + yOffset,
   }
-  material?.dispose()
 }
 
-function disposeScene() {
-  scene?.traverse((object) => {
-    const disposable = object as THREE.Object3D & {
-      geometry?: THREE.BufferGeometry
-      material?: THREE.Material | THREE.Material[]
-    }
-    disposable.geometry?.dispose()
-    disposeMaterial(disposable.material)
+function frontWallForSegment(segment: RenderedSegment): WallSegment[] {
+  const start = Math.max(segment.startAngle, 0)
+  const end = Math.min(segment.endAngle, Math.PI)
+  if (end - start <= 0.01) return []
+
+  return [
+    {
+      key: `front-wall-${segment.index}`,
+      path: sideWallPath(start, end, OUTER_RX, OUTER_RY, totalDepth.value),
+      fill: colorMix(segment.topColor, isLightTheme() ? 56 : 42, isLightTheme() ? '#b9d6df' : '#020814'),
+      stroke: segment.strokeColor,
+      opacity: isLightTheme() ? 0.82 : 0.94,
+    },
+  ]
+}
+
+function formatPoint(point: EllipsePoint): string {
+  return `${point.x.toFixed(3)} ${point.y.toFixed(3)}`
+}
+
+function sampledArcPoints(start: number, end: number, rx: number, ry: number): EllipsePoint[] {
+  const arc = Math.max(0.001, end - start)
+  const steps = Math.max(8, Math.ceil((arc / TAU) * ARC_POINT_DENSITY))
+
+  return Array.from({ length: steps + 1 }, (_, index) => {
+    const angle = start + (arc * index) / steps
+    return pointOnTiltedEllipse(angle, rx, ry)
   })
-  scene = null
-  camera = null
-  rootGroup = null
-  hoveredGroup = null
-  segmentMeshes = []
 }
 
-function resolveColor(value: string, fallback = '#000000'): THREE.Color {
-  const rgb = value
-    .trim()
-    .match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)/i)
-  if (rgb) {
-    return new THREE.Color(Number(rgb[1]) / 255, Number(rgb[2]) / 255, Number(rgb[3]) / 255)
-  }
-
-  try {
-    return new THREE.Color(value)
-  } catch {
-    return new THREE.Color(fallback)
-  }
-}
-
-function cssVariableName(value: string): string | null {
-  return value.match(/^var\((--[\w-]+)/)?.[1] ?? null
-}
-
-function runtimeColor(value: string | undefined, token: keyof Theme['variables'], fallback: string): string {
-  if (value && !cssVariableName(value)) return value
-  if (props.theme?.variables[token]) return props.theme.variables[token]
-  const variableName = value ? cssVariableName(value) : token
-  if (!variableName || !host.value) return fallback
-  return getComputedStyle(host.value).getPropertyValue(variableName).trim() || fallback
-}
-
-// 浅色主题:保留扇区色相,压低饱和、提高明度,得到适配白底玻璃的顶面亮基色
-function lightPieBright(base: THREE.Color): THREE.Color {
-  const hsl = { h: 0, s: 0, l: 0 }
-  base.getHSL(hsl)
-  return new THREE.Color().setHSL(hsl.h, Math.min(1, hsl.s * 0.8), Math.min(0.82, hsl.l + 0.22))
-}
-
-// 顶面由内到外的深基色:比亮基色略深、略饱和,拉出层次但仍属白底玻璃
-function lightPieDeep(base: THREE.Color): THREE.Color {
-  const hsl = { h: 0, s: 0, l: 0 }
-  base.getHSL(hsl)
-  return new THREE.Color().setHSL(hsl.h, Math.min(1, hsl.s * 0.9), Math.min(0.64, hsl.l + 0.06))
-}
-
-function makeAnnularSectorShape(start: number, end: number): THREE.Shape {
-  const shape = new THREE.Shape()
-  shape.moveTo(Math.cos(start) * OUTER_RADIUS, Math.sin(start) * OUTER_RADIUS)
-  shape.absarc(0, 0, OUTER_RADIUS, start, end, false)
-  shape.lineTo(Math.cos(end) * INNER_RADIUS, Math.sin(end) * INNER_RADIUS)
-  shape.absarc(0, 0, INNER_RADIUS, end, start, true)
-  shape.closePath()
-  return shape
-}
-
-function makeAnnularSectorGeometry(start: number, end: number, depth: number): THREE.ExtrudeGeometry {
-  const shape = makeAnnularSectorShape(start, end)
-
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth,
-    bevelEnabled: true,
-    bevelSize: 0.018,
-    bevelThickness: 0.024,
-    bevelSegments: 3,
-    curveSegments: 64,
-    steps: 1,
-  })
-
-  geometry.translate(0, 0, -depth / 2)
-  return geometry
-}
-
-function gradientColorAt(angle: number, radius: number, base: THREE.Color): THREE.Color {
-  const y = Math.sin(angle) * radius
-  const ratio = Math.max(0, Math.min(1, (y + OUTER_RADIUS) / (OUTER_RADIUS * 2)))
-  return lightPieDeep(base).lerp(lightPieBright(base), ratio)
-}
-
-function makeTopGradientMesh(start: number, end: number, depth: number, base: THREE.Color): THREE.Mesh {
-  const arc = Math.max(0.01, end - start)
-  const steps = Math.max(18, Math.ceil((arc / TAU) * 128))
-  const positions: number[] = []
-  const colors: number[] = []
-  const indices: number[] = []
-
-  for (let index = 0; index <= steps; index += 1) {
-    const ratio = index / steps
-    const angle = start + arc * ratio
-    const outerColor = gradientColorAt(angle, OUTER_RADIUS, base)
-    const innerColor = gradientColorAt(angle, INNER_RADIUS, base).lerp(lightPieDeep(base), 0.1)
-
-    positions.push(Math.cos(angle) * OUTER_RADIUS, Math.sin(angle) * OUTER_RADIUS, depth / 2 + 0.012)
-    colors.push(outerColor.r, outerColor.g, outerColor.b)
-
-    positions.push(Math.cos(angle) * INNER_RADIUS, Math.sin(angle) * INNER_RADIUS, depth / 2 + 0.012)
-    colors.push(innerColor.r, innerColor.g, innerColor.b)
-  }
-
-  for (let index = 0; index < steps; index += 1) {
-    const outerCurrent = index * 2
-    const innerCurrent = outerCurrent + 1
-    const outerNext = outerCurrent + 2
-    const innerNext = outerCurrent + 3
-    indices.push(outerCurrent, outerNext, innerNext, outerCurrent, innerNext, innerCurrent)
-  }
-
-  const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
-  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3))
-  geometry.setIndex(indices)
-  geometry.computeVertexNormals()
-
-  return new THREE.Mesh(
-    geometry,
-    new THREE.MeshBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.98,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    }),
+function closedTiltedEllipsePath(rx: number, ry: number, yOffset: number): string {
+  const points = Array.from({ length: ARC_POINT_DENSITY }, (_, index) =>
+    pointOnTiltedEllipse((TAU * index) / ARC_POINT_DENSITY, rx, ry, yOffset),
   )
+  return [`M ${formatPoint(points[0])}`, ...points.slice(1).map((point) => `L ${formatPoint(point)}`), 'Z'].join(' ')
 }
 
-function makeSegmentGroup(segment: Pie3DSegment, depth: number, gap: number): THREE.Group {
-  const start = START_ANGLE + segment.startRatio * TAU + gap
-  const end = START_ANGLE + segment.endRatio * TAU - gap
-  const midAngle = (start + end) / 2
-  const isLight = isLightTheme()
-  const sourceColor = resolveColor(segment.color)
-  const color = isLight ? lightPieDeep(sourceColor) : sourceColor
-  const rimTheme = resolveColor(runtimeColor(undefined, '--instrument-rim', '#d7fbff'))
-  const sideColor = isLight
-    ? lightPieBright(sourceColor).lerp(LIGHT_PIE_SIDE, 0.55)
-    : color.clone().offsetHSL(0, -0.03, -0.18).multiplyScalar(0.82)
-  const rimColor = isLight
-    ? lightPieBright(sourceColor).lerp(LIGHT_PIE_EDGE, 0.4)
-    : color.clone().lerp(rimTheme, 0.08).offsetHSL(0, 0.03, 0.08)
-  const geometry = makeAnnularSectorGeometry(start, Math.max(start + 0.01, end), depth)
+function sideWallPath(start: number, end: number, rx: number, ry: number, depth: number): string {
+  const topPoints = sampledArcPoints(start, end, rx, ry)
+  const bottomPoints = topPoints
+    .map((point) => ({ x: point.x, y: point.y + depth }))
+    .reverse()
 
-  const mesh = new THREE.Mesh(geometry, [
-    new THREE.MeshStandardMaterial({
-      color: isLight
-        ? lightPieBright(sourceColor)
-        : color.clone().lerp(rimTheme, 0.02).offsetHSL(0, 0.1, 0.05),
-      emissive: color.clone().multiplyScalar(isLight ? 0.006 : 0.11),
-      metalness: isLight ? 0.08 : 0.16,
-      roughness: isLight ? 0.6 : 0.36,
-      transparent: true,
-      opacity: isLight ? 0.32 : 0.96,
-    }),
-    new THREE.MeshStandardMaterial({
-      color: sideColor,
-      emissive: sideColor.clone().multiplyScalar(isLight ? 0.006 : 0.04),
-      metalness: isLight ? 0.02 : 0.12,
-      roughness: isLight ? 0.76 : 0.52,
-      transparent: true,
-      opacity: isLight ? 0.34 : 0.88,
-    }),
-  ]) as unknown as SegmentMesh
-
-  const group = new THREE.Group()
-  mesh.userData = { group, midAngle, segment }
-  segmentMeshes.push(mesh)
-
-  const edgeGeometry = new THREE.EdgesGeometry(geometry, 24)
-  const edges = new THREE.LineSegments(
-    edgeGeometry,
-    new THREE.LineBasicMaterial({
-      color: rimColor,
-      transparent: true,
-      opacity: isLight ? 0.05 : 0.17,
-    }),
-  )
-
-  const innerGlowGeometry = new THREE.RingGeometry(INNER_RADIUS * 0.94, INNER_RADIUS * 1.02, 96, 1, start, end - start)
-  const innerGlow = new THREE.Mesh(
-    innerGlowGeometry,
-    new THREE.MeshBasicMaterial({
-      color: rimColor,
-      transparent: true,
-      opacity: isLight ? 0.025 : 0.12,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    }),
-  )
-  innerGlow.position.z = depth / 2 + 0.012
-
-  group.userData = { midAngle }
-  const topGradient = isLight
-    ? makeTopGradientMesh(start, Math.max(start + 0.01, end), depth, sourceColor)
-    : null
-  group.add(mesh, edges, innerGlow)
-  if (topGradient) group.add(topGradient)
-  return group
+  return [
+    `M ${formatPoint(topPoints[0])}`,
+    ...topPoints.slice(1).map((point) => `L ${formatPoint(point)}`),
+    ...bottomPoints.map((point) => `L ${formatPoint(point)}`),
+    'Z',
+  ].join(' ')
 }
 
-function makeCenterCap(depth: number, toneColor: THREE.Color, accentColor: THREE.Color, surfaceColor: THREE.Color): THREE.Mesh {
-  const isLight = isLightTheme()
-  const topRadius = INNER_RADIUS * (isLight ? 0.5 : 0.82)
-  const bottomRadius = INNER_RADIUS * (isLight ? 0.58 : 0.9)
-  const geometry = new THREE.CylinderGeometry(topRadius, bottomRadius, depth * 0.82, 96)
-  geometry.rotateX(Math.PI / 2)
-  const material = new THREE.MeshStandardMaterial({
-    color: isLight ? new THREE.Color('#f4fbfc') : surfaceColor.clone().lerp(toneColor, 0.12),
-    emissive: accentColor.clone().multiplyScalar(isLight ? 0.004 : 0.16),
-    emissiveIntensity: isLight ? 0.004 : 0.1,
-    metalness: isLight ? 0.04 : 0.2,
-    roughness: isLight ? 0.82 : 0.46,
-    transparent: true,
-    opacity: isLight ? 0.16 : 0.56,
-  })
-  const mesh = new THREE.Mesh(geometry, material)
-  mesh.position.z = 0.018
-  return mesh
+function annularSectorPath(start: number, end: number): string {
+  const outerPoints = sampledArcPoints(start, end, OUTER_RX, OUTER_RY)
+  const innerPoints = sampledArcPoints(start, end, INNER_RX, INNER_RY).reverse()
+
+  return [
+    `M ${formatPoint(outerPoints[0])}`,
+    ...outerPoints.slice(1).map((point) => `L ${formatPoint(point)}`),
+    ...innerPoints.map((point) => `L ${formatPoint(point)}`),
+    'Z',
+  ].join(' ')
 }
 
-function buildScene() {
-  disposeScene()
-
-  const isLight = isLightTheme()
-  const depth = pieDepth()
-  const segments = buildPie3DSegments(props.items)
-  const gap = segments.length > 1 ? 0.014 : 0
-  const toneColor = resolveColor(runtimeColor(props.tone, '--data-pie-primary', '#20e8ff'))
-  const accentColor = resolveColor(runtimeColor(props.accent, '--data-pie-pending', '#9df5ff'))
-  const surfaceColor = resolveColor(runtimeColor(props.surface, '--instrument-base', '#33566c'))
-  const mutedColor = resolveColor(runtimeColor(undefined, '--surface-muted', '#000000'))
-
-  scene = new THREE.Scene()
-  camera = new THREE.OrthographicCamera(-1.6, 1.6, 1.05, -1.05, 0.1, 20)
-  camera.position.set(0, -2.65, 2.05)
-  camera.lookAt(0, 0, 0)
-
-  scene.add(new THREE.AmbientLight(toneColor.clone().offsetHSL(0, -0.04, 0.08), isLight ? 0.48 : 0.88))
-
-  const keyLight = new THREE.DirectionalLight(toneColor.clone().offsetHSL(0, -0.02, 0.12), isLight ? 0.62 : 1.28)
-  keyLight.position.set(-1.5, -2.6, 3.2)
-  scene.add(keyLight)
-
-  const rimLight = new THREE.DirectionalLight(accentColor.clone().offsetHSL(0, 0.04, 0.1), isLight ? 0.22 : 0.96)
-  rimLight.position.set(2.4, 1.8, 2.4)
-  scene.add(rimLight)
-
-  const frontLight = new THREE.PointLight(accentColor, isLight ? 0.08 : 0.58, 6)
-  frontLight.position.set(0, -1.5, 1.2)
-  scene.add(frontLight)
-
-  rootGroup = new THREE.Group()
-  rootGroup.rotation.z = -0.12
-  rootGroup.scale.set(1.04, 1.04, 1)
-
-  if (segments.length === 0) {
-    rootGroup.add(
-      makeSegmentGroup(
-        { name: '暂无数据', value: 1, color: mutedColor.getStyle(), startRatio: 0, endRatio: 1 },
-        depth,
-        0,
-      ),
-    )
-  } else {
-    segments.forEach((segment) => rootGroup?.add(makeSegmentGroup(segment, depth, gap)))
-  }
-
-  rootGroup.add(makeCenterCap(depth, toneColor, accentColor, surfaceColor))
-  scene.add(rootGroup)
-}
-
-function ensureRenderer() {
-  if (!canvas.value || renderer) return
-  renderer = new THREE.WebGLRenderer({
-    canvas: canvas.value,
-    alpha: true,
-    antialias: true,
-    powerPreference: 'high-performance',
-  })
-  renderer.setClearAlpha(0)
-  renderer.outputColorSpace = THREE.SRGBColorSpace
-}
-
-function resize() {
-  if (!host.value || !renderer || !camera) return
-  const rect = host.value.getBoundingClientRect()
-  const width = Math.max(1, Math.floor(rect.width))
-  const height = Math.max(1, Math.floor(rect.height))
-  const aspect = width / height
-
-  camera.left = -CAMERA_BASE_SIZE * aspect
-  camera.right = CAMERA_BASE_SIZE * aspect
-  camera.top = CAMERA_BASE_SIZE
-  camera.bottom = -CAMERA_BASE_SIZE
-  camera.updateProjectionMatrix()
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO))
-  renderer.setSize(width, height, false)
-  renderScene()
-}
-
-function renderScene() {
-  if (!renderer || !scene || !camera) return
-  renderer.render(scene, camera)
-}
-
-function prefersReducedMotion(): boolean {
-  return motionQuery?.matches ?? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
-function shouldRotate(): boolean {
-  return props.autoRotate && !prefersReducedMotion()
-}
-
-function stopRotation() {
-  if (animationFrame) {
-    cancelAnimationFrame(animationFrame)
-    animationFrame = 0
-  }
-  lastFrameTime = 0
-}
-
-function tickRotation(timestamp: number) {
-  if (!rootGroup || !shouldRotate()) {
-    animationFrame = 0
-    lastFrameTime = 0
-    return
-  }
-
-  if (!lastFrameTime) lastFrameTime = timestamp
-  const delta = Math.min(48, timestamp - lastFrameTime)
-  lastFrameTime = timestamp
-  rootGroup.rotation.z += delta * 0.00016
-  renderScene()
-  animationFrame = requestAnimationFrame(tickRotation)
-}
-
-function startRotation() {
-  stopRotation()
-  if (!shouldRotate()) return
-  animationFrame = requestAnimationFrame(tickRotation)
-}
-
-function onMotionPreferenceChange() {
-  if (shouldRotate()) {
-    startRotation()
-    return
-  }
-
-  stopRotation()
-  renderScene()
-}
-
-function mountScene() {
-  ensureRenderer()
-  if (!renderer) return
-  tooltip.visible = false
-  stopRotation()
-  buildScene()
-  resize()
-  renderScene()
-  startRotation()
-}
-
-function resetHover() {
-  if (hoveredGroup) {
-    hoveredGroup.position.set(0, 0, 0)
-    hoveredGroup.scale.set(1, 1, 1)
-    hoveredGroup = null
-  }
-  tooltip.visible = false
-  renderScene()
-}
-
-function updateHover(mesh: SegmentMesh, event: PointerEvent) {
-  const group = mesh.userData.group
-  const midAngle = mesh.userData.midAngle
-
-  if (hoveredGroup && hoveredGroup !== group) {
-    hoveredGroup.position.set(0, 0, 0)
-    hoveredGroup.scale.set(1, 1, 1)
-  }
-
-  hoveredGroup = group
-  group.position.set(Math.cos(midAngle) * 0.045, Math.sin(midAngle) * 0.045, 0.035)
-  group.scale.set(1.025, 1.025, 1.025)
-
+function moveTooltip(event: PointerEvent) {
   const rect = host.value?.getBoundingClientRect()
-  const segment = mesh.userData.segment
+  if (!rect) return
+
+  tooltip.x = event.clientX - rect.left + 10
+  tooltip.y = event.clientY - rect.top - 10
+}
+
+function showTooltip(segment: RenderedSegment, event: PointerEvent) {
+  activeSegmentIndex.value = segment.index
   tooltip.visible = true
   tooltip.name = segment.name
   tooltip.value = segment.value
   tooltip.percent = total.value > 0 ? ((segment.value / total.value) * 100).toFixed(1) : '0.0'
-
-  if (rect) {
-    tooltip.x = event.clientX - rect.left + 10
-    tooltip.y = event.clientY - rect.top - 10
-  }
-
-  renderScene()
+  moveTooltip(event)
 }
 
-function onPointerMove(event: PointerEvent) {
-  if (!canvas.value || !camera || segmentMeshes.length === 0) return
-  const rect = canvas.value.getBoundingClientRect()
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-
-  raycaster.setFromCamera(pointer, camera)
-  const [hit] = raycaster.intersectObjects(segmentMeshes, false)
-
-  if (!hit) {
-    resetHover()
-    return
-  }
-
-  updateHover(hit.object as SegmentMesh, event)
+function showKeyboardTooltip(segment: RenderedSegment) {
+  activeSegmentIndex.value = segment.index
+  tooltip.visible = true
+  tooltip.name = segment.name
+  tooltip.value = segment.value
+  tooltip.percent = total.value > 0 ? ((segment.value / total.value) * 100).toFixed(1) : '0.0'
+  tooltip.x = segment.labelX + 12
+  tooltip.y = segment.labelY - 16
 }
 
-onMounted(() => {
-  nextTick(() => {
-    motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    motionQuery.addEventListener('change', onMotionPreferenceChange)
-    mountScene()
-    observer = new ResizeObserver(resize)
-    if (host.value) observer.observe(host.value)
-  })
-})
-
-watch(
-  () => [props.items, props.thickness, props.theme, props.tone, props.accent, props.surface, props.autoRotate],
-  () => nextTick(mountScene),
-  { deep: true },
-)
-
-onUnmounted(() => {
-  stopRotation()
-  motionQuery?.removeEventListener('change', onMotionPreferenceChange)
-  motionQuery = null
-  observer?.disconnect()
-  disposeScene()
-  renderer?.dispose()
-  renderer = null
-})
+function hideTooltip() {
+  activeSegmentIndex.value = null
+  tooltip.visible = false
+}
 </script>
 
 <template>
   <div
     ref="host"
-    class="pie3d-three-shell"
+    class="pie3d-three-shell pie3d-25d-shell"
     :style="shellStyle"
-    @pointermove="onPointerMove"
-    @pointerleave="resetHover"
+    @pointerleave="hideTooltip"
   >
-    <canvas ref="canvas" class="pie3d-three-canvas" />
+    <svg
+      class="pie3d-25d-svg"
+      :viewBox="`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`"
+      role="img"
+      :aria-label="chartLabel"
+    >
+      <defs>
+        <filter :id="filterId" x="-20%" y="-20%" width="140%" height="150%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3.5" />
+          <feOffset dx="0" dy="6" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.28" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <linearGradient
+          v-for="segment in renderedSegments"
+          :id="segment.gradientId"
+          :key="segment.gradientId"
+          x1="0"
+          y1="18"
+          x2="0"
+          y2="128"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" :stop-color="segment.brightColor" />
+          <stop offset="0.48" :stop-color="segment.topColor" />
+          <stop offset="1" :stop-color="segment.deepColor" />
+        </linearGradient>
+      </defs>
+
+      <ellipse
+        class="pie3d-ground"
+        :cx="CENTER_X"
+        :cy="CENTER_Y + totalDepth + 12"
+        rx="90"
+        ry="26"
+      />
+
+      <g class="pie3d-depth-stack" aria-hidden="true" :filter="`url(#${filterId})`">
+        <g
+          v-for="layer in depthLayers"
+          :key="layer.key"
+          class="pie3d-depth-layer"
+          :style="{ transform: `translateY(${layer.offset}px)`, opacity: layer.opacity }"
+        >
+          <path
+            v-for="segment in renderedSegments"
+            :key="`${layer.key}-${segment.index}`"
+            :d="segment.path"
+            :fill="segment.depthColor"
+            :stroke="segment.strokeColor"
+            stroke-width="0.75"
+          />
+        </g>
+      </g>
+
+      <g class="pie3d-front-wall-stack" aria-hidden="true">
+        <path
+          v-for="wall in frontWallSegments"
+          :key="wall.key"
+          class="pie3d-front-wall"
+          :d="wall.path"
+          :fill="wall.fill"
+          :stroke="wall.stroke"
+          :opacity="wall.opacity"
+          stroke-width="0.9"
+        />
+      </g>
+
+      <g class="pie3d-top-stack" :filter="`url(#${filterId})`">
+        <path
+          v-for="segment in renderedSegments"
+          :key="segment.index"
+          class="pie3d-top-segment"
+          :class="{ 'is-active': activeSegmentIndex === segment.index }"
+          :d="segment.path"
+          :fill="`url(#${segment.gradientId})`"
+          :stroke="segment.strokeColor"
+          stroke-width="1.15"
+          tabindex="0"
+          :data-segment-name="segment.name"
+          @pointerenter="showTooltip(segment, $event)"
+          @pointermove="moveTooltip"
+          @focus="showKeyboardTooltip(segment)"
+          @blur="hideTooltip"
+        />
+      </g>
+
+      <path
+        class="pie3d-center-cap"
+        :d="centerCapPath"
+      />
+      <path
+        class="pie3d-inner-rim"
+        :d="innerRimPath"
+      />
+    </svg>
+
     <div
       v-if="tooltip.visible"
       class="pie3d-three-tooltip"
       :style="tooltipStyle"
     >
-      <div>{{ tooltip.name }}：{{ tooltip.value }} 台</div>
+      <div>{{ tooltip.name }}：{{ tooltip.value }}</div>
       <div>占比：{{ tooltip.percent }}%</div>
     </div>
   </div>
@@ -583,10 +416,59 @@ onUnmounted(() => {
   overflow: visible;
 }
 
-.pie3d-three-canvas {
+.pie3d-25d-svg {
   display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
+}
+
+.pie3d-ground {
+  fill: color-mix(in srgb, var(--pie-surface) 46%, transparent);
+  opacity: 0.36;
+}
+
+.pie3d-depth-layer {
+  transform-box: view-box;
+}
+
+.pie3d-depth-layer path {
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-front-wall {
+  filter: saturate(0.95) brightness(0.88);
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-top-segment {
+  cursor: default;
+  outline: none;
+  transition:
+    filter 180ms ease,
+    transform 180ms ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-top-segment:hover,
+.pie3d-top-segment:focus,
+.pie3d-top-segment.is-active {
+  filter: brightness(1.11) saturate(1.08);
+  transform: translateY(-0.125rem);
+}
+
+.pie3d-center-cap {
+  fill: color-mix(in srgb, var(--pie-surface) 72%, transparent);
+  stroke: color-mix(in srgb, var(--pie-edge) 40%, transparent);
+  stroke-width: 1;
+}
+
+.pie3d-inner-rim {
+  fill: transparent;
+  stroke: color-mix(in srgb, var(--pie-accent) 44%, transparent);
+  stroke-width: 1.2;
 }
 
 .pie3d-three-tooltip {
@@ -600,10 +482,16 @@ onUnmounted(() => {
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--pie-surface) 72%, #020814);
   color: var(--pie-text);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
   font-weight: 800;
   line-height: 1.45;
   pointer-events: none;
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pie3d-top-segment {
+    transition: none;
+  }
 }
 </style>

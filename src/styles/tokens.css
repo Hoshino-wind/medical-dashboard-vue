@@ -10,6 +10,8 @@
  * 保持单一事实来源;若该主题调整,这里需同步。运行时主题会覆盖这些默认值。
  */
 :root {
+  --dashboard-font-scale: 1.45;
+  --dashboard-list-font-scale: 1.18;
   --bg-top: #031425;
   --bg: #020814;
   --bg-soft: #062a47;
