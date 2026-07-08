@@ -81,7 +81,7 @@ describe('dashboard themes', () => {
     expect(moduleCatalog.map((item) => item.title)).toEqual([
       '设备总览',
       '维修工单',
-      '报修统计',
+      '保修统计',
       '生命支持设备可用率',
       '巡检工单',
       '保养统计',

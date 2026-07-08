@@ -30,14 +30,11 @@ const props = withDefaults(
 const animated = ref(0)
 let raf = 0
 
-const ringEl = ref<HTMLDivElement | null>(null)
-const ringPx = ref(0)
-let ringObserver: ResizeObserver | null = null
-
 const RING_R = 50
 const CIRCUMFERENCE = 2 * Math.PI * RING_R
-// 与 rings.css `.gauge-ring-progress` 的 stroke-width 保持一致（px，且使用 non-scaling-stroke）
-const PROGRESS_STROKE = 10.6
+// 需与 rings.css 中 .gauge-ring-progress 的 stroke-width 保持一致
+const PROGRESS_STROKE_WIDTH = 10.6
+const FULL_RING_THRESHOLD = 99.5
 
 interface GaugePalette {
   tone: string
@@ -88,15 +85,18 @@ const GAUGE_PALETTES = [
 const uid = `gg-${Math.random().toString(36).slice(2, 8)}`
 
 const strokeDashoffset = computed(() => {
-  const ratio = Math.max(0, Math.min(100, animated.value || 0)) / 100
-  if (ratio <= 0) return CIRCUMFERENCE
-  // 圆头端帽会在弧两端各多出半个描边宽度；non-scaling-stroke 下端帽是固定 px，
-  // 需按当前渲染尺寸换算回 viewBox 单位再从可见弧长中扣除，让弧长精确等于数值。
-  const scale = ringPx.value > 0 ? ringPx.value / 120 : 1
-  const capComp = PROGRESS_STROKE / scale
-  const geometric = Math.max(0, ratio * CIRCUMFERENCE - capComp)
-  return CIRCUMFERENCE - geometric
+  const normalized = Math.max(0, Math.min(100, animated.value || 0))
+  if (normalized >= FULL_RING_THRESHOLD) return 0
+  // stroke-linecap: round 让进度弧两端各延伸 strokeWidth/2，
+  // 需在 offset 上补回 strokeWidth，否则视觉进度会比百分比偏大约 strokeWidth/CIRCUMFERENCE
+  // 用 Math.min 钳制，避免极小值（<3.4%）时 offset 超过周长导致 dash 循环、错误显示一段弧
+  return Math.min(
+    CIRCUMFERENCE,
+    CIRCUMFERENCE * (1 - normalized / 100) + PROGRESS_STROKE_WIDTH,
+  )
 })
+
+const isComplete = computed(() => Math.max(0, Math.min(100, animated.value || 0)) >= FULL_RING_THRESHOLD)
 
 const palette = computed(() => {
   const normalized = Math.max(0, Math.min(100, props.value || 0))
@@ -137,32 +137,23 @@ function displayValue(value: number): string {
 
 onMounted(() => {
   run()
-  if (ringEl.value) {
-    ringPx.value = ringEl.value.clientWidth
-    ringObserver = new ResizeObserver((entries) => {
-      const width = entries[0]?.contentRect.width
-      if (width) ringPx.value = width
-    })
-    ringObserver.observe(ringEl.value)
-  }
 })
 watch(() => props.value, run)
 onUnmounted(() => {
   cancelAnimationFrame(raf)
-  ringObserver?.disconnect()
 })
 </script>
 
 <template>
   <div
     class="hologram-gauge"
-    :class="{ 'is-large': large, 'has-inside-label': insideLabel }"
+    :class="{ 'is-large': large, 'has-inside-label': insideLabel, 'is-complete': isComplete }"
     :style="rootStyle"
   >
     <div class="hologram-gauge-stage">
       <HologramGaugeBase />
 
-      <div ref="ringEl" class="hologram-gauge-ring">
+      <div class="hologram-gauge-ring">
         <svg class="hologram-gauge-svg" viewBox="0 0 120 120" aria-hidden="true">
           <defs>
             <linearGradient :id="`ring-progress-${uid}`" x1="0" y1="0" x2="1" y2="1">

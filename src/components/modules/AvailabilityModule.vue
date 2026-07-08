@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
 import type { AvailabilityItem } from '@/types/dashboard'
 import { pxToRem } from '@/utils/rem'
 
 const PAGE_SIZE = 3
+// 翻页间隔：每页停留时间，足够看清进度条增长动画（run() 约 1.2s）
+const PAGE_INTERVAL = 5500
 
 const props = withDefaults(
   defineProps<{
@@ -26,60 +28,75 @@ const pages = computed(() => {
   return result.length > 0 ? result : [[]]
 })
 
-const shouldLoop = computed(() => pages.value.length > 1)
+const shouldPaginate = computed(() => pages.value.length > 1)
 
-const renderPages = computed(() =>
-  shouldLoop.value ? [...pages.value, pages.value[0]] : pages.value,
+const currentIndex = ref(0)
+let pageTimer: ReturnType<typeof setInterval> | null = null
+
+const currentPage = computed(() => pages.value[currentIndex.value] ?? [])
+
+function nextPage() {
+  if (!shouldPaginate.value) return
+  currentIndex.value = (currentIndex.value + 1) % pages.value.length
+}
+
+function startAutoPaging() {
+  stopAutoPaging()
+  if (shouldPaginate.value) {
+    pageTimer = setInterval(nextPage, PAGE_INTERVAL)
+  }
+}
+
+function stopAutoPaging() {
+  if (pageTimer) {
+    clearInterval(pageTimer)
+    pageTimer = null
+  }
+}
+
+// 数据页数变化后回到第一页并重启计时
+watch(
+  () => pages.value.length,
+  () => {
+    currentIndex.value = 0
+    startAutoPaging()
+  },
 )
 
-const pageStepPx = computed(() => (props.variant === 'ultrasound' ? 190 : 198))
-
-const scrollStyle = computed<Record<string, string>>(() => ({
-  '--availability-page-count': String(pages.value.length),
-  '--availability-scroll-duration': `${pages.value.length * 7.2}s`,
-  '--availability-page-step': pxToRem(pageStepPx.value),
-  '--availability-scroll-distance': pxToRem(-pageStepPx.value * pages.value.length),
-  // linear 连续平滑上滚(替代原先 steps 离散翻页,后者每页停 7.2s 几乎看不出在动)
-  '--availability-scroll-easing': 'linear',
-}))
+onMounted(startAutoPaging)
+onUnmounted(stopAutoPaging)
 </script>
 
 <template>
   <div
     class="availability-grid availability-window h-full"
-    :class="[`availability-${variant}`, { 'is-looping': shouldLoop }]"
-    :style="scrollStyle"
+    :class="[`availability-${variant}`, { 'is-paginating': shouldPaginate }]"
   >
-    <div class="availability-track">
+    <Transition name="availability-flip" mode="out-in">
+      <!-- :key 绑定当前页索引：每次翻页 Vue 销毁旧页、挂载新页，
+           内部的 HologramGauge 重新触发 onMounted → run()，进度条从 0 增长到目标值 -->
       <div
-        v-for="(page, pageIndex) in renderPages"
-        :key="pageIndex"
+        :key="currentIndex"
         class="availability-page grid h-full grid-cols-3 items-center gap-1"
       >
         <AvailabilityMetricRing
-          v-for="item in page"
-          :key="`${pageIndex}-${item.name}`"
+          v-for="item in currentPage"
+          :key="item.name"
           :value="item.value"
           :label="item.name"
           :count="item.count"
           :size="ringSize"
         />
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <style scoped>
 .availability-window {
+  position: relative;
   min-height: 0;
   overflow: hidden;
-}
-
-.availability-track {
-  display: grid;
-  grid-auto-rows: 100%;
-  height: 100%;
-  will-change: transform;
 }
 
 .availability-page {
@@ -87,25 +104,29 @@ const scrollStyle = computed<Record<string, string>>(() => ({
   justify-items: center;
 }
 
-.availability-window.is-looping .availability-track {
-  grid-auto-rows: var(--availability-page-step);
-  animation: availability-page-scroll var(--availability-scroll-duration)
-    var(--availability-scroll-easing) infinite;
+/* 翻页过渡：上滑 + 淡入淡出 */
+.availability-flip-enter-active,
+.availability-flip-leave-active {
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-@keyframes availability-page-scroll {
-  from {
-    transform: translateY(0);
-  }
+.availability-flip-enter-from {
+  opacity: 0;
+  transform: translateY(26px);
+}
 
-  to {
-    transform: translateY(var(--availability-scroll-distance));
-  }
+.availability-flip-leave-to {
+  opacity: 0;
+  transform: translateY(-26px);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .availability-window.is-looping .availability-track {
-    animation: none;
+  .availability-flip-enter-from,
+  .availability-flip-leave-to {
+    transform: none;
+    transition-duration: 0.2s;
   }
 }
 </style>

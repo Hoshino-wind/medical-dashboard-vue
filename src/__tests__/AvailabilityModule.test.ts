@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { nextTick } from 'vue'
 import AvailabilityModule from '@/components/modules/AvailabilityModule.vue'
 
 const RingStub = {
@@ -7,8 +8,8 @@ const RingStub = {
   template: '<div class="ring-stub">{{ label }} {{ value }} {{ count }}</div>',
 }
 
-describe('availability module carousel', () => {
-  it('loops by pages of three when more availability items are provided', () => {
+describe('availability module pagination', () => {
+  it('marks the window as paginating and renders only the current page when more items are provided', () => {
     const wrapper = mount(AvailabilityModule, {
       props: {
         items: [
@@ -25,15 +26,15 @@ describe('availability module carousel', () => {
       },
     })
 
-    expect(wrapper.find('.availability-window').classes()).toContain('is-looping')
-    expect(wrapper.find('.availability-window').attributes('style')).toContain(
-      '--availability-scroll-easing: linear',
-    )
-    expect(wrapper.find('.availability-window').attributes('style')).toContain(
-      '--availability-page-step: 12.375rem',
-    )
-    expect(wrapper.findAll('.availability-page')).toHaveLength(3)
-    expect(wrapper.text()).toContain('注射泵')
+    expect(wrapper.find('.availability-window').classes()).toContain('is-paginating')
+    // 翻页模式下同一时间只渲染当前页（第一页）
+    expect(wrapper.findAll('.availability-page')).toHaveLength(1)
+    // 第一页只包含前 3 项
+    expect(wrapper.text()).toContain('除颤监护仪')
+    expect(wrapper.text()).toContain('呼吸机')
+    expect(wrapper.text()).toContain('监护仪')
+    // 第 4 项在第二页，初始不显示
+    expect(wrapper.text()).not.toContain('注射泵')
   })
 
   it('stays static when a single page of availability items is provided', () => {
@@ -52,7 +53,43 @@ describe('availability module carousel', () => {
       },
     })
 
-    expect(wrapper.find('.availability-window').classes()).not.toContain('is-looping')
+    expect(wrapper.find('.availability-window').classes()).not.toContain('is-paginating')
     expect(wrapper.findAll('.availability-page')).toHaveLength(1)
+  })
+
+  it('advances to the next page on each interval tick, cycling back to the first page', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(AvailabilityModule, {
+      props: {
+        items: [
+          { name: '除颤监护仪', value: 92.6, count: 68 },
+          { name: '呼吸机', value: 94.7, count: 717 },
+          { name: '监护仪', value: 94.8, count: 210 },
+          { name: '注射泵', value: 95.6, count: 86 },
+        ],
+      },
+      global: {
+        stubs: {
+          AvailabilityMetricRing: RingStub,
+        },
+      },
+    })
+
+    // 第一页
+    expect(wrapper.text()).toContain('除颤监护仪')
+    expect(wrapper.text()).not.toContain('注射泵')
+
+    // 翻到第二页
+    vi.advanceTimersByTime(5500)
+    await nextTick()
+    expect(wrapper.text()).toContain('注射泵')
+    expect(wrapper.text()).not.toContain('除颤监护仪')
+
+    // 再翻一次回到第一页（循环）
+    vi.advanceTimersByTime(5500)
+    await nextTick()
+    expect(wrapper.text()).toContain('除颤监护仪')
+
+    vi.useRealTimers()
   })
 })

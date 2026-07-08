@@ -131,21 +131,7 @@
   width: 0.625rem;
   height: 0.625rem;
   border-radius: 0.1875rem;
-}
-
-.cube-bar-legend .is-all {
-  color: color-mix(in srgb, var(--data-bar) 94%, var(--text) 6%);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--data-bar) 76%, var(--bg)), color-mix(in srgb, var(--data-bar) 42%, var(--bg)));
-}
-
-.cube-bar-legend .is-onsite {
-  color: color-mix(in srgb, var(--data-bar-secondary) 94%, var(--text) 6%);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--data-bar-secondary) 76%, var(--bg)), color-mix(in srgb, var(--data-bar-secondary) 42%, var(--bg)));
-}
-
-.cube-bar-legend .is-factory {
-  color: color-mix(in srgb, var(--data-pie-pending) 94%, var(--text) 6%);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--data-pie-pending) 76%, var(--bg)), color-mix(in srgb, var(--data-pie-pending) 42%, var(--bg)));
+  border: 0.0625rem solid currentColor;
 }
 
 .chart-bar {

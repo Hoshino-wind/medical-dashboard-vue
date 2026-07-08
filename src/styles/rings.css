@@ -78,6 +78,28 @@
   pointer-events: none;
 }
 
+.hologram-gauge-ring::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: calc(var(--gauge-size, 7.375rem) * 0.039);
+  border: calc(var(--gauge-size, 7.375rem) * 0.088) solid var(--gauge-tone-soft);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 1.05rem color-mix(in srgb, var(--gauge-tone) 34%, transparent),
+    inset 0 0 0.75rem color-mix(in srgb, var(--gauge-tone-bright) 18%, transparent);
+}
+
+.hologram-gauge.is-complete .hologram-gauge-ring::after {
+  opacity: 1;
+}
+
+.hologram-gauge.is-complete .hologram-gauge-svg {
+  opacity: 0;
+}
+
 .hologram-gauge-svg {
   position: relative;
   z-index: 2;
@@ -89,7 +111,9 @@
 .gauge-ring-track,
 .gauge-ring-progress {
   fill: none;
-  vector-effect: non-scaling-stroke;
+  /* 不使用 vector-effect: non-scaling-stroke：它会让 stroke-dasharray/dashoffset
+     也按屏幕像素计算，导致基于 viewBox 的 CIRCUMFERENCE 与实际周长不匹配，
+     进度百分比与环形严重错位（如 92% 显示为满环） */
 }
 
 .gauge-ring-track {
@@ -103,6 +127,10 @@
   stroke-linejoin: round;
   stroke-width: 10.6;
   transition: stroke-dashoffset 120ms linear;
+}
+
+.hologram-gauge.is-complete .gauge-ring-progress {
+  stroke-linecap: butt;
 }
 
 /* 单调由深到浅的渐变，避免中段出现亮带导致过渡不流畅 */

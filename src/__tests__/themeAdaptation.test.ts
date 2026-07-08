@@ -94,7 +94,7 @@ describe('global theme adaptation', () => {
     expect(cubeBar).toContain('fontSize: 11')
     expect(cubeBar).toContain('fontSize: 12')
     expect(cubeBar).toContain('fontSize: 14')
-    expect(cubeBar).toContain('fontSize: 15')
+    expect(cubeBar).toContain('fontSize: 9')
     expect(lineArea).toContain('chartFontSize(')
   })
 

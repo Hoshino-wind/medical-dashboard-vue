@@ -284,12 +284,20 @@
     height: auto;
   }
 
-  .overview-layout {
-    grid-template-columns: 1fr;
+  /* 窄屏下指标卡退为紧凑尺寸，避免与缩小的环形重叠 */
+  .overview-stat {
+    width: clamp(5.6rem, 28%, 7.2rem);
+    padding: 0.25rem 0.4rem;
+  }
+
+  .overview-stat-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0.22rem;
   }
 
   .overview-value {
-    font-size: calc(1.125rem * var(--dashboard-font-scale, 1.45));
+    font-size: calc(0.84rem * var(--dashboard-font-scale, 1.45));
   }
 
   .data-table {

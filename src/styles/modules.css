@@ -1,20 +1,29 @@
 /* Dashboard module layouts */
+/* 设备总览：环形缩小居中，5 个指标卡环绕分布（grid 区域布局，天然防重叠） */
 .overview-layout {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(13.25rem, 1fr) 12rem;
+  /* 内边距让环绕指标卡不贴面板边缘 */
+  padding: 0.35rem 0.6rem;
+  /* 左列 | 环形 | 右列，环形跨上下两行 */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr auto;
+  grid-template-areas:
+    'tl   ring tr'
+    'bl   ring br'
+    'bc   bc   bc';
   align-items: center;
-  gap: 0.625rem;
-  transform: translate(0, 0);
+  justify-items: center;
+  gap: 0.35rem 0.5rem;
+  box-sizing: border-box;
 }
 
 .overview-ring {
+  grid-area: ring;
   display: flex;
-  min-width: 0;
   align-items: center;
   justify-content: center;
-  transform: translate(-0.5rem, -0.35rem);
 }
 
 .overview-feature-ring {
@@ -22,73 +31,66 @@
   isolation: isolate;
 }
 
-.overview-feature-ring::before {
-  content: '';
-  position: absolute;
-  display: none;
-  left: 50%;
-  bottom: 0.4375rem;
-  z-index: 0;
-  width: 1.125rem;
-  height: 7.375rem;
-  border-radius: 62.4375rem;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--data-ring) 22%, transparent) 48%,
-    color-mix(in srgb, var(--data-ring) 48%, transparent) 100%
-  );
-  opacity: 0.62;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
+/* 环内百分比数值随环形等比缩小（固定值，不随 font-scale 变化，与其它仪表盘值一致） */
 .overview-feature-ring .hologram-gauge-value {
-  font-size: 2.95rem;
+  font-size: 1.96rem;
 }
 
-.overview-metrics {
-  display: grid;
-  min-height: 0;
-  grid-template-columns: 1fr;
-  align-content: center;
-  gap: 0.375rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 50%, transparent);
-  border-radius: 0.375rem;
-  overflow: hidden;
-  background: transparent;
+.overview-feature-ring .hologram-gauge-label {
+  font-size: 0.6rem;
 }
 
+/* —— grid-area 分配 —— */
+.overview-stat.pos-tl {
+  grid-area: tl;
+  justify-self: start;
+}
+
+.overview-stat.pos-tr {
+  grid-area: tr;
+  justify-self: end;
+}
+
+.overview-stat.pos-bl {
+  grid-area: bl;
+  justify-self: start;
+}
+
+.overview-stat.pos-br {
+  grid-area: br;
+  justify-self: end;
+}
+
+.overview-stat.pos-bc {
+  grid-area: bc;
+  justify-self: center;
+  width: min(100%, 11rem);
+}
+
+/* 指标卡基础样式（紧凑版，适配环绕布局） */
 .overview-stat {
   min-width: 0;
-  min-height: 2.92rem;
+  width: 100%;
+  max-width: 9rem;
   border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 48%, transparent);
   border-radius: 0.375rem;
   background:
-    linear-gradient(90deg, color-mix(in srgb, currentColor 10%, transparent), transparent 68%),
+    linear-gradient(90deg, color-mix(in srgb, currentColor 12%, transparent), transparent 68%),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--surface-strong) 18%, transparent),
-      color-mix(in srgb, var(--surface) 10%, transparent)
+      color-mix(in srgb, var(--surface-strong) 22%, transparent),
+      color-mix(in srgb, var(--surface) 12%, transparent)
     );
-  padding: 0.35rem 0.5rem;
+  padding: 0.3rem 0.5rem;
   box-shadow:
     inset 0.1875rem 0 0 color-mix(in srgb, currentColor 58%, transparent),
     inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 18%, transparent);
 }
 
-.overview-stat:nth-child(2n) {
-  border-right: 0.0625rem solid color-mix(in srgb, var(--border) 38%, transparent);
-}
-
-.overview-stat:nth-last-child(-n + 1) {
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--border) 38%, transparent);
-}
-
 .overview-stat.with-icon {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .overview-stat.with-icon > div {
@@ -97,10 +99,10 @@
 }
 
 .overview-stat-icon {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.5rem;
+  height: 1.5rem;
   flex: none;
-  padding: 0.375rem;
+  padding: 0.3rem;
   border: 0.0625rem solid color-mix(in srgb, currentColor 48%, transparent);
   border-radius: 0.1875rem;
   background: linear-gradient(
@@ -110,17 +112,10 @@
   );
 }
 
-.overview-stat.span-2 {
-  grid-column: auto;
-  min-height: 2.92rem;
-  align-items: center;
-  border-right: 0.0625rem solid color-mix(in srgb, var(--border) 38%, transparent);
-}
-
 .overview-value {
-  margin-top: 0.25rem;
+  margin-top: 0.12rem;
   overflow: hidden;
-  font-size: calc(1.18rem * var(--dashboard-font-scale, 1.45));
+  font-size: calc(0.98rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;
   line-height: 1.05;
   letter-spacing: 0;
@@ -129,10 +124,16 @@
 }
 
 .overview-value span {
-  margin-left: 0.1875rem;
+  margin-left: 0.125rem;
   color: var(--muted);
-  font-size: calc(0.6875rem * var(--dashboard-font-scale, 1.45));
+  font-size: calc(0.6rem * var(--dashboard-font-scale, 1.45));
   font-weight: 800;
+}
+
+/* kpi-label 也同步缩小一点，和紧凑卡更协调 */
+.overview-stat .kpi-label {
+  font-size: calc(0.62rem * var(--dashboard-font-scale, 1.45));
+  line-height: 1.1;
 }
 
 .kpi-card {
@@ -313,7 +314,8 @@
 .pie-center-value {
   position: absolute;
   left: 50%;
-  top: 51%;
+  /* top 对齐 3D 饼图顶面圆心（viewBox Y=61/188≈32.4%），饼图厚度在下方 */
+  top: 32.4%;
   z-index: 3;
   color: color-mix(in srgb, var(--text) 92%, var(--data-inspection-pie-finished) 8%);
   font-size: 1.16rem;
@@ -572,9 +574,6 @@
   filter: saturate(1.06);
 }
 
-.health-pie-panel .health-pie-heart {
-  top: 51%;
-}
 
 .health-pie-panel .health-legend {
   position: static;
@@ -711,14 +710,16 @@
   filter: saturate(1.08);
 }
 
+/* 心心相对 .health-pie-core 定位，top 对齐 3D 饼图顶面圆心（viewBox Y=61/188≈32.4%） */
 .health-pie-heart {
   position: absolute;
   left: 50%;
-  top: 38%;
+  top: 32.4%;
   z-index: 4;
   display: grid;
-  width: 2.125rem;
-  height: 2.125rem;
+  /* 尺寸贴近内圈孔（约 59×24px），只漏一点边缘 */
+  width: 1.75rem;
+  height: 1.75rem;
   place-items: center;
   border: 0;
   background: transparent;
@@ -728,8 +729,8 @@
 }
 
 .health-pie-heart svg {
-  width: 1.875rem;
-  height: 1.875rem;
+  width: 1.5rem;
+  height: 1.5rem;
   stroke-width: 2.4;
 }
 

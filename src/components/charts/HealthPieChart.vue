@@ -47,9 +47,9 @@ function isLightTheme(theme: Theme | undefined): boolean {
         :accent="themeColor(theme, '--data-health-pie-warning', '#6ef5ff')"
         :surface="themeColor(theme, '--instrument-base', '#33566c')"
       />
-    </div>
-    <div class="health-pie-heart" aria-hidden="true">
-      <HeartPulse />
+      <div class="health-pie-heart" aria-hidden="true">
+        <HeartPulse />
+      </div>
     </div>
   </div>
 </template>
