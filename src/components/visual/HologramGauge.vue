@@ -30,8 +30,14 @@ const props = withDefaults(
 const animated = ref(0)
 let raf = 0
 
+const ringEl = ref<HTMLDivElement | null>(null)
+const ringPx = ref(0)
+let ringObserver: ResizeObserver | null = null
+
 const RING_R = 50
 const CIRCUMFERENCE = 2 * Math.PI * RING_R
+// 与 rings.css `.gauge-ring-progress` 的 stroke-width 保持一致（px，且使用 non-scaling-stroke）
+const PROGRESS_STROKE = 10.6
 
 interface GaugePalette {
   tone: string
@@ -81,7 +87,16 @@ const GAUGE_PALETTES = [
 // 每个实例唯一 id，避免多仪表盘共存时 SVG <defs> id 冲突
 const uid = `gg-${Math.random().toString(36).slice(2, 8)}`
 
-const strokeDashoffset = computed(() => CIRCUMFERENCE * (1 - (animated.value || 0) / 100))
+const strokeDashoffset = computed(() => {
+  const ratio = Math.max(0, Math.min(100, animated.value || 0)) / 100
+  if (ratio <= 0) return CIRCUMFERENCE
+  // 圆头端帽会在弧两端各多出半个描边宽度；non-scaling-stroke 下端帽是固定 px，
+  // 需按当前渲染尺寸换算回 viewBox 单位再从可见弧长中扣除，让弧长精确等于数值。
+  const scale = ringPx.value > 0 ? ringPx.value / 120 : 1
+  const capComp = PROGRESS_STROKE / scale
+  const geometric = Math.max(0, ratio * CIRCUMFERENCE - capComp)
+  return CIRCUMFERENCE - geometric
+})
 
 const palette = computed(() => {
   const normalized = Math.max(0, Math.min(100, props.value || 0))
@@ -120,9 +135,22 @@ function displayValue(value: number): string {
   return Number.isInteger(props.value) ? Math.round(value).toString() : value.toFixed(1)
 }
 
-onMounted(run)
+onMounted(() => {
+  run()
+  if (ringEl.value) {
+    ringPx.value = ringEl.value.clientWidth
+    ringObserver = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width
+      if (width) ringPx.value = width
+    })
+    ringObserver.observe(ringEl.value)
+  }
+})
 watch(() => props.value, run)
-onUnmounted(() => cancelAnimationFrame(raf))
+onUnmounted(() => {
+  cancelAnimationFrame(raf)
+  ringObserver?.disconnect()
+})
 </script>
 
 <template>
@@ -134,13 +162,13 @@ onUnmounted(() => cancelAnimationFrame(raf))
     <div class="hologram-gauge-stage">
       <HologramGaugeBase />
 
-      <div class="hologram-gauge-ring">
+      <div ref="ringEl" class="hologram-gauge-ring">
         <svg class="hologram-gauge-svg" viewBox="0 0 120 120" aria-hidden="true">
           <defs>
             <linearGradient :id="`ring-progress-${uid}`" x1="0" y1="0" x2="1" y2="1">
               <stop class="gauge-grad-a" offset="0" />
-              <stop class="gauge-grad-b" offset="0.36" />
-              <stop class="gauge-grad-c" offset="0.72" />
+              <stop class="gauge-grad-b" offset="0.5" />
+              <stop class="gauge-grad-c" offset="0.82" />
               <stop class="gauge-grad-d" offset="1" />
             </linearGradient>
           </defs>

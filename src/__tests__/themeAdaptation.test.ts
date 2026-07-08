@@ -169,8 +169,12 @@ describe('global theme adaptation', () => {
     const source = `${gauge}\n${base}\n${ringStyles}`
 
     expect(source).toContain('hologram-gauge-base')
-    expect(base).toContain("import ThreePiePedestal from './ThreePiePedestal.vue'")
-    expect(base).toContain('variant="compact"')
+    expect(base).toContain('hologram-gauge-base-svg')
+    expect(base).toContain('viewBox="0 0 220 76"')
+    expect(base).toContain('gauge-base-wall')
+    expect(base).toContain('gauge-base-deck')
+    expect(base).not.toContain('ThreePiePedestal')
+    expect(base).not.toContain('WebGLRenderer')
     expect(source).not.toContain('gauge-base-tier')
     expect(source).not.toContain('gauge-base-beam')
     expect(gauge).toContain('gauge-ring-track')
@@ -197,7 +201,8 @@ describe('global theme adaptation', () => {
     expect(gauge).toContain('#e6b94a')
     expect(gauge).toContain('#24c78e')
     expect(gauge).toContain('#ddf5f8')
-    expect(base).toContain('accent="var(--gauge-tone)"')
+    expect(base).toContain('stop-color="var(--gauge-tone)"')
+    expect(base).toContain('gauge-base-deck--top')
     expect(availabilityModule).not.toContain('ringTones')
     expect(availabilityModule).not.toContain('toneFor')
     expect(progressStyles).toContain('var(--gauge-tone-soft)')
@@ -241,9 +246,10 @@ describe('global theme adaptation', () => {
     expect(gauge).toContain('<HologramGaugeBase')
     expect(gauge).not.toContain('<div class="hologram-gauge-base"')
     expect(base).toContain('hologram-gauge-base')
-    expect(base).toContain('ThreePiePedestal')
-    expect(base).not.toContain('gauge-base-ring')
-    expect(ringStyles).toMatch(/top:\s*calc\(var\(--gauge-size,\s*7\.375rem\)\s*\*\s*0\.86\)/)
+    expect(base).toContain('hologram-gauge-base-svg')
+    expect(base).not.toContain('ThreePiePedestal')
+    expect(base).not.toContain('requestAnimationFrame')
+    expect(ringStyles).toMatch(/top:\s*calc\(var\(--gauge-size,\s*7\.375rem\)\s*\*\s*0\.78\)/)
   })
 
   it('keeps global chrome free of text and card glow effects', () => {

@@ -27,9 +27,8 @@ describe('availability module carousel', () => {
 
     expect(wrapper.find('.availability-window').classes()).toContain('is-looping')
     expect(wrapper.find('.availability-window').attributes('style')).toContain(
-      '--availability-scroll-easing: linear',
+      '--availability-scroll-easing: steps(2, end)',
     )
-    expect(wrapper.find('.availability-window').attributes('style')).not.toContain('steps(')
     expect(wrapper.findAll('.availability-page')).toHaveLength(3)
     expect(wrapper.text()).toContain('注射泵')
   })

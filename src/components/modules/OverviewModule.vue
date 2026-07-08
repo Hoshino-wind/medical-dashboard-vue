@@ -28,7 +28,7 @@ const overviewRingSize = pxToRem(176)
       />
     </div>
     <div class="overview-metrics">
-      <div class="overview-stat with-icon span-2">
+      <div class="overview-stat overview-stat--total with-icon">
         <MonitorCog class="overview-stat-icon text-[color:var(--data-pie-primary)]" />
         <div>
           <div class="kpi-label">设备总数</div>
@@ -37,7 +37,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon span-2">
+      <div class="overview-stat overview-stat--available with-icon">
         <ShieldCheck class="overview-stat-icon text-[color:var(--good)]" />
         <div>
           <div class="kpi-label">可用设备</div>
@@ -46,7 +46,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon is-alert is-danger">
+      <div class="overview-stat overview-stat--repair with-icon is-alert is-danger">
         <Wrench class="overview-stat-icon text-[color:var(--danger)]" />
         <div>
           <div class="kpi-label">维修中</div>
@@ -55,7 +55,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon is-alert is-warn">
+      <div class="overview-stat overview-stat--maintenance with-icon is-alert is-warn">
         <ClipboardList class="overview-stat-icon text-[color:var(--warn)]" />
         <div>
           <div class="kpi-label">待保养</div>
@@ -64,7 +64,7 @@ const overviewRingSize = pxToRem(176)
           </div>
         </div>
       </div>
-      <div class="overview-stat with-icon span-2">
+      <div class="overview-stat overview-stat--inspection with-icon">
         <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
         <div>
           <div class="kpi-label">待巡检</div>

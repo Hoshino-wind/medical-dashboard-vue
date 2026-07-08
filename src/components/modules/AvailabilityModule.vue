@@ -16,7 +16,7 @@ const props = withDefaults(
   },
 )
 
-const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 106 : 112))
+const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
 
 const pages = computed(() => {
   const result: AvailabilityItem[][] = []
@@ -35,7 +35,7 @@ const renderPages = computed(() =>
 const scrollStyle = computed<Record<string, string>>(() => ({
   '--availability-page-count': String(pages.value.length),
   '--availability-scroll-duration': `${pages.value.length * 7.2}s`,
-  '--availability-scroll-easing': 'linear',
+  '--availability-scroll-easing': `steps(${pages.value.length}, end)`,
 }))
 </script>
 
@@ -49,7 +49,7 @@ const scrollStyle = computed<Record<string, string>>(() => ({
       <div
         v-for="(page, pageIndex) in renderPages"
         :key="pageIndex"
-        class="availability-page grid h-full grid-cols-3 items-center gap-2"
+        class="availability-page grid h-full grid-cols-3 items-center gap-1"
       >
         <AvailabilityMetricRing
           v-for="item in page"
