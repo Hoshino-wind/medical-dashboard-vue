@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, reactive, ref } from 'vue'
+import { useInstrumentLoop } from '@/composables/useInstrumentLoop'
 import { buildPie3DSegments, type Pie3DInputItem, type Pie3DSegment } from '@/utils/pie3dSegments'
 import { pxToRem } from '@/utils/rem'
 import type { Theme } from '@/types/theme'
@@ -42,8 +43,19 @@ const props = withDefaults(
   },
 )
 
+const rotationOffset = ref(0)
+
 // 起始角度：基础 -90°（12 点方向）+ 顺时针旋转偏移（rotation 为正=顺时针）
-const startAngle = computed(() => BASE_START_ANGLE + (props.rotation * Math.PI) / 180)
+const startAngle = computed(
+  () => BASE_START_ANGLE + ((props.rotation + rotationOffset.value) * Math.PI) / 180,
+)
+
+const { pause: pauseRotation, resume: resumeRotation } = useInstrumentLoop(
+  (deltaMs) => {
+    rotationOffset.value = (rotationOffset.value + deltaMs * 0.0025) % 360
+  },
+  () => props.autoRotate,
+)
 
 interface EllipsePoint {
   x: number
@@ -56,6 +68,9 @@ interface RenderedSegment extends Pie3DSegment {
   endAngle: number
   path: string
   topColor: string
+  gradientId: string
+  highlightColor: string
+  shadowColor: string
   depthColor: string
   strokeColor: string
   labelX: number
@@ -78,6 +93,8 @@ interface DepthLayer {
 
 const host = ref<HTMLDivElement | null>(null)
 const activeSegmentIndex = ref<number | null>(null)
+let pointerInside = false
+let focusWithin = false
 const componentUid = getCurrentInstance()?.uid ?? 0
 const filterId = `pie3d-ambient-shadow-${componentUid}`
 const total = computed(() =>
@@ -159,6 +176,13 @@ const renderedSegments = computed<RenderedSegment[]>(() => {
       endAngle: Math.max(start + 0.001, end),
       path: annularSectorPath(start, Math.max(start + 0.001, end)),
       topColor: segment.color,
+      gradientId: `pie3d-top-${componentUid}-${index}`,
+      highlightColor: colorMix(
+        segment.color,
+        58,
+        props.theme?.variables['--instrument-rim'] ?? '#d7fbff',
+      ),
+      shadowColor: colorMix(segment.color, 68, props.theme?.variables['--bg'] ?? '#020814'),
       depthColor: colorMix(segment.color, isLightTheme() ? 64 : 48, isLightTheme() ? '#c3dbe1' : '#020814'),
       strokeColor: colorMix(segment.color, isLightTheme() ? 70 : 72, props.theme?.variables['--instrument-rim'] ?? '#d7fbff'),
       labelX: label.x,
@@ -326,6 +350,37 @@ function hideTooltip() {
   activeSegmentIndex.value = null
   tooltip.visible = false
 }
+
+function syncInteractionRotation() {
+  if (pointerInside || focusWithin) {
+    pauseRotation()
+  } else {
+    resumeRotation()
+  }
+}
+
+function handlePointerEnter() {
+  pointerInside = true
+  syncInteractionRotation()
+}
+
+function handlePointerLeave() {
+  pointerInside = false
+  if (!focusWithin) hideTooltip()
+  syncInteractionRotation()
+}
+
+function handleFocusIn() {
+  focusWithin = true
+  syncInteractionRotation()
+}
+
+function handleFocusOut(event: FocusEvent) {
+  if (event.relatedTarget instanceof Node && host.value?.contains(event.relatedTarget)) return
+
+  focusWithin = false
+  syncInteractionRotation()
+}
 </script>
 
 <template>
@@ -333,7 +388,10 @@ function hideTooltip() {
     ref="host"
     class="pie3d-three-shell pie3d-25d-shell"
     :style="shellStyle"
-    @pointerleave="hideTooltip"
+    @pointerenter="handlePointerEnter"
+    @pointerleave="handlePointerLeave"
+    @focusin="handleFocusIn"
+    @focusout="handleFocusOut"
   >
     <svg
       class="pie3d-25d-svg"
@@ -353,6 +411,20 @@ function hideTooltip() {
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        <linearGradient
+          v-for="segment in renderedSegments"
+          :id="segment.gradientId"
+          :key="segment.gradientId"
+          class="pie3d-top-light"
+          x1="0"
+          y1="0"
+          x2="1"
+          y2="1"
+        >
+          <stop offset="0" :stop-color="segment.highlightColor" />
+          <stop offset="0.48" :stop-color="segment.topColor" />
+          <stop offset="1" :stop-color="segment.shadowColor" />
+        </linearGradient>
       </defs>
 
       <ellipse
@@ -401,7 +473,7 @@ function hideTooltip() {
           class="pie3d-top-segment"
           :class="{ 'is-active': activeSegmentIndex === segment.index }"
           :d="segment.path"
-          :fill="segment.topColor"
+          :fill="`url(#${segment.gradientId})`"
           :stroke="segment.strokeColor"
           stroke-width="1.15"
           :style="{ opacity: isLightTheme() ? 0.76 : 1 }"

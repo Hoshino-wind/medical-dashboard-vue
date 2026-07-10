@@ -196,13 +196,15 @@ describe('global theme adaptation', () => {
     expect(pie3d).toContain('opacity: isLightTheme() ? 0.76 : 1')
   })
 
-  it('renders 2.5D pie top faces as flat fills instead of gradients', () => {
+  it('renders pie top faces with unique theme-derived instrument lighting', () => {
     const pie3d = readSource('components/charts/Pie3D.vue')
 
-    expect(pie3d).toContain(':fill="segment.topColor"')
-    expect(pie3d).not.toContain('<linearGradient')
-    expect(pie3d).not.toContain('gradientId')
-    expect(pie3d).not.toContain(':fill="`url(#${segment.')
+    expect(pie3d).toContain('class="pie3d-top-light"')
+    expect(pie3d).toContain(':id="segment.gradientId"')
+    expect(pie3d).toContain(':fill="`url(#${segment.gradientId})`"')
+    expect(pie3d).toContain("props.theme?.variables['--instrument-rim']")
+    expect(pie3d).toContain("props.theme?.variables['--bg']")
+    expect(pie3d).not.toMatch(/#(?:20f1d4|123e63|0a8fb7|2f8dff|45d8ff|53fff0|4defff|265d85)/i)
   })
 
   it('renders pie charts as layered SVG 2.5D without WebGL materials', () => {
@@ -213,10 +215,14 @@ describe('global theme adaptation', () => {
     expect(pie3d).toContain('pie3d-top-segment')
     expect(pie3d).toContain('data-segment-name')
     expect(pie3d).toContain('tooltip.visible')
+    expect(pie3d).toContain('useInstrumentLoop')
+    expect(pie3d).toContain('props.autoRotate')
+    expect(pie3d).toContain('pie3d-top-light')
+    expect(pie3d).toContain('segment.highlightColor')
+    expect(pie3d).toContain('segment.shadowColor')
     expect(pie3d).not.toContain('WebGLRenderer')
     expect(pie3d).not.toContain('MeshStandardMaterial')
     expect(pie3d).not.toContain('Raycaster')
-    expect(pie3d).not.toContain('requestAnimationFrame(tickRotation)')
   })
 
   it('keeps lower glow out of 2.5D pie charts', () => {
