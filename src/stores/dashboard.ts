@@ -197,19 +197,24 @@ export const useDashboardStore = defineStore('dashboard', () => {
     return true
   }
 
-  function placeModuleInSlot(moduleId: string, slotIndex: number) {
+  function canPlaceModuleInSlot(moduleId: string, slotIndex: number) {
     if (slotIndex < 0 || slotIndex >= slotCount.value) return false
     if (!moduleCatalog.some((item) => item.id === moduleId)) return false
 
     const next = normalizeSlotIds(config.selectedModuleIds, config.layout)
     const currentIndex = next.indexOf(moduleId)
-    if (currentIndex >= 0) {
-      next[currentIndex] = null
-    }
+    if (currentIndex >= 0) next[currentIndex] = null
     next[slotIndex] = moduleId
+    return !hasRowTableConflict(next)
+  }
 
-    if (hasRowTableConflict(next)) return false
+  function placeModuleInSlot(moduleId: string, slotIndex: number) {
+    if (!canPlaceModuleInSlot(moduleId, slotIndex)) return false
 
+    const next = normalizeSlotIds(config.selectedModuleIds, config.layout)
+    const currentIndex = next.indexOf(moduleId)
+    if (currentIndex >= 0) next[currentIndex] = null
+    next[slotIndex] = moduleId
     config.selectedModuleIds = next
     syncModuleOrder()
     return true
@@ -224,26 +229,33 @@ export const useDashboardStore = defineStore('dashboard', () => {
     syncModuleOrder()
   }
 
-  function moveSelectedModule(fromIndex: number, toIndex: number) {
-    const currentSlots = normalizeSlotIds(config.selectedModuleIds, config.layout)
+  function canMoveSelectedModule(fromIndex: number, toIndex: number) {
+    const next = normalizeSlotIds(config.selectedModuleIds, config.layout)
     if (
       fromIndex < 0 ||
-      fromIndex >= currentSlots.length ||
+      fromIndex >= next.length ||
       toIndex < 0 ||
-      toIndex >= currentSlots.length
+      toIndex >= next.length
     ) {
       return false
     }
 
-    const moved = currentSlots[fromIndex]
-    if (!moved) return false
+    if (!next[fromIndex]) return false
+    ;[next[fromIndex], next[toIndex]] = [next[toIndex], next[fromIndex]]
+    return !hasRowTableConflict(next)
+  }
+
+  function moveSelectedModule(fromIndex: number, toIndex: number) {
+    if (!canMoveSelectedModule(fromIndex, toIndex)) return false
+
+    const currentSlots = normalizeSlotIds(config.selectedModuleIds, config.layout)
     if (fromIndex === toIndex) return true
 
     const next = [...currentSlots]
+    const moved = next[fromIndex]
     const target = next[toIndex] ?? null
     next[toIndex] = moved
     next[fromIndex] = target
-    if (hasRowTableConflict(next)) return false
 
     config.selectedModuleIds = next
     syncModuleOrder()
@@ -288,8 +300,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
     setLayout,
     moveModule,
     addModuleToLayout,
+    canPlaceModuleInSlot,
     placeModuleInSlot,
     removeModuleFromLayout,
+    canMoveSelectedModule,
     moveSelectedModule,
     clearSelectedModules,
     resetConfig,
