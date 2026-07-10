@@ -72,4 +72,20 @@ describe('holographic instrument visual system', () => {
     expect(pedestal).toContain('pedestal-orbit-overlay')
     expect(pedestal).toContain('var(--motion-loop-instrument)')
   })
+
+  it('leaves diagnostic pedestal positioning to its absolute-positioned consumers', () => {
+    const pedestal = read('components/visual/ThreePiePedestal.vue')
+    const completion = read('components/modules/CompletionModule.vue')
+    const healthPie = read('components/charts/HealthPieChart.vue')
+    const modules = read('styles/modules.css')
+    const pedestalRoot = pedestal.match(/\.three-pie-pedestal\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const inspectionBase = modules.match(/(?:^|\n)\.inspection-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const healthBase = modules.match(/(?:^|\n)\.health-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
+
+    expect(completion).toContain('class="inspection-pie-base"')
+    expect(healthPie).toContain('class="health-pie-base"')
+    expect(inspectionBase).toContain('position: absolute')
+    expect(healthBase).toContain('position: absolute')
+    expect(pedestalRoot).not.toContain('position:')
+  })
 })

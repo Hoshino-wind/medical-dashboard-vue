@@ -539,7 +539,6 @@ onUnmounted(() => {
 
 <style scoped>
 .three-pie-pedestal {
-  position: relative;
   overflow: visible;
   pointer-events: none;
 }
