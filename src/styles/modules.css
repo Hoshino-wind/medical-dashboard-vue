@@ -1,5 +1,33 @@
 /* Dashboard module layouts */
 /* 设备总览：环形缩小居中，5 个指标卡环绕分布（grid 区域布局，天然防重叠） */
+.overview-layout,
+.availability-page {
+  position: relative;
+}
+
+.overview-layout::before,
+.availability-page::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 12%;
+  right: 12%;
+  top: 50%;
+  height: 0.0625rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--instrument-structure) 24%, transparent),
+    transparent
+  );
+  box-shadow: 0 0 0.8rem color-mix(in srgb, var(--instrument-structure) 12%, transparent);
+}
+
+.availability-page > :nth-child(2) {
+  z-index: 2;
+  transform: translateY(-0.35rem) scale(1.04);
+}
+
 .overview-layout {
   display: grid;
   height: 100%;
@@ -276,6 +304,7 @@
 
 .inspection-order-grid,
 .health-status-grid {
+  position: relative;
   display: grid;
   height: 100%;
   min-height: 0;
@@ -283,6 +312,32 @@
   grid-template-rows: minmax(0, 1fr) 2.35rem;
   align-items: stretch;
   gap: 0.25rem 0.75rem;
+}
+
+.inspection-order-grid::after,
+.health-status-grid::after {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  bottom: 3rem;
+  left: var(--module-list-width, 64%);
+  width: 0.0625rem;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--instrument-core) 36%, transparent),
+    transparent
+  );
+  animation: instrument-energy-pulse var(--motion-loop-status) ease-in-out infinite;
+  animation-delay: var(--motion-phase);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inspection-order-grid::after,
+  .health-status-grid::after {
+    animation: none;
+  }
 }
 
 .order-list-panel {

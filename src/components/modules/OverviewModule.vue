@@ -9,8 +9,8 @@ defineProps<{
   data: OverviewData
 }>()
 
-// 环形等比缩小：原先 176px → 132px，底座/字体随之按 --gauge-size 等比缩放
-const overviewRingSize = pxToRem(132)
+// 环形等比缩小：原先 176px → 145px，底座/字体随之按 --gauge-size 等比缩放
+const overviewRingSize = pxToRem(145)
 </script>
 
 <template>

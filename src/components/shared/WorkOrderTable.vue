@@ -14,13 +14,11 @@ function isPendingRepairRow(row: string[]): boolean {
   return row[row.length - 1] === PENDING_REPAIR_STATUS
 }
 
-function statusStyle(value: string): string {
-  if (value === PENDING_REPAIR_STATUS)
-    return 'color: color-mix(in srgb, var(--warn) 86%, var(--text) 14%)'
-  if (value.includes('维修')) return 'color: color-mix(in srgb, var(--danger) 74%, var(--muted) 26%)'
-  if (value.includes('配件'))
-    return 'color: color-mix(in srgb, var(--accent-3) 74%, var(--muted) 26%)'
-  return 'color: color-mix(in srgb, var(--good) 72%, var(--muted) 28%)'
+function statusTone(value: string): 'warn' | 'danger' | 'purple' | 'good' {
+  if (value === PENDING_REPAIR_STATUS) return 'warn'
+  if (value.includes('维修')) return 'danger'
+  if (value.includes('配件')) return 'purple'
+  return 'good'
 }
 
 const pendingRepairRows = computed(() => props.rows.filter(isPendingRepairRow))
@@ -52,9 +50,11 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
               <span
                 v-if="cellIndex === row.length - 1"
                 class="status-pill"
-                :style="statusStyle(String(cell))"
-                >{{ cell }}</span
+                :class="`status-pill--${statusTone(String(cell))}`"
               >
+                <i class="status-energy-dot" aria-hidden="true"></i>
+                {{ cell }}
+              </span>
               <span v-else>{{ cell }}</span>
             </td>
           </tr>
@@ -70,9 +70,11 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
                     <span
                       v-if="cellIndex === row.length - 1"
                       class="status-pill"
-                      :style="statusStyle(String(cell))"
-                      >{{ cell }}</span
+                      :class="`status-pill--${statusTone(String(cell))}`"
                     >
+                      <i class="status-energy-dot" aria-hidden="true"></i>
+                      {{ cell }}
+                    </span>
                     <span v-else>{{ cell }}</span>
                   </td>
                 </tr>

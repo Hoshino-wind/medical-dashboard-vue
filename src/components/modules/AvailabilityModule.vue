@@ -80,12 +80,13 @@ onUnmounted(stopAutoPaging)
         class="availability-page grid h-full grid-cols-3 items-center gap-1"
       >
         <AvailabilityMetricRing
-          v-for="item in currentPage"
+          v-for="(item, itemIndex) in currentPage"
           :key="item.name"
           :value="item.value"
           :label="item.name"
           :count="item.count"
           :size="ringSize"
+          :style="{ '--motion-local-phase': `${itemIndex * -1.4}s` }"
         />
       </div>
     </Transition>

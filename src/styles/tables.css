@@ -27,6 +27,22 @@
   overflow: hidden;
 }
 
+.paged-viewport::after {
+  content: '';
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0 44%,
+    color-mix(in srgb, var(--instrument-structure-bright) 9%, transparent) 50%,
+    transparent 56% 100%
+  );
+  animation: instrument-data-scan var(--motion-loop-background) linear infinite;
+  animation-delay: var(--motion-phase);
+}
+
 .paged-track {
   display: grid;
   grid-auto-rows: 100%;
@@ -125,12 +141,39 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.28rem;
   min-width: 0;
   height: auto;
   padding: 0;
   border-radius: 0;
   font-size: calc(0.6875rem * var(--dashboard-list-font-scale, 1.18));
   font-weight: 900;
+}
+
+.status-energy-dot {
+  width: 0.34rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--status-tone);
+  box-shadow: 0 0 0.55rem color-mix(in srgb, var(--status-tone) 72%, transparent);
+  animation: instrument-energy-pulse var(--motion-loop-status) ease-in-out infinite;
+  animation-delay: var(--motion-phase);
+}
+
+.status-pill--warn {
+  --status-tone: var(--warn);
+}
+
+.status-pill--danger {
+  --status-tone: var(--danger);
+}
+
+.status-pill--purple {
+  --status-tone: var(--accent-3);
+}
+
+.status-pill--good {
+  --status-tone: var(--good);
 }
 
 .work-order-summary {
@@ -267,4 +310,11 @@
       color-mix(in srgb, var(--status-tone, var(--chart-primary)) 6%, transparent),
       transparent 70%
     );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paged-viewport::after,
+  .status-energy-dot {
+    animation: none;
+  }
 }

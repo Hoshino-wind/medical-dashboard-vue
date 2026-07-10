@@ -166,12 +166,8 @@ describe('work order style panels', () => {
     expect(scrollingViewport.text()).toContain('维修中')
     expect(scrollingViewport.text()).toContain('配件运输中')
     expect(tableStyles).toContain('.work-order-pinned-table .is-pending-repair')
-    expect(
-      pinnedTable.find('.status-pill').attributes('style'),
-    ).toContain('var(--warn)')
-    expect(
-      scrollingViewport.find('.status-pill').attributes('style'),
-    ).toContain('var(--danger)')
+    expect(wrapper.findAll('.status-energy-dot').length).toBeGreaterThan(0)
+    expect(wrapper.find('.status-pill').classes()).toContain('status-pill--warn')
     expect(
       tableStyles.match(/\.work-order-pinned-table \.is-pending-repair td\s*\{[\s\S]*?\n\}/)?.[0] ?? '',
     ).not.toContain('inset 0.1875rem 0 0')

@@ -5,7 +5,7 @@ import AvailabilityModule from '@/components/modules/AvailabilityModule.vue'
 
 const RingStub = {
   props: ['value', 'label', 'count'],
-  template: '<div class="ring-stub">{{ label }} {{ value }} {{ count }}</div>',
+  template: '<div class="ring-stub" v-bind="$attrs">{{ label }} {{ value }} {{ count }}</div>',
 }
 
 describe('availability module pagination', () => {
@@ -55,6 +55,25 @@ describe('availability module pagination', () => {
 
     expect(wrapper.find('.availability-window').classes()).not.toContain('is-paginating')
     expect(wrapper.findAll('.availability-page')).toHaveLength(1)
+  })
+
+  it('assigns staggered loop phases without changing the three-item page', () => {
+    const wrapper = mount(AvailabilityModule, {
+      props: {
+        items: [
+          { name: '除颤仪', value: 90, count: 4 },
+          { name: '呼吸机', value: 90, count: 3 },
+          { name: '监护仪', value: 90, count: 32 },
+        ],
+      },
+      global: { stubs: { AvailabilityMetricRing: RingStub } },
+    })
+
+    expect(wrapper.findAll('.ring-stub').map((item) => item.attributes('style'))).toEqual([
+      '--motion-local-phase: 0s;',
+      '--motion-local-phase: -1.4s;',
+      '--motion-local-phase: -2.8s;',
+    ])
   })
 
   it('advances to the next page on each interval tick, cycling back to the first page', async () => {
