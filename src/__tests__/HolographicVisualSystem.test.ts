@@ -39,4 +39,12 @@ describe('holographic instrument visual system', () => {
     expect(panel).toContain('--panel-edge-weight: 72%')
     expect(panel).toContain('var(--motion-phase)')
   })
+
+  it('combines inherited panel and local phases for gauge scan timing', () => {
+    const gaugeBase = read('components/visual/HologramGaugeBase.vue')
+
+    expect(gaugeBase).toContain(
+      'animation-delay: calc(var(--motion-phase, 0s) + var(--motion-local-phase, 0s));',
+    )
+  })
 })
