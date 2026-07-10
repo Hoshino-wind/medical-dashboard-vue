@@ -113,4 +113,16 @@ describe('holographic instrument visual system', () => {
     expect(healthBase).toContain('position: absolute')
     expect(pedestalRoot).not.toContain('position:')
   })
+
+  it('styles the configuration page as a loop-enabled holographic editor', () => {
+    const config = read('styles/config.css')
+
+    expect(config).toContain('.is-drop-allowed')
+    expect(config).toContain('.is-drop-blocked')
+    expect(config).toContain('.is-placed')
+    expect(config).toContain('.theme-swatch-dot')
+    expect(config).toContain('.config-live-preview:fullscreen')
+    expect(config).toContain('var(--motion-loop-background)')
+    expect(config).toContain('@media (prefers-reduced-motion: reduce)')
+  })
 })
