@@ -16,8 +16,9 @@ const CountUpStub = {
 }
 
 const PieStub = {
-  props: ['items', 'total', 'tone'],
-  template: '<div class="pie-stub" data-test="pie-chart">{{ total }}</div>',
+  props: ['items', 'total', 'tone', 'autoRotate'],
+  template:
+    '<div class="pie-stub" data-test="pie-chart" :data-auto-rotate="autoRotate">{{ total }}</div>',
 }
 
 describe('work order style panels', () => {
@@ -55,6 +56,7 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('已完成1411单')
     expect(wrapper.text()).toContain('待巡检71单')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="pie-chart"]').attributes('data-auto-rotate')).toBe('true')
     expect(wrapper.find('.inspection-status-summary .is-total').exists()).toBe(true)
   })
 
@@ -77,7 +79,7 @@ describe('work order style panels', () => {
       global: {
         stubs: {
           CountUp: CountUpStub,
-          HealthPieChart: PieStub,
+          Pie3D: PieStub,
         },
       },
     })
@@ -94,6 +96,7 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('维修中44台')
     expect(wrapper.text()).toContain('即将保养102台')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
+    expect(wrapper.find('[data-test="pie-chart"]').attributes('data-auto-rotate')).toBe('true')
   })
 
   it('uses status tone variables for bottom summary numbers', () => {

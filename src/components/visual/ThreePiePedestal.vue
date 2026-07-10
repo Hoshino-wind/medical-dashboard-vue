@@ -524,6 +524,7 @@ onUnmounted(() => {
     :style="hostStyle"
     aria-hidden="true"
   >
+    <span class="pedestal-orbit-overlay" aria-hidden="true"></span>
     <template v-if="props.variant === 'compact'">
       <span class="pedestal-compact-glow"></span>
       <span class="pedestal-compact-shadow"></span>
@@ -538,8 +539,24 @@ onUnmounted(() => {
 
 <style scoped>
 .three-pie-pedestal {
+  position: relative;
   overflow: visible;
   pointer-events: none;
+}
+
+.pedestal-orbit-overlay {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 24%;
+  width: 92%;
+  height: 42%;
+  border: 0.0625rem dashed color-mix(in srgb, var(--pedestal-accent) 56%, transparent);
+  border-radius: 50%;
+  opacity: calc(0.44 * var(--pedestal-intensity, 1));
+  transform: translateX(-50%) perspective(14rem) rotateX(66deg);
+  animation: instrument-orbit-sweep var(--motion-loop-instrument) linear infinite;
+  animation-delay: calc(var(--motion-phase, 0s) - 1.6s);
 }
 
 .three-pie-pedestal canvas {
@@ -677,5 +694,12 @@ onUnmounted(() => {
     transparent 79% 100%
   );
   opacity: 0.48;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pedestal-orbit-overlay {
+    animation: none;
+    opacity: 0.28;
+  }
 }
 </style>

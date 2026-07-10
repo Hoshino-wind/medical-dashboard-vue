@@ -65,4 +65,11 @@ describe('holographic instrument visual system', () => {
     expect(rings).toContain('@media (prefers-reduced-motion: reduce)')
     expect(rings).toContain('.hologram-gauge-ring::before {\n    animation: none;\n  }')
   })
+
+  it('adds a low-cost diagnostic pie pedestal orbit with shared loop timing', () => {
+    const pedestal = read('components/visual/ThreePiePedestal.vue')
+
+    expect(pedestal).toContain('pedestal-orbit-overlay')
+    expect(pedestal).toContain('var(--motion-loop-instrument)')
+  })
 })

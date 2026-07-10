@@ -39,6 +39,7 @@ function isLightTheme(theme: Theme | undefined): boolean {
     />
     <div class="health-pie-core">
       <Pie3D
+        :auto-rotate="true"
         :items="items"
         :height="chartHeight"
         :thickness="7"

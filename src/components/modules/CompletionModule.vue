@@ -87,6 +87,7 @@ const inspectionPieItems = computed(() => {
           :intensity="isLightTheme(theme) ? 0.72 : 0.96"
         />
         <Pie3D
+          :auto-rotate="true"
           :items="inspectionPieItems"
           :height="chartHeight"
           :thickness="7"
