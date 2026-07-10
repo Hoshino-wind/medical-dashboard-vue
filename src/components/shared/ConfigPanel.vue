@@ -197,8 +197,13 @@ async function confirmDestructiveAction() {
 }
 
 async function requestPreviewFullscreen() {
+  const preview = previewRef.value
+  if (!preview?.requestFullscreen) {
+    showLayoutWarning('当前浏览器不支持全屏预览')
+    return
+  }
   try {
-    await previewRef.value?.requestFullscreen?.()
+    await preview.requestFullscreen()
   } catch {
     showLayoutWarning('浏览器未能进入全屏预览')
   }

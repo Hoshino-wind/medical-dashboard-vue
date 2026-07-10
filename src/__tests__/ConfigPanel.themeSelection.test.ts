@@ -318,6 +318,27 @@ describe('ConfigPanel workbench configuration', () => {
     expect(requestFullscreen.mock.contexts[0]).toBe(wrapper.find('.config-live-preview').element)
   })
 
+  it('announces when the current browser cannot open the live preview fullscreen', async () => {
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', {
+      configurable: true,
+      writable: true,
+      value: undefined,
+    })
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [createPinia()],
+        stubs: { BigScreen: true },
+      },
+    })
+
+    await wrapper.find('[data-testid="preview-fullscreen"]').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.config-rule-toast.visible').text()).toContain(
+      '当前浏览器不支持全屏预览',
+    )
+  })
+
   it('keeps local auto-save feedback visible independently from publish feedback', async () => {
     const wrapper = mount(ConfigPanel, {
       global: {
