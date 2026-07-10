@@ -52,6 +52,12 @@
     inset 0 0 1.1rem color-mix(in srgb, var(--gauge-tone-bright) 12%, transparent);
 }
 
+.hologram-gauge.is-idle .hologram-gauge-ring {
+  box-shadow:
+    0 0 1rem color-mix(in srgb, var(--gauge-tone) 18%, transparent),
+    inset 0 0 0.9rem color-mix(in srgb, var(--instrument-core) 10%, transparent);
+}
+
 .hologram-gauge-ring::before {
   content: '';
   position: absolute;
@@ -76,6 +82,8 @@
     );
   opacity: 0.74;
   pointer-events: none;
+  animation: instrument-energy-pulse var(--motion-loop-instrument) ease-in-out infinite;
+  animation-delay: calc(var(--motion-phase, 0s) + var(--motion-local-phase, 0s) - 0.9s);
 }
 
 .hologram-gauge-ring::after {
@@ -188,6 +196,12 @@
 .hologram-gauge.has-inside-label .hologram-gauge-label {
   position: static;
   font-size: calc(0.625rem * var(--dashboard-font-scale, 1.45));
+}
+
+.hologram-gauge-value,
+.hologram-gauge-count {
+  font-family: var(--instrument-font-data);
+  font-variant-numeric: tabular-nums;
 }
 
 .hologram-gauge-value {
@@ -399,4 +413,10 @@
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-lglow {
   opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hologram-gauge-ring::before {
+    animation: none;
+  }
 }

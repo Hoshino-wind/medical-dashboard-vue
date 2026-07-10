@@ -228,7 +228,7 @@ const uid = `hgb-${Math.random().toString(36).slice(2, 8)}`
   stroke-width: 1.6;
   stroke-linecap: round;
   opacity: 0.8;
-  animation: gauge-base-scan-sweep 5.5s linear infinite;
+  animation: gauge-base-scan-sweep var(--motion-loop-instrument) linear infinite;
   animation-delay: calc(var(--motion-phase, 0s) + var(--motion-local-phase, 0s));
 }
 

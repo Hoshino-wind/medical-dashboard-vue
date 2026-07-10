@@ -9,7 +9,7 @@ describe('HologramGauge', () => {
 
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       const id = window.setTimeout(() => {
-        callback(frameIndex === 0 ? 0 : 1200)
+        callback(frameIndex === 0 ? 0 : 700)
         frameIndex += 1
       }, 0)
 
@@ -63,6 +63,16 @@ describe('HologramGauge', () => {
     })
 
     expect(wrapper.attributes('style')).toContain('--gauge-tone: #1677ff')
+
+    wrapper.unmount()
+  })
+
+  it('keeps a zero-value gauge alive as an idle instrument', () => {
+    const wrapper = mount(HologramGauge, { props: { value: 0 } })
+
+    expect(wrapper.classes()).toContain('is-idle')
+    expect(wrapper.find('.gauge-base-scan').exists()).toBe(true)
+    expect(wrapper.find('.hologram-gauge-value').text()).toBe('0%')
 
     wrapper.unmount()
   })

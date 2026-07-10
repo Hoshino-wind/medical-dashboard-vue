@@ -40,11 +40,29 @@ describe('holographic instrument visual system', () => {
     expect(panel).toContain('var(--motion-phase)')
   })
 
-  it('combines inherited panel and local phases for gauge scan timing', () => {
+  it('uses shared loop timing and combined phases for gauge scan timing', () => {
     const gaugeBase = read('components/visual/HologramGaugeBase.vue')
 
+    expect(gaugeBase).toContain('var(--motion-loop-instrument)')
+    expect(gaugeBase).toContain('var(--motion-local-phase, 0s)')
     expect(gaugeBase).toContain(
       'animation-delay: calc(var(--motion-phase, 0s) + var(--motion-local-phase, 0s));',
     )
+  })
+
+  it('keeps gauge energy visible while limiting reduced motion to animation', () => {
+    const rings = read('styles/rings.css')
+
+    expect(rings).toContain('.hologram-gauge.is-idle .hologram-gauge-ring')
+    expect(rings).toContain(
+      'animation: instrument-energy-pulse var(--motion-loop-instrument) ease-in-out infinite;',
+    )
+    expect(rings).toContain(
+      'animation-delay: calc(var(--motion-phase, 0s) + var(--motion-local-phase, 0s) - 0.9s);',
+    )
+    expect(rings).toContain('font-family: var(--instrument-font-data)')
+    expect(rings).toContain('font-variant-numeric: tabular-nums')
+    expect(rings).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(rings).toContain('.hologram-gauge-ring::before {\n    animation: none;\n  }')
   })
 })

@@ -34,6 +34,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RING_R
 // 需与 rings.css 中 .gauge-ring-progress 的 stroke-width 保持一致
 const PROGRESS_STROKE_WIDTH = 10.6
 const FULL_RING_THRESHOLD = 99.5
+const GAUGE_ANIMATION_DURATION = 700
 
 interface GaugePalette {
   tone: string
@@ -96,6 +97,7 @@ const strokeDashoffset = computed(() => {
 })
 
 const isComplete = computed(() => Math.max(0, Math.min(100, animated.value || 0)) >= FULL_RING_THRESHOLD)
+const isIdle = computed(() => Math.max(0, props.value || 0) === 0)
 
 const thresholdPalette = computed(() => {
   const normalized = Math.max(0, Math.min(100, props.value || 0))
@@ -132,7 +134,7 @@ function run() {
   let start: number | null = null
   const step = (ts: number) => {
     if (start === null) start = ts
-    const progress = Math.min(1, (ts - start) / 1200)
+    const progress = Math.min(1, (ts - start) / GAUGE_ANIMATION_DURATION)
     const eased = 1 - Math.pow(1 - progress, 3)
     animated.value = target * eased
     if (progress < 1) raf = requestAnimationFrame(step)
@@ -157,7 +159,12 @@ onUnmounted(() => {
 <template>
   <div
     class="hologram-gauge"
-    :class="{ 'is-large': large, 'has-inside-label': insideLabel, 'is-complete': isComplete }"
+    :class="{
+      'is-large': large,
+      'has-inside-label': insideLabel,
+      'is-complete': isComplete,
+      'is-idle': isIdle,
+    }"
     :style="rootStyle"
   >
     <div class="hologram-gauge-stage">
