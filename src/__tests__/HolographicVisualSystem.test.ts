@@ -26,6 +26,21 @@ describe('holographic instrument visual system', () => {
     expect(main).toContain("import './styles/motion.css'")
   })
 
+  it('provides theme-aware borderless, standard and stereoscopic panel frames', () => {
+    const panelShell = read('components/shared/PanelShell.vue')
+    const panel = read('styles/panel.css')
+
+    expect(panelShell).toContain('panel-title-plate')
+    expect(panel).toContain("[data-panel-border='borderless']")
+    expect(panel).toContain("[data-panel-border='standard']")
+    expect(panel).toContain("[data-panel-border='stereoscopic']")
+    expect(panel).toContain('.panel-title-plate')
+    expect(panel).toContain('var(--chart-primary)')
+    expect(panel).toContain('var(--motion-loop-panel)')
+    expect(panel).toContain("[data-theme-mode='light'] .panel-border-flow")
+    expect(panel).not.toContain("[data-theme-mode='light'] .panel-border-flow {\n  display: none;")
+  })
+
   it('uses a central energy spine and positional panel levels without changing equal columns', () => {
     const layout = read('styles/layout.css')
     const panel = read('styles/panel.css')

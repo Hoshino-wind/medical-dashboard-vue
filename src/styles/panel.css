@@ -14,6 +14,9 @@
   --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 92%, var(--chart-primary) 8%);
   --panel-title-secondary: color-mix(in srgb, var(--chart-primary) 72%, var(--chart-secondary) 28%);
   --panel-title-accent: color-mix(in srgb, var(--warn) 78%, var(--chart-primary) 22%);
+  --panel-frame-rim: color-mix(in srgb, var(--chart-primary) 72%, var(--instrument-rim) 28%);
+  --panel-frame-depth: color-mix(in srgb, var(--chart-secondary) 28%, var(--bg) 72%);
+  --panel-frame-highlight: color-mix(in srgb, var(--instrument-rim) 62%, var(--chart-primary) 38%);
   border: 0.0625rem solid
     color-mix(in srgb, var(--glass-edge) var(--panel-edge-weight), transparent);
   border-radius: 0.5rem;
@@ -64,6 +67,75 @@
   box-shadow:
     inset 0 0 0 0.0625rem color-mix(in srgb, var(--glass-edge) 42%, transparent),
     inset 0 0 1.15rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent);
+}
+
+.screen-frame[data-panel-border='borderless'] .panel {
+  border-color: transparent;
+  box-shadow: inset 0 0 1.35rem color-mix(in srgb, var(--panel-title-primary) 7%, transparent);
+}
+
+.screen-frame[data-panel-border='borderless'] .panel::before {
+  box-shadow: inset 0 0 1.15rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent);
+}
+
+.screen-frame[data-panel-border='borderless'] .panel-corners {
+  opacity: 0;
+}
+
+.screen-frame[data-panel-border='borderless'] .panel-border-flow {
+  inset: -0.125rem;
+  padding: 0.16rem;
+  opacity: 0.86;
+}
+
+.screen-frame[data-panel-border='standard'] .panel {
+  border-color: color-mix(in srgb, var(--glass-edge) var(--panel-edge-weight), transparent);
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel {
+  border-color: color-mix(in srgb, var(--panel-frame-rim) 88%, transparent);
+  box-shadow:
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 28%, transparent),
+    inset 0.22rem 0.22rem 0.7rem color-mix(in srgb, var(--instrument-rim) 5%, transparent),
+    inset -0.28rem -0.32rem 0.78rem color-mix(in srgb, var(--panel-frame-depth) 58%, transparent),
+    0 0 0 0.0625rem color-mix(in srgb, var(--chart-primary) 32%, transparent),
+    0 0.5rem 1.15rem color-mix(in srgb, var(--bg) 64%, transparent),
+    0 0 1.25rem color-mix(in srgb, var(--chart-primary) var(--panel-glow-weight), transparent);
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel::before {
+  inset: 0.22rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--panel-frame-rim) 42%, transparent);
+  border-radius: 0.28rem;
+  box-shadow:
+    inset 0.0625rem 0.0625rem 0 color-mix(in srgb, var(--panel-frame-highlight) 38%, transparent),
+    inset -0.0625rem -0.0625rem 0 color-mix(in srgb, var(--panel-frame-depth) 72%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 12%, transparent);
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0.42rem;
+  pointer-events: none;
+  border-right: 0.125rem solid color-mix(in srgb, var(--panel-frame-depth) 76%, transparent);
+  border-bottom: 0.125rem solid color-mix(in srgb, var(--panel-frame-depth) 76%, transparent);
+  border-radius: 0.2rem;
+  box-shadow:
+    inset -0.125rem -0.125rem 0.55rem color-mix(in srgb, var(--panel-frame-depth) 34%, transparent),
+    0.14rem 0.18rem 0 color-mix(in srgb, var(--panel-frame-highlight) 13%, transparent);
+  opacity: 0.82;
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel-corners {
+  inset: 0.12rem;
+  background:
+    linear-gradient(var(--panel-frame-highlight), var(--panel-frame-highlight)) left top / 1.22rem 0.125rem no-repeat,
+    linear-gradient(var(--panel-frame-highlight), var(--panel-frame-highlight)) left top / 0.125rem 1.22rem no-repeat,
+    linear-gradient(var(--panel-frame-rim), var(--panel-frame-rim)) right bottom / 1.22rem 0.125rem no-repeat,
+    linear-gradient(var(--panel-frame-rim), var(--panel-frame-rim)) right bottom / 0.125rem 1.22rem no-repeat;
+  opacity: 1;
 }
 
 .screen-grid > .panel:hover {
@@ -285,6 +357,68 @@
   overflow: hidden;
 }
 
+.panel-title-plate {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  min-width: 11.5rem;
+  max-width: 100%;
+  min-height: 1.82rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.2rem 1rem 0.24rem;
+  overflow: hidden;
+  border: 0.0625rem solid color-mix(in srgb, var(--panel-title-secondary) 54%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--instrument-rim) 12%, transparent),
+      transparent 48%
+    ),
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--chart-primary) 24%, var(--surface-strong)) 18% 82%,
+      transparent
+    );
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--panel-frame-highlight) 28%, transparent),
+    inset 0 -0.0625rem 0 color-mix(in srgb, var(--chart-secondary) 48%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 16%, transparent);
+  clip-path: polygon(0.58rem 0, calc(100% - 0.58rem) 0, 100% 50%, calc(100% - 0.58rem) 100%, 0.58rem 100%, 0 50%);
+}
+
+.panel-title-plate::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0.16rem 0.5rem;
+  background: radial-gradient(
+    ellipse at 50% 0,
+    color-mix(in srgb, var(--panel-title-primary) 18%, transparent),
+    transparent 72%
+  );
+  opacity: 0.8;
+}
+
+.panel-title-plate::after {
+  content: '';
+  position: absolute;
+  right: 12%;
+  bottom: 0;
+  left: 12%;
+  height: 0.0625rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--chart-primary) 28% 72%,
+    transparent
+  );
+  box-shadow: 0 0 0.4rem var(--chart-primary);
+  opacity: 0.72;
+}
+
 .panel-title-text {
   position: relative;
   z-index: 1;
@@ -354,6 +488,10 @@
   justify-content: center;
 }
 
+.title-style-left .panel-title-plate {
+  min-width: 12.5rem;
+}
+
 .title-style-left .panel-title-text,
 .title-style-strip .panel-title-text {
   max-width: min(100%, 17.5rem);
@@ -362,6 +500,10 @@
 
 .title-style-strip .panel-title-frame {
   justify-content: center;
+}
+
+.title-style-strip .panel-title-plate {
+  min-width: 18rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -441,7 +583,24 @@
 }
 
 .dashboard-shell[data-theme-mode='light'] .panel-border-flow {
-  display: none;
+  display: block;
+  mix-blend-mode: multiply;
+  opacity: 0.34;
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel-title-plate {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), transparent 54%),
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--accent) 9%, #ffffff) 16% 84%,
+      transparent
+    );
+  box-shadow:
+    inset 0 -0.0625rem 0 color-mix(in srgb, var(--accent) 28%, transparent),
+    0 0.2rem 0.55rem rgba(31, 58, 68, 0.06);
 }
 
 .dashboard-shell[data-theme-mode='light'] .panel-title-mini-bars i {

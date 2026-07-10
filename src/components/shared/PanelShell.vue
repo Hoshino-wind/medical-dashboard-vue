@@ -23,15 +23,17 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
     <span class="panel-corners" aria-hidden="true"></span>
     <div class="panel-header panel-header--main">
       <h2 class="panel-title-frame">
-        <span class="panel-title-mini-bars panel-title-mini-bars--left" aria-hidden="true">
-          <i></i><i></i><i></i>
-        </span>
-        <span class="panel-title-text">
-          {{ title }}
-          <span v-if="subtitle" class="panel-title-suffix">（{{ subtitle }}）</span>
-        </span>
-        <span class="panel-title-mini-bars panel-title-mini-bars--right" aria-hidden="true">
-          <i></i><i></i><i></i>
+        <span class="panel-title-plate">
+          <span class="panel-title-mini-bars panel-title-mini-bars--left" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
+          <span class="panel-title-text">
+            {{ title }}
+            <span v-if="subtitle" class="panel-title-suffix">（{{ subtitle }}）</span>
+          </span>
+          <span class="panel-title-mini-bars panel-title-mini-bars--right" aria-hidden="true">
+            <i></i><i></i><i></i>
+          </span>
         </span>
       </h2>
     </div>
