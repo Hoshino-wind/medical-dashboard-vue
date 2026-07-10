@@ -20,7 +20,7 @@ const CountUpStub = {
 const PieStub = {
   props: ['items', 'total', 'tone', 'autoRotate'],
   template:
-    '<div class="pie-stub" data-test="pie-chart" :data-auto-rotate="autoRotate">{{ total }}</div>',
+    '<div class="pie-stub" data-test="pie-chart" :data-auto-rotate="autoRotate"><span v-for="item in items" :key="item.name">{{ item.name }}</span>{{ total }}</div>',
 }
 
 describe('work order style panels', () => {
@@ -95,6 +95,8 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('本月保养完成率')
     expect(wrapper.text()).toContain('待保养')
     expect(wrapper.text()).not.toContain('待巡检')
+    expect(wrapper.find('[data-test="pie-chart"]').text()).toContain('逾期未保养')
+    expect(wrapper.find('[data-test="pie-chart"]').text()).not.toContain('逾期未检')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="pie-chart"]').attributes('data-auto-rotate')).toBe('true')
     expect(wrapper.findAll('.module-status-summary > .module-status-metric')).toHaveLength(3)
