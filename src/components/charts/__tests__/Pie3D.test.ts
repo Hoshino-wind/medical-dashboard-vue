@@ -45,6 +45,26 @@ function dispatchFocusEvent(
   target.dispatchEvent(new FocusEvent(type, { bubbles: true, relatedTarget }))
 }
 
+function polygonArea(path: string): number {
+  const points = Array.from(
+    path.matchAll(/[ML]\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g),
+    (match) => ({ x: Number(match[1]), y: Number(match[2]) }),
+  )
+
+  return Math.abs(
+    points.reduce((area, point, index) => {
+      const next = points[(index + 1) % points.length]
+      return area + point.x * next.y - next.x * point.y
+    }, 0) / 2,
+  )
+}
+
+function frontWallArea(wrapper: VueWrapper): number {
+  return wrapper
+    .findAll('.pie3d-front-wall')
+    .reduce((area, wall) => area + polygonArea(wall.attributes('d') ?? ''), 0)
+}
+
 describe('Pie3D', () => {
   const wrappers: VueWrapper[] = []
   let raf: ReturnType<typeof stubRaf>
@@ -166,6 +186,35 @@ describe('Pie3D', () => {
     expect(wrapper.find('.pie3d-top-segment').attributes('d')).not.toBe(beforeInteraction)
   })
 
+  it('restores the focused segment tooltip after hovering another segment', async () => {
+    const wrapper = mountPie({ autoRotate: true })
+    raf.runFrame(100)
+    raf.runFrame(116)
+    await nextTick()
+    const beforeInteraction = wrapper.find('.pie3d-top-segment').attributes('d')
+    const [focusedSegment, hoveredSegment] = wrapper.findAll('.pie3d-top-segment')
+
+    await focusedSegment.trigger('focus')
+    dispatchFocusEvent(focusedSegment.element, 'focusin')
+    await wrapper.trigger('pointerenter')
+    expect(wrapper.find('.pie3d-three-tooltip').text()).toContain('运行')
+
+    await hoveredSegment.trigger('pointerenter', { clientX: 80, clientY: 40 })
+    expect(wrapper.find('.pie3d-three-tooltip').text()).toContain('待机')
+
+    await wrapper.trigger('pointerleave')
+    expect(wrapper.find('.pie3d-three-tooltip').text()).toContain('运行')
+    raf.runFrame(132)
+    await nextTick()
+    expect(wrapper.find('.pie3d-top-segment').attributes('d')).toBe(beforeInteraction)
+
+    dispatchFocusEvent(focusedSegment.element, 'focusout')
+    await focusedSegment.trigger('blur')
+    raf.runFrame(148)
+    await nextTick()
+    expect(wrapper.find('.pie3d-top-segment').attributes('d')).not.toBe(beforeInteraction)
+  })
+
   it('does not resume rotation when focus moves between segments', async () => {
     const wrapper = mountPie({ autoRotate: true })
     raf.runFrame(100)
@@ -188,6 +237,40 @@ describe('Pie3D', () => {
     raf.runFrame(164)
     await nextTick()
     expect(wrapper.find('.pie3d-top-segment').attributes('d')).not.toBe(beforeFocus)
+  })
+
+  it('keeps front-wall geometry present and continuous through a full rotation', async () => {
+    const wrapper = mountPie({ autoRotate: false, rotation: 0 })
+    const areas: number[] = []
+
+    for (const rotation of [0, 180, 270, 359, 361]) {
+      await wrapper.setProps({ rotation })
+      const area = frontWallArea(wrapper)
+      areas.push(area)
+      expect(area).toBeGreaterThan(0)
+      expect(Number.isFinite(area)).toBe(true)
+      expect(
+        wrapper
+          .findAll('.pie3d-front-wall')
+          .every((wall) => !(wall.attributes('d') ?? '').includes('NaN')),
+      ).toBe(true)
+    }
+
+    const beforeWrap = areas.at(-2) ?? 0
+    const afterWrap = areas.at(-1) ?? 0
+    expect(Math.abs(beforeWrap - afterWrap) / Math.max(beforeWrap, afterWrap)).toBeLessThan(0.12)
+  })
+
+  it('splits one front wall when a segment crosses the 2π boundary', () => {
+    const wrapper = mountPie({
+      items: [{ name: '全部', value: 100, color: '#19d7c1' }],
+      rotation: 100,
+    })
+    const walls = wrapper.findAll('.pie3d-front-wall')
+
+    expect(walls).toHaveLength(2)
+    expect(walls.every((wall) => polygonArea(wall.attributes('d') ?? '') > 0)).toBe(true)
+    expect(new Set(walls.map((wall) => wall.attributes('d'))).size).toBe(2)
   })
 
   it('uses disjoint theme-derived top-light gradients across component instances', () => {

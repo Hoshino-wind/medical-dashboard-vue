@@ -47,7 +47,8 @@ const rotationOffset = ref(0)
 
 // 起始角度：基础 -90°（12 点方向）+ 顺时针旋转偏移（rotation 为正=顺时针）
 const startAngle = computed(
-  () => BASE_START_ANGLE + ((props.rotation + rotationOffset.value) * Math.PI) / 180,
+  () =>
+    normalizeAngle(BASE_START_ANGLE + ((props.rotation + rotationOffset.value) * Math.PI) / 180),
 )
 
 const { pause: pauseRotation, resume: resumeRotation } = useInstrumentLoop(
@@ -93,6 +94,7 @@ interface DepthLayer {
 
 const host = ref<HTMLDivElement | null>(null)
 const activeSegmentIndex = ref<number | null>(null)
+const focusedSegmentIndex = ref<number | null>(null)
 let pointerInside = false
 let focusWithin = false
 const componentUid = getCurrentInstance()?.uid ?? 0
@@ -212,6 +214,10 @@ function colorMix(color: string, colorPercent: number, mixColor: string): string
   return `color-mix(in srgb, ${color} ${colorPercent}%, ${mixColor})`
 }
 
+function normalizeAngle(angle: number): number {
+  return ((angle % TAU) + TAU) % TAU
+}
+
 function pointOnTiltedEllipse(angle: number, rx: number, ry: number, yOffset = 0): EllipsePoint {
   const sin = Math.sin(angle)
   const frontRatio = (sin + 1) / 2
@@ -225,19 +231,26 @@ function pointOnTiltedEllipse(angle: number, rx: number, ry: number, yOffset = 0
 }
 
 function frontWallForSegment(segment: RenderedSegment): WallSegment[] {
-  const start = Math.max(segment.startAngle, 0)
-  const end = Math.min(segment.endAngle, Math.PI)
-  if (end - start <= 0.01) return []
+  const normalizedStart = normalizeAngle(segment.startAngle)
+  const normalizedEnd = normalizedStart + Math.max(0, segment.endAngle - segment.startAngle)
+  const lastCycle = Math.floor(normalizedEnd / TAU)
 
-  return [
-    {
-      key: `front-wall-${segment.index}`,
+  return Array.from({ length: lastCycle + 1 }, (_, cycle) => {
+    const frontStart = cycle * TAU
+    const frontEnd = frontStart + Math.PI
+    const start = Math.max(normalizedStart, frontStart)
+    const end = Math.min(normalizedEnd, frontEnd)
+
+    if (end - start <= 0.01) return null
+
+    return {
+      key: `front-wall-${segment.index}-${cycle}`,
       path: sideWallPath(start, end, OUTER_RX, OUTER_RY, totalDepth.value),
       fill: colorMix(segment.topColor, isLightTheme() ? 56 : 42, isLightTheme() ? '#b9d6df' : '#020814'),
       stroke: segment.strokeColor,
       opacity: isLightTheme() ? 0.76 : 0.94,
-    },
-  ]
+    }
+  }).filter((wall): wall is WallSegment => wall !== null)
 }
 
 function formatPoint(point: EllipsePoint): string {
@@ -325,6 +338,7 @@ function showTooltip(segment: RenderedSegment, event: PointerEvent) {
 
 function showKeyboardTooltip(segment: RenderedSegment) {
   const rect = host.value?.getBoundingClientRect()
+  focusedSegmentIndex.value = segment.index
   activeSegmentIndex.value = segment.index
   tooltip.visible = true
   tooltip.name = segment.name
@@ -351,6 +365,13 @@ function hideTooltip() {
   tooltip.visible = false
 }
 
+function hideKeyboardTooltip(segment: RenderedSegment) {
+  if (focusedSegmentIndex.value !== segment.index) return
+
+  focusedSegmentIndex.value = null
+  hideTooltip()
+}
+
 function syncInteractionRotation() {
   if (pointerInside || focusWithin) {
     pauseRotation()
@@ -366,7 +387,14 @@ function handlePointerEnter() {
 
 function handlePointerLeave() {
   pointerInside = false
-  if (!focusWithin) hideTooltip()
+  const focusedSegment = renderedSegments.value.find(
+    (segment) => segment.index === focusedSegmentIndex.value,
+  )
+  if (focusWithin && focusedSegment) {
+    showKeyboardTooltip(focusedSegment)
+  } else {
+    hideTooltip()
+  }
   syncInteractionRotation()
 }
 
@@ -482,7 +510,7 @@ function handleFocusOut(event: FocusEvent) {
           @pointerenter="showTooltip(segment, $event)"
           @pointermove="moveTooltip"
           @focus="showKeyboardTooltip(segment)"
-          @blur="hideTooltip"
+          @blur="hideKeyboardTooltip(segment)"
         />
       </g>
 
