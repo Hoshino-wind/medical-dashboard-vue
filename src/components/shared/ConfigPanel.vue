@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { AlertCircle, Check, ChevronDown, LayoutGrid, RotateCcw, Save, X } from 'lucide-vue-next'
 import { themes } from '@/data/themes'
@@ -39,7 +39,9 @@ const isComponentPoolActive = ref(false)
 const savedAt = ref('')
 const layoutWarning = ref('')
 const confirmAction = ref<ConfirmAction>(null)
+const confirmDialogRef = ref<HTMLDivElement | null>(null)
 const placedSlotIndex = ref<number | null>(null)
+let confirmTrigger: HTMLElement | null = null
 let warningTimer: number | undefined
 let placedTimer: number | undefined
 
@@ -55,10 +57,6 @@ function moduleDisplayType(module: ModuleCatalogItem): ModuleDisplayType {
 
 function moduleTypeLabel(module: ModuleCatalogItem) {
   return moduleDisplayType(module) === 'table' ? '表格' : '图形'
-}
-
-function moduleById(moduleId: string | null) {
-  return [...availableModules.value, ...selectedModules.value].find((module) => module.id === moduleId)
 }
 
 function themeLabel(theme: Theme) {
@@ -138,12 +136,7 @@ function handleSlotDrop(index: number) {
         : false
 
   if (!placed) {
-    const draggedModule = moduleById(draggedModuleId.value)
-    showLayoutWarning(
-      draggedModule && moduleDisplayType(draggedModule) !== 'table'
-        ? '当前布局没有可用区域'
-        : '每一行只允许存在一个【表格】类型组件',
-    )
+    showLayoutWarning()
   } else {
     markSlotPlaced(index)
   }
@@ -165,10 +158,42 @@ function handleComponentPoolDrop() {
   clearDragState()
 }
 
-function confirmDestructiveAction() {
-  if (confirmAction.value === 'clear') store.clearSelectedModules()
-  if (confirmAction.value === 'reset') store.resetConfig()
+async function openConfirmation(action: Exclude<ConfirmAction, null>, event: MouseEvent) {
+  confirmTrigger = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
+  confirmAction.value = action
+  await nextTick()
+  confirmDialogRef.value?.querySelector<HTMLButtonElement>('button')?.focus()
+}
+
+async function closeConfirmation() {
   confirmAction.value = null
+  await nextTick()
+  confirmTrigger?.focus()
+  confirmTrigger = null
+}
+
+function trapConfirmationFocus(event: KeyboardEvent) {
+  if (event.key !== 'Tab') return
+  const buttons = Array.from(
+    confirmDialogRef.value?.querySelectorAll<HTMLButtonElement>('button:not([disabled])') ?? [],
+  )
+  if (buttons.length === 0) return
+  const first = buttons[0]
+  const last = buttons[buttons.length - 1]
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last?.focus()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first?.focus()
+  }
+}
+
+async function confirmDestructiveAction() {
+  const action = confirmAction.value
+  if (action === 'clear') store.clearSelectedModules()
+  if (action === 'reset') store.resetConfig()
+  await closeConfirmation()
 }
 
 async function requestPreviewFullscreen() {
@@ -212,23 +237,32 @@ onBeforeUnmount(() => {
           <span v-if="savedAt" class="config-published-state" aria-live="polite">
             已发布 {{ savedAt }}
           </span>
-          <button class="app-button is-clear" type="button" @click="confirmAction = 'clear'">
+          <button class="app-button is-clear" type="button" @click="openConfirmation('clear', $event)">
             <X class="h-4 w-4" />
             清空布局
           </button>
-          <button class="app-button is-reset" type="button" @click="confirmAction = 'reset'">
+          <button class="app-button is-reset" type="button" @click="openConfirmation('reset', $event)">
             <RotateCcw class="h-4 w-4" />
             重置
           </button>
         </div>
       </div>
 
-      <div v-if="confirmAction" class="config-confirm-layer" role="alertdialog" aria-modal="true">
-        <strong>
+      <div
+        v-if="confirmAction"
+        ref="confirmDialogRef"
+        class="config-confirm-layer"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="config-confirm-title"
+        @keydown.esc.prevent="closeConfirmation"
+        @keydown.tab="trapConfirmationFocus"
+      >
+        <strong id="config-confirm-title">
           {{ confirmAction === 'clear' ? '确认清空当前布局？' : '确认恢复默认配置？' }}
         </strong>
         <div class="config-confirm-actions">
-          <button type="button" @click="confirmAction = null">取消</button>
+          <button type="button" @click="closeConfirmation">取消</button>
           <button type="button" class="is-danger" @click="confirmDestructiveAction">确认</button>
         </div>
       </div>

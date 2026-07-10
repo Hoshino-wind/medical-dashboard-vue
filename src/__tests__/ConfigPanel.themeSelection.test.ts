@@ -192,6 +192,28 @@ describe('ConfigPanel workbench configuration', () => {
     )
   })
 
+  it('announces a table-row conflict when moving a chart would swap two tables together', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: { BigScreen: true },
+      },
+    })
+    const store = useDashboardStore(pinia)
+    const before = [...store.config.selectedModuleIds]
+
+    await wrapper.find('[data-testid="layout-slot-0"]').trigger('dragstart')
+    await wrapper.find('[data-testid="layout-slot-4"]').trigger('drop')
+    await flushPromises()
+
+    expect(store.config.selectedModuleIds).toEqual(before)
+    expect(wrapper.find('.config-rule-toast.visible').text()).toContain(
+      '每一行只允许存在一个【表格】类型组件',
+    )
+    expect(wrapper.find('.config-rule-toast.visible').text()).not.toContain('没有可用区域')
+  })
+
   it('previews allowed and blocked slots as soon as a component drag starts', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
@@ -235,6 +257,7 @@ describe('ConfigPanel workbench configuration', () => {
   it('requires confirmation for destructive clear and reset actions', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
+      attachTo: document.body,
       global: {
         plugins: [pinia],
         stubs: { BigScreen: true },
@@ -243,12 +266,27 @@ describe('ConfigPanel workbench configuration', () => {
     const store = useDashboardStore(pinia)
     const original = [...store.config.selectedModuleIds]
 
-    await wrapper.find('.config-shell-actions .is-clear').trigger('click')
-    expect(wrapper.find('[role="alertdialog"]').exists()).toBe(true)
-    await wrapper.findAll('[role="alertdialog"] button')[0].trigger('click')
+    const clearTrigger = wrapper.find('.config-shell-actions .is-clear')
+    await clearTrigger.trigger('click')
+    await flushPromises()
+    const dialog = wrapper.find('[role="alertdialog"]')
+    const dialogButtons = wrapper.findAll('[role="alertdialog"] button')
+    expect(dialog.exists()).toBe(true)
+    expect(dialog.attributes('aria-labelledby')).toBe('config-confirm-title')
+    expect(document.activeElement).toBe(dialogButtons[0].element)
+
+    const confirmButton = dialogButtons[1].element as HTMLElement
+    confirmButton.focus()
+    await dialogButtons[1].trigger('keydown', { key: 'Tab' })
+    expect(document.activeElement).toBe(dialogButtons[0].element)
+
+    await dialog.trigger('keydown', { key: 'Escape' })
+    await flushPromises()
+    expect(wrapper.find('[role="alertdialog"]').exists()).toBe(false)
+    expect(document.activeElement).toBe(clearTrigger.element)
     expect(store.config.selectedModuleIds).toEqual(original)
 
-    await wrapper.find('.config-shell-actions .is-clear').trigger('click')
+    await clearTrigger.trigger('click')
     await wrapper.findAll('[role="alertdialog"] button')[1].trigger('click')
     expect(store.config.selectedModuleIds.some(Boolean)).toBe(false)
 
@@ -256,6 +294,7 @@ describe('ConfigPanel workbench configuration', () => {
     await wrapper.find('.config-shell-actions .is-reset').trigger('click')
     await wrapper.findAll('[role="alertdialog"] button')[1].trigger('click')
     expect(store.config.layout).toBe('3x3')
+    wrapper.unmount()
   })
 
   it('renders theme and layout previews and requests fullscreen on the live preview element', async () => {
