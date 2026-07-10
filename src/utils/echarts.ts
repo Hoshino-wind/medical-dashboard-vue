@@ -6,7 +6,8 @@
  * 从而避免首屏打包全量 echarts(~1MB),实现体积下降。
  *
  * 仅注册当前实际用到的图表类型与组件:
- *   - LineChart  : LineAreaChart(折线面积图)
+ *   - LineChart / EffectScatterChart / ScatterChart:
+ *                  LineAreaChart(折线面积图、默认末点脉冲、减少动态效果静态末点)
  *   - CustomChart: CubeBarChart(自定义 3D 玻璃柱状图,renderItem)
  *   - GridComponent : xAxis/yAxis + grid
  *   - TooltipComponent : 各图表的 tooltip
@@ -17,17 +18,19 @@
  *
  * Pie3D 使用 SVG 2.5D 环图,不占用 ECharts pie/gl 注册。
  *
- * 未来若新增图表类型(如 BarChart / PieChart / 散点 / 雷达),
+ * 未来若新增图表类型(如 BarChart / PieChart / RadarChart),
  * 只需在下方 use() 数组追加对应模块,组件层无需任何改动。
  */
 import * as echarts from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart, CustomChart } from 'echarts/charts'
+import { CustomChart, EffectScatterChart, LineChart, ScatterChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent } from 'echarts/components'
 
 echarts.use([
   CanvasRenderer,
   LineChart,
+  EffectScatterChart,
+  ScatterChart,
   CustomChart,
   GridComponent,
   TooltipComponent,

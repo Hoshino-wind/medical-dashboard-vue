@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
@@ -23,6 +23,30 @@ function token(name: keyof ThemeVariables): string {
 }
 
 const tooltipExtraCssText = 'border-radius: 0.5rem;'
+const motionPreference =
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)')
+    : null
+const isReducedMotion = ref(motionPreference?.matches ?? false)
+
+const lastPoint = computed<[string, number] | null>(() => {
+  const index = Math.min(props.data.labels.length, props.data.data.length) - 1
+  return index >= 0 ? [props.data.labels[index], props.data.data[index]] : null
+})
+
+function syncMotionPreference(event?: MediaQueryListEvent) {
+  isReducedMotion.value = event?.matches ?? motionPreference?.matches ?? false
+}
+
+onMounted(() => {
+  if (!motionPreference) return
+  syncMotionPreference()
+  motionPreference.addEventListener('change', syncMotionPreference)
+})
+
+onUnmounted(() => {
+  motionPreference?.removeEventListener('change', syncMotionPreference)
+})
 
 const option = computed(() => {
   const text = token('--text')
@@ -99,6 +123,22 @@ const option = computed(() => {
           },
         },
       },
+      {
+        type: isReducedMotion.value ? 'scatter' : 'effectScatter',
+        coordinateSystem: 'cartesian2d',
+        data: lastPoint.value ? [lastPoint.value] : [],
+        symbolSize: 10,
+        z: 5,
+        ...(isReducedMotion.value
+          ? {}
+          : { rippleEffect: { period: 5, scale: 2.4, brushType: 'stroke' } }),
+        itemStyle: {
+          color: pointColor,
+          shadowBlur: 14,
+          shadowColor: lineColor,
+        },
+        tooltip: { show: false },
+      },
     ],
     tooltip: {
       trigger: 'axis',
@@ -118,5 +158,10 @@ const option = computed(() => {
 </script>
 
 <template>
-  <EChart :class="`chart-${variant}`" :option="option" height="100%" />
+  <EChart
+    :class="`chart-${variant}`"
+    :option="option"
+    :aria-label="`${variant === 'inspection' ? '巡检统计' : '保养统计'}时间轨迹图`"
+    height="100%"
+  />
 </template>

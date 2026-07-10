@@ -7,6 +7,7 @@ const props = withDefaults(
   defineProps<{
     option: EChartsOption
     height?: string
+    ariaLabel?: string
   }>(),
   {
     height: pxToRem(170),
@@ -76,7 +77,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="chart-shell" :class="{ 'is-ready': isChartReady }" :style="{ height }">
+  <div
+    class="chart-shell"
+    :class="{ 'is-ready': isChartReady }"
+    :style="{ height }"
+    role="img"
+    :aria-label="ariaLabel"
+  >
     <div ref="chartEl" class="chart-canvas w-full" />
     <div class="chart-loading-layer" aria-hidden="true">
       <span class="chart-loading-pulse"></span>

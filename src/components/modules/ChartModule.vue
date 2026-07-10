@@ -39,7 +39,10 @@ const lineFooter = computed(() => {
 <template>
   <CubeBarChart v-if="type === 'bar'" :data="data as BarChartData" :theme="theme" />
   <div v-else class="line-chart-module">
-    <div class="line-chart-body">
+    <div
+      class="line-chart-body"
+      :class="{ 'line-chart-body--inspection': type === 'inspection' }"
+    >
       <LineAreaChart :data="data as LineChartData" :theme="theme" :variant="type" />
     </div>
     <div v-if="lineFooter" class="line-chart-footer">

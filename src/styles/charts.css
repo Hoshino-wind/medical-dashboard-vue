@@ -271,7 +271,40 @@
 }
 
 .line-chart-body {
+  --line-track-color: var(--data-maintenance-line);
+  position: relative;
+  isolation: isolate;
   min-height: 0;
+}
+
+.line-chart-body--inspection {
+  --line-track-color: var(--data-inspection-line);
+}
+
+.line-chart-body::after {
+  position: absolute;
+  z-index: 0;
+  inset: auto 7% 4%;
+  height: 22%;
+  content: '';
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--line-track-color) 14%, transparent),
+    transparent 70%
+  );
+  animation: instrument-energy-pulse var(--motion-loop-instrument) ease-in-out infinite;
+  animation-delay: var(--motion-phase);
+}
+
+.line-chart-body > .chart-shell {
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .line-chart-body::after {
+    animation: none;
+  }
 }
 
 .line-chart-footer {
