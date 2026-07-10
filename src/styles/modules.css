@@ -172,6 +172,7 @@
     transparent
   );
   box-shadow: 0 0.12rem 0.38rem color-mix(in srgb, var(--stat-tone) 28%, transparent);
+  transform: translate3d(0, 0, 0);
   animation: overview-frame-trace var(--motion-loop-status) linear infinite;
   animation-delay: var(--motion-phase);
 }
@@ -203,7 +204,7 @@
 
 @keyframes overview-frame-trace {
   to {
-    left: 102%;
+    transform: translate3d(425%, 0, 0);
   }
 }
 
