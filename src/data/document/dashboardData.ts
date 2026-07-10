@@ -1,11 +1,6 @@
 import rawDashboardData from './bigScreenData.txt?raw'
 import { parseBigScreenFakeData } from './parseBigScreenFakeData'
-import type {
-  DashboardData,
-  HealthTrendData,
-  InspectionOrders,
-  RepairOrder,
-} from '@/types/dashboard'
+import type { DashboardData, InspectionOrders, RepairOrder } from '@/types/dashboard'
 import type {
   ParsedBigScreenFakeData,
   ParsedRepairOrderItem,
@@ -28,24 +23,26 @@ function toDashboardData(source: ParsedBigScreenFakeData): DashboardData {
     overview: source.overview,
     repairOrders: source.repairOrders.map(toRepairOrderRow),
     inspectionOrders: toInspectionOrders(source.inspectionOrders),
+    maintenanceOrders: toInspectionOrders(source.maintenanceOrders),
     lifeSupport: source.lifeSupport,
     ultrasound: source.ultrasound,
     deviceDistribution: source.deviceDistribution,
     repairStats: source.repairStats,
     maintenanceStats: source.maintenanceStats,
     inspectionStats: source.inspectionStats,
-    healthTrend: toMaintenanceTrend(source),
   }
 }
 
-function toRepairOrderRow(order: ParsedRepairOrderItem): RepairOrder {
+function toRepairOrderRow(source: ParsedRepairOrderItem): RepairOrder {
+  const status = source.status === '待响应' ? '待接修' : source.status
+
   return [
-    order.department,
-    order.equipName,
-    order.repairCode,
-    order.repairReportDuration,
-    order.responder,
-    order.status,
+    source.department,
+    source.equipName,
+    source.repairCode,
+    source.repairReportDuration,
+    source.responder,
+    status,
   ]
 }
 
@@ -60,22 +57,6 @@ function toInspectionOrders(orders: ServiceOrderItem[]): InspectionOrders {
     waiting,
     overdue,
     rows: orders.map(toServiceOrderRow),
-  }
-}
-
-function toMaintenanceTrend(source: ParsedBigScreenFakeData): HealthTrendData {
-  const warning = source.maintenanceOrders.filter(
-    (order) => numericRemainDays(order.remainDays) <= 0,
-  ).length
-  const pending = source.maintenanceOrders.length - warning
-
-  return {
-    online: source.overview.available,
-    warning,
-    repairing: source.overview.repairing,
-    pending,
-    score: source.overview.availability,
-    rows: source.maintenanceOrders.map(toServiceOrderRow),
   }
 }
 

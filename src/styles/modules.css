@@ -321,13 +321,19 @@
   top: 0.5rem;
   bottom: 3rem;
   left: var(--module-list-width, 64%);
-  width: 0.0625rem;
+  width: 0.125rem;
   background: linear-gradient(
     180deg,
-    transparent,
-    color-mix(in srgb, var(--instrument-core) 36%, transparent),
-    transparent
+    transparent 0%,
+    color-mix(in srgb, var(--instrument-core) 24%, transparent) 16%,
+    color-mix(in srgb, var(--instrument-core) 82%, transparent) 50%,
+    color-mix(in srgb, var(--instrument-core) 24%, transparent) 84%,
+    transparent 100%
   );
+  box-shadow:
+    0 0 0.24rem color-mix(in srgb, var(--instrument-core) 58%, transparent),
+    0 0 0.82rem color-mix(in srgb, var(--instrument-core) 26%, transparent);
+  transform: translateX(-50%);
   animation: instrument-energy-pulse var(--motion-loop-status) ease-in-out infinite;
   animation-delay: var(--motion-phase);
   pointer-events: none;
@@ -540,7 +546,9 @@
   align-items: stretch;
   height: 100%;
   min-height: 0;
+  gap: 0.18rem;
   overflow: hidden;
+  padding: 0.12rem;
   border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 52%, transparent);
   border-radius: 0.375rem;
   background: linear-gradient(
@@ -555,15 +563,24 @@
 }
 
 .module-status-summary > div {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto auto;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: auto;
   column-gap: 0.25rem;
   min-width: 0;
-  border-right: 0.0625rem solid color-mix(in srgb, var(--border) 26%, transparent);
+  overflow: hidden;
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--status-tone, var(--glass-edge)) 38%, var(--glass-edge) 62%);
+  border-radius: 0.25rem;
   background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-highlight) 10%, transparent),
+      transparent 42%
+    ),
     linear-gradient(
       90deg,
       color-mix(in srgb, var(--status-tone, var(--data-pie-primary)) 14%, transparent),
@@ -574,11 +591,39 @@
       color-mix(in srgb, var(--status-tone, var(--data-pie-primary)) 15%, transparent),
       transparent 64%
     );
+  box-shadow:
+    inset 0 0 0 0.0625rem
+      color-mix(in srgb, var(--status-tone, var(--instrument-rim)) 22%, transparent),
+    inset 0 -0.18rem 0.38rem
+      color-mix(in srgb, var(--status-tone, var(--surface-strong)) 10%, transparent),
+    0 0.14rem 0.28rem color-mix(in srgb, var(--surface-strong) 18%, transparent);
   white-space: nowrap;
 }
 
-.module-status-summary > div:last-child {
-  border-right: 0;
+.module-status-metric::before,
+.module-status-metric::after {
+  content: '';
+  position: absolute;
+  top: 0.08rem;
+  width: 0.58rem;
+  height: 0.0625rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--status-tone, var(--instrument-core)) 74%, transparent)
+  );
+  box-shadow: 0 0 0.32rem
+    color-mix(in srgb, var(--status-tone, var(--instrument-core)) 42%, transparent);
+  pointer-events: none;
+}
+
+.module-status-metric::before {
+  left: 0.12rem;
+}
+
+.module-status-metric::after {
+  right: 0.12rem;
+  transform: scaleX(-1);
 }
 
 .module-status-summary span {
@@ -1319,7 +1364,30 @@
   box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
 }
 
-.dashboard-shell[data-theme-mode='light'] .module-status-summary > div,
+.dashboard-shell[data-theme-mode='light'] .module-status-summary > .module-status-metric {
+  border-color: color-mix(
+    in srgb,
+    var(--status-tone, var(--border)) 22%,
+    var(--border) 78%
+  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.94),
+      color-mix(in srgb, var(--status-tone, var(--bg-soft)) 5%, #ffffff)
+    ),
+    radial-gradient(
+      ellipse at 50% 100%,
+      color-mix(in srgb, var(--status-tone, var(--data-pie-primary)) 6%, transparent),
+      transparent 70%
+    );
+  box-shadow:
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--border) 52%, transparent),
+    inset 0 -0.14rem 0.32rem
+      color-mix(in srgb, var(--status-tone, var(--bg-soft)) 5%, transparent),
+    0 0.12rem 0.24rem rgba(31, 58, 68, 0.05);
+}
+
 .dashboard-shell[data-theme-mode='light'] .inspection-bottom > div {
   border-right-color: color-mix(in srgb, var(--border) 72%, transparent);
   background:
@@ -1330,7 +1398,6 @@
     );
 }
 
-.dashboard-shell[data-theme-mode='light'] .module-status-summary > div:last-child,
 .dashboard-shell[data-theme-mode='light'] .inspection-bottom > div:last-child {
   border-right: 0;
 }

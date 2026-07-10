@@ -5,16 +5,27 @@ import CountUp from '../shared/CountUp.vue'
 import ThreePiePedestal from '../visual/ThreePiePedestal.vue'
 import { pxToRem } from '@/utils/rem'
 import { usePagedList } from '@/composables/usePagedList'
-import type { InspectionOrders } from '@/types/dashboard'
+import type { InspectionOrders, OrderCompletionVariant } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
-const props = defineProps<{
-  data: InspectionOrders
-  theme?: Theme
-}>()
+const props = withDefaults(
+  defineProps<{
+    data: InspectionOrders
+    theme?: Theme
+    variant?: OrderCompletionVariant
+  }>(),
+  {
+    variant: 'inspection',
+  },
+)
 
 const inspectionHeaders = ['所属科室', '设备名称', '剩余时间', '负责人']
 const chartHeight = pxToRem(136)
+const copy = computed(() =>
+  props.variant === 'maintenance'
+    ? { rate: '本月保养完成率', waiting: '待保养' }
+    : { rate: '本月巡检完成率', waiting: '待巡检' },
+)
 
 const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedList(
   computed(() => props.data.rows),
@@ -36,7 +47,7 @@ const inspectionPieItems = computed(() => {
       color: themeColor('--data-inspection-pie-finished', '#20e8ff'),
     },
     {
-      name: '待巡检',
+      name: copy.value.waiting,
       value: props.data.waiting,
       color: themeColor('--data-inspection-pie-waiting', '#7efcff'),
     },
@@ -77,8 +88,8 @@ const inspectionPieItems = computed(() => {
       </div>
     </div>
 
-    <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月巡检完成率">
-      <div class="pie-summary-title">本月巡检完成率</div>
+    <aside class="pie-summary-panel inspection-pie-panel" :aria-label="copy.rate">
+      <div class="pie-summary-title">{{ copy.rate }}</div>
       <div class="pie-chart-shell inspection-pie-shell">
         <ThreePiePedestal
           class="inspection-pie-base"
@@ -101,14 +112,14 @@ const inspectionPieItems = computed(() => {
     </aside>
 
     <div class="module-status-summary inspection-status-summary">
-      <div class="is-total">
+      <div class="module-status-metric is-total">
         <span>总数</span><b><CountUp :value="data.total" /></b><em>单</em>
       </div>
-      <div class="is-good">
+      <div class="module-status-metric is-good">
         <span>已完成</span><b><CountUp :value="data.finished" /></b><em>单</em>
       </div>
-      <div class="is-purple">
-        <span>待巡检</span><b><CountUp :value="data.waiting" /></b><em>单</em>
+      <div class="module-status-metric is-purple">
+        <span>{{ copy.waiting }}</span><b><CountUp :value="data.waiting" /></b><em>单</em>
       </div>
     </div>
   </div>

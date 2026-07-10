@@ -19,9 +19,19 @@ describe('useDashboardData', () => {
       '00001',
       '0天0小时23分',
       '/',
-      '待响应',
+      '待接修',
     ])
+    expect(data.repairOrders.some((row) => row.at(-1) === '待响应')).toBe(false)
+    expect(data.repairOrders.some((row) => row.at(-1) === '待接修')).toBe(true)
     expect(data.inspectionOrders.rows[0]).toEqual(['紧急医学救援队', '呼吸机', '0天', '/'])
+    expect(data.maintenanceOrders).toMatchObject({
+      rate: 0,
+      total: 6,
+      finished: 0,
+      waiting: 5,
+      overdue: 1,
+    })
+    expect(data.maintenanceOrders.rows[0]).toEqual(['紧急医学救援队', '呼吸机', '0天', '/'])
     expect(data.repairStats.labels).toEqual([
       '2025-07',
       '2025-08',

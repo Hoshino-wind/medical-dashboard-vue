@@ -18,9 +18,6 @@ const AvailabilityModule = defineAsyncComponent(
 const CompletionModule = defineAsyncComponent(
   () => import('@/components/modules/CompletionModule.vue'),
 )
-const HealthTrendModule = defineAsyncComponent(
-  () => import('@/components/modules/HealthTrendModule.vue'),
-)
 const DeviceDistributionModule = defineAsyncComponent(
   () => import('@/components/modules/DeviceDistributionModule.vue'),
 )
@@ -100,8 +97,12 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
     resolveProps: resolveLine,
   },
   health: {
-    component: HealthTrendModule,
-    resolveProps: (_module, ctx) => ({ data: ctx.data.healthTrend, theme: ctx.theme }),
+    component: CompletionModule,
+    resolveProps: (_module, ctx) => ({
+      data: ctx.data.maintenanceOrders,
+      theme: ctx.theme,
+      variant: 'maintenance',
+    }),
   },
   distribution: {
     component: DeviceDistributionModule,

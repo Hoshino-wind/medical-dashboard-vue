@@ -5,7 +5,9 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import CompletionModule from '@/components/modules/CompletionModule.vue'
 import WorkOrderTable from '@/components/shared/WorkOrderTable.vue'
-import HealthTrendModule from '@/components/modules/HealthTrendModule.vue'
+import { moduleRegistry } from '@/config/moduleRegistry'
+import { dashboardData } from '@/data/document/dashboardData'
+import { moduleCatalog } from '@/data/modules'
 import { themes } from '@/data/themes'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
@@ -58,21 +60,22 @@ describe('work order style panels', () => {
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="pie-chart"]').attributes('data-auto-rotate')).toBe('true')
     expect(wrapper.find('.inspection-status-summary .is-total').exists()).toBe(true)
+    expect(wrapper.findAll('.module-status-summary > .module-status-metric')).toHaveLength(3)
   })
 
-  it('renders health trend as a compact status list plus full-width bottom status summary', () => {
-    const wrapper = mount(HealthTrendModule, {
+  it('renders maintenance orders with maintenance-specific copy', () => {
+    const wrapper = mount(CompletionModule, {
       props: {
-        theme: themes[1],
+        variant: 'maintenance',
         data: {
-          online: 15744,
-          warning: 68,
-          repairing: 44,
-          pending: 102,
-          score: 96.8,
+          rate: 88.6,
+          total: 1482,
+          finished: 1313,
+          waiting: 169,
+          overdue: 12,
           rows: [
-            ['运行正常', '生命支持设备', '15,744台', '稳定'],
-            ['维保预警', '呼吸机/监护仪', '68台', '需排查'],
+            ['紧急医学救援队', '呼吸机', '0天', '/'],
+            ['耳鼻咽喉科', '冷藏冷冻机', '10天', '欧阳张三'],
           ],
         },
       },
@@ -84,19 +87,27 @@ describe('work order style panels', () => {
       },
     })
 
-    expect(wrapper.find('.health-status-grid').exists()).toBe(true)
-    expect(wrapper.find('.health-status-table').exists()).toBe(true)
-    expect(wrapper.find('.health-pie-panel').exists()).toBe(true)
-    expect(wrapper.find('.health-status-summary').exists()).toBe(true)
-    expect(wrapper.find('.health-pie-panel .health-status-summary').exists()).toBe(false)
-    expect(wrapper.text()).toContain('生命支持设备')
-    expect(wrapper.text()).toContain('设备健康状态')
-    expect(wrapper.text()).toContain('运行正常15744台')
-    expect(wrapper.text()).toContain('维保预警68台')
-    expect(wrapper.text()).toContain('维修中44台')
-    expect(wrapper.text()).toContain('即将保养102台')
+    expect(wrapper.find('.inspection-order-grid').exists()).toBe(true)
+    expect(wrapper.find('.inspection-order-table').exists()).toBe(true)
+    expect(wrapper.find('.inspection-pie-panel').exists()).toBe(true)
+    expect(wrapper.find('.inspection-status-summary').exists()).toBe(true)
+    expect(wrapper.text()).toContain('紧急医学救援队')
+    expect(wrapper.text()).toContain('本月保养完成率')
+    expect(wrapper.text()).toContain('待保养')
+    expect(wrapper.text()).not.toContain('待巡检')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="pie-chart"]').attributes('data-auto-rotate')).toBe('true')
+    expect(wrapper.findAll('.module-status-summary > .module-status-metric')).toHaveLength(3)
+  })
+
+  it('routes the saved healthTrend catalog slot to maintenance completion orders', () => {
+    const healthModule = moduleCatalog.find((module) => module.id === 'healthTrend')!
+    const theme = themes[0]!
+
+    expect(moduleRegistry.health.component).toBe(moduleRegistry.completion.component)
+    expect(
+      moduleRegistry.health.resolveProps(healthModule, { data: dashboardData, theme }),
+    ).toEqual({ data: dashboardData.maintenanceOrders, theme, variant: 'maintenance' })
   })
 
   it('uses status tone variables for bottom summary numbers', () => {
@@ -107,7 +118,8 @@ describe('work order style panels', () => {
     expect(moduleStyles).toContain('grid-template-columns: auto auto auto')
     expect(moduleStyles).toContain('.module-status-summary b > span')
     expect(moduleStyles).toContain('height: 1rem')
-    expect(moduleStyles).not.toContain('.module-status-summary > div::before')
+    expect(moduleStyles).toContain('.module-status-metric::before')
+    expect(moduleStyles).toContain('.module-status-metric::after')
     expect(moduleStyles).toContain('.inspection-status-summary .is-total')
     expect(moduleStyles).toContain('--data-inspection-pie-finished')
     expect(moduleStyles).toContain('--data-inspection-pie-waiting')
@@ -116,9 +128,18 @@ describe('work order style panels', () => {
     expect(moduleStyles).toContain('--data-health-pie-warning')
     expect(moduleStyles).toContain('--data-health-pie-repairing')
     expect(moduleStyles).toContain('--data-health-pie-pending')
+
+    const separatorRule =
+      moduleStyles.match(
+        /\.inspection-order-grid::after,\s*\.health-status-grid::after\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    expect(separatorRule).toContain('box-shadow:')
+    expect(moduleStyles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.inspection-order-grid::after/,
+    )
   })
 
-  it('animates work order summary numbers with CountUp', () => {
+  it('does not render a stale static summary below repair orders', () => {
     const wrapper = mount(WorkOrderTable, {
       props: {
         headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
@@ -127,17 +148,9 @@ describe('work order style panels', () => {
           ['检验科', '分析仪', 'ERB-2', '1天', '王华', '待接修'],
         ],
       },
-      global: {
-        stubs: {
-          CountUp: CountUpStub,
-        },
-      },
     })
 
-    expect(wrapper.find('.work-order-summary').text()).toContain('维修中44单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('配件运输中18单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('待接修1单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('已维修1326单')
+    expect(wrapper.find('.work-order-summary').exists()).toBe(false)
   })
 
   it('pins pending repair orders before the scrolling repair list with distinct status colors and no vertical warning stripes', () => {
@@ -212,25 +225,25 @@ describe('work order style panels', () => {
         },
       },
     })
-    const maintenanceOrders = mount(HealthTrendModule, {
+    const maintenanceOrders = mount(CompletionModule, {
       props: {
-        theme: themes[1],
+        variant: 'maintenance',
         data: {
-          online: 15744,
-          warning: 68,
-          repairing: 44,
-          pending: 102,
-          score: 96.8,
+          rate: 88.6,
+          total: 1482,
+          finished: 1313,
+          waiting: 169,
+          overdue: 12,
           rows: [
-            ['全院设备', '运行正常', '15,744台', '稳定'],
-            ['生命支持设备', '维保预警', '68台', '需排查'],
+            ['紧急医学救援队', '呼吸机', '0天', '/'],
+            ['耳鼻咽喉科', '冷藏冷冻机', '10天', '欧阳张三'],
           ],
         },
       },
       global: {
         stubs: {
           CountUp: CountUpStub,
-          HealthPieChart: PieStub,
+          Pie3D: PieStub,
         },
       },
     })
@@ -241,13 +254,12 @@ describe('work order style panels', () => {
     }
   })
 
-  it('uses CountUp for remaining static summary sources', () => {
+  it('keeps CountUp in chart summaries but not in the repair table', () => {
     const workOrderTable = readFileSync(join(testDir, '../components/shared/WorkOrderTable.vue'), 'utf8')
     const chartModule = readFileSync(join(testDir, '../components/modules/ChartModule.vue'), 'utf8')
 
-    expect(workOrderTable).toContain("import CountUp from './CountUp.vue'")
-    expect(workOrderTable).toContain('<CountUp :value="44"')
-    expect(workOrderTable).toContain('<CountUp :value="1326"')
+    expect(workOrderTable).not.toContain("import CountUp from './CountUp.vue'")
+    expect(workOrderTable).not.toContain('<CountUp')
     expect(chartModule).toContain("import CountUp from '../shared/CountUp.vue'")
     expect(chartModule).toContain('<CountUp :value="lineFooter.value"')
   })

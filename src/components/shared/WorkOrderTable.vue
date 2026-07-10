@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import CountUp from './CountUp.vue'
 import { usePagedList } from '@/composables/usePagedList'
 
 const props = defineProps<{
@@ -83,12 +82,6 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
           </div>
         </div>
       </div>
-    </div>
-    <div class="work-order-summary">
-      <div class="is-danger"><span>维修中</span><b><CountUp :value="44" /></b><em>单</em></div>
-      <div class="is-purple"><span>配件运输中</span><b><CountUp :value="18" /></b><em>单</em></div>
-      <div class="is-warn"><span>待接修</span><b><CountUp :value="pendingRepairRows.length" /></b><em>单</em></div>
-      <div class="is-good"><span>已维修</span><b><CountUp :value="1326" /></b><em>单</em></div>
     </div>
   </div>
 </template>

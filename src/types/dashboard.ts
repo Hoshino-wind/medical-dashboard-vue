@@ -38,6 +38,9 @@ export interface InspectionOrders {
   rows: string[][]
 }
 
+/** 巡检/保养工单完成率面板语义 */
+export type OrderCompletionVariant = 'inspection' | 'maintenance'
+
 /** 设备可用率条目(生命支持 / 超声) */
 export interface AvailabilityItem {
   name: string
@@ -86,11 +89,11 @@ export interface DashboardData {
   overview: OverviewData
   repairOrders: RepairOrder[]
   inspectionOrders: InspectionOrders
+  maintenanceOrders: InspectionOrders
   lifeSupport: AvailabilityItem[]
   ultrasound: AvailabilityItem[]
   deviceDistribution: DeviceDistributionItem[]
   repairStats: BarChartData
   maintenanceStats: LineChartData
   inspectionStats: LineChartData
-  healthTrend: HealthTrendData
 }
