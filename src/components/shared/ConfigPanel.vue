@@ -10,6 +10,7 @@ import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
 type ModuleDisplayType = 'table' | 'chart'
+type ConfirmAction = 'clear' | 'reset' | null
 
 const store = useDashboardStore()
 const { config, availableModules, selectedModules, selectedSlotModules, activeTheme, slotCount } =
@@ -37,7 +38,10 @@ const dragOverSlot = ref<number | null>(null)
 const isComponentPoolActive = ref(false)
 const savedAt = ref('')
 const layoutWarning = ref('')
+const confirmAction = ref<ConfirmAction>(null)
+const placedSlotIndex = ref<number | null>(null)
 let warningTimer: number | undefined
+let placedTimer: number | undefined
 
 const tableModuleIds = new Set(['repairOrders', 'inspectionOrders', 'healthTrend'])
 
@@ -102,18 +106,36 @@ function handleSlotDragStart(index: number, module: ModuleCatalogItem | null) {
   draggedModuleId.value = module.id
 }
 
+function slotDropState(index: number): 'allowed' | 'blocked' | null {
+  if (!draggedModuleId.value) return null
+  const allowed =
+    draggedSlotIndex.value !== null
+      ? store.canMoveSelectedModule(draggedSlotIndex.value, index)
+      : store.canPlaceModuleInSlot(draggedModuleId.value, index)
+  return allowed ? 'allowed' : 'blocked'
+}
+
+function markSlotPlaced(index: number) {
+  placedSlotIndex.value = index
+  if (placedTimer) window.clearTimeout(placedTimer)
+  placedTimer = window.setTimeout(() => {
+    placedSlotIndex.value = null
+  }, 520)
+}
+
 function handleSlotDrop(index: number) {
-  let placed = true
-  if (draggedModuleId.value) {
-    if (draggedSlotIndex.value !== null) {
-      placed = store.moveSelectedModule(
-        draggedSlotIndex.value,
-        index,
-      )
-    } else {
-      placed = store.placeModuleInSlot(draggedModuleId.value, index)
-    }
+  if (!draggedModuleId.value) {
+    clearDragState()
+    return
   }
+
+  const dropState = slotDropState(index)
+  const placed =
+    dropState === 'allowed' && draggedSlotIndex.value !== null
+      ? store.moveSelectedModule(draggedSlotIndex.value, index)
+      : dropState === 'allowed'
+        ? store.placeModuleInSlot(draggedModuleId.value, index)
+        : false
 
   if (!placed) {
     const draggedModule = moduleById(draggedModuleId.value)
@@ -122,6 +144,8 @@ function handleSlotDrop(index: number) {
         ? '当前布局没有可用区域'
         : '每一行只允许存在一个【表格】类型组件',
     )
+  } else {
+    markSlotPlaced(index)
   }
 
   clearDragState()
@@ -141,6 +165,20 @@ function handleComponentPoolDrop() {
   clearDragState()
 }
 
+function confirmDestructiveAction() {
+  if (confirmAction.value === 'clear') store.clearSelectedModules()
+  if (confirmAction.value === 'reset') store.resetConfig()
+  confirmAction.value = null
+}
+
+async function requestPreviewFullscreen() {
+  try {
+    await previewRef.value?.requestFullscreen?.()
+  } catch {
+    showLayoutWarning('浏览器未能进入全屏预览')
+  }
+}
+
 onMounted(() => {
   if (typeof ResizeObserver === 'undefined') return
   previewObserver = new ResizeObserver(measurePreview)
@@ -152,6 +190,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   previewObserver?.disconnect()
+  if (warningTimer) window.clearTimeout(warningTimer)
+  if (placedTimer) window.clearTimeout(placedTimer)
 })
 </script>
 
@@ -168,15 +208,28 @@ onBeforeUnmount(() => {
           <span>{{ layoutWarning || '每一行只允许存在一个【表格】类型组件' }}</span>
         </div>
         <div class="config-shell-actions">
-          <span class="config-save-state">{{ savedAt ? `已发布 ${savedAt}` : '自动保存' }}</span>
-          <button class="app-button" type="button" @click="store.clearSelectedModules()">
+          <span class="config-save-state">修改自动保存到本机</span>
+          <span v-if="savedAt" class="config-published-state" aria-live="polite">
+            已发布 {{ savedAt }}
+          </span>
+          <button class="app-button is-clear" type="button" @click="confirmAction = 'clear'">
             <X class="h-4 w-4" />
             清空布局
           </button>
-          <button class="app-button" type="button" @click="store.resetConfig()">
+          <button class="app-button is-reset" type="button" @click="confirmAction = 'reset'">
             <RotateCcw class="h-4 w-4" />
             重置
           </button>
+        </div>
+      </div>
+
+      <div v-if="confirmAction" class="config-confirm-layer" role="alertdialog" aria-modal="true">
+        <strong>
+          {{ confirmAction === 'clear' ? '确认清空当前布局？' : '确认恢复默认配置？' }}
+        </strong>
+        <div class="config-confirm-actions">
+          <button type="button" @click="confirmAction = null">取消</button>
+          <button type="button" class="is-danger" @click="confirmDestructiveAction">确认</button>
         </div>
       </div>
 
@@ -217,18 +270,23 @@ onBeforeUnmount(() => {
             class="layout-slot-board"
             :class="{ 'layout-slot-board-2x3': config.layout === '2x3' }"
           >
-            <button
+            <div
               v-for="(module, index) in slotItems"
               :key="index"
               class="layout-slot"
               :class="[
                 module ? `is-${moduleDisplayType(module)}` : 'is-empty',
-                { 'is-drag-over': dragOverSlot === index },
+                slotDropState(index) === 'allowed' && 'is-drop-allowed',
+                slotDropState(index) === 'blocked' && 'is-drop-blocked',
+                placedSlotIndex === index && 'is-placed',
+                dragOverSlot === index && 'is-drag-over',
               ]"
-              type="button"
+              role="group"
+              :aria-label="
+                module ? `布局位置 ${index + 1}：${module.title}` : `空布局位置 ${index + 1}`
+              "
               :draggable="Boolean(module)"
               :data-testid="`layout-slot-${index}`"
-              @click="module ? store.removeModuleFromLayout(index) : undefined"
               @dragstart="handleSlotDragStart(index, module)"
               @dragenter.prevent="dragOverSlot = index"
               @dragover.prevent
@@ -237,11 +295,21 @@ onBeforeUnmount(() => {
             >
               <span v-if="module" class="layout-slot-title">{{ module.title }}</span>
               <span v-else class="layout-slot-empty">将业务组件拖动至此处</span>
-            </button>
+              <button
+                v-if="module"
+                class="layout-slot-remove"
+                type="button"
+                :data-testid="`remove-layout-slot-${index}`"
+                :aria-label="`移除${module.title}`"
+                @click.stop="store.removeModuleFromLayout(index)"
+              >
+                <X class="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
           <button class="config-publish-button" type="button" @click="publishConfig">
             <Save class="h-4 w-4" />
-            保存并发布
+            发布演示
           </button>
         </section>
 
@@ -258,6 +326,9 @@ onBeforeUnmount(() => {
                   :checked="config.layout === '2x3'"
                   @change="store.setLayout('2x3' as LayoutType)"
                 />
+                <span class="layout-choice-preview is-2x3" aria-hidden="true">
+                  <i v-for="cell in 6" :key="cell"></i>
+                </span>
                 <span>2行3列</span>
               </label>
               <label class="property-radio">
@@ -268,6 +339,9 @@ onBeforeUnmount(() => {
                   :checked="config.layout === '3x3'"
                   @change="store.setLayout('3x3' as LayoutType)"
                 />
+                <span class="layout-choice-preview is-3x3" aria-hidden="true">
+                  <i v-for="cell in 9" :key="cell"></i>
+                </span>
                 <span>3行3列</span>
               </label>
             </fieldset>
@@ -287,6 +361,14 @@ onBeforeUnmount(() => {
                   :checked="theme.id === config.themeId"
                   @change="store.setTheme(theme.id as ThemeId)"
                 />
+                <span class="theme-swatch" aria-hidden="true">
+                  <i
+                    v-for="color in theme.preview"
+                    :key="color"
+                    class="theme-swatch-dot"
+                    :style="{ '--swatch-color': color }"
+                  ></i>
+                </span>
                 <span>{{ themeLabel(theme) }}</span>
                 <Check v-if="theme.id === config.themeId" class="h-3.5 w-3.5" aria-hidden="true" />
               </label>
@@ -304,7 +386,17 @@ onBeforeUnmount(() => {
     <section class="config-preview-panel panel" aria-label="效果预览">
       <div class="config-preview-header">
         <h2>效果预览</h2>
-        <span>{{ activeTheme.name }} · {{ config.layout }}</span>
+        <div class="config-preview-actions">
+          <span>{{ activeTheme.name }} · {{ config.layout }}</span>
+          <button
+            data-testid="preview-fullscreen"
+            class="app-button"
+            type="button"
+            @click="requestPreviewFullscreen"
+          >
+            全屏预览
+          </button>
+        </div>
       </div>
       <div ref="previewRef" class="config-live-preview">
         <div class="config-live-scaler" :style="{ transform: `translate(-50%, -50%) scale(${previewScale})` }">
