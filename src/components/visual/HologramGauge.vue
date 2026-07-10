@@ -15,6 +15,7 @@ const props = withDefaults(
     showFooter?: boolean
     large?: boolean
     baseDensity?: number
+    curtainVariant?: 'cylinder' | 'fan'
   }>(),
   {
     unit: '台',
@@ -23,6 +24,7 @@ const props = withDefaults(
     showFooter: true,
     large: false,
     baseDensity: undefined,
+    curtainVariant: 'fan',
   },
 )
 
@@ -168,7 +170,7 @@ onUnmounted(() => {
     :style="rootStyle"
   >
     <div class="hologram-gauge-stage">
-      <HologramGaugeBase />
+      <HologramGaugeBase :curtain-variant="curtainVariant" />
 
       <div class="hologram-gauge-ring">
         <svg class="hologram-gauge-svg" viewBox="0 0 120 120" aria-hidden="true">

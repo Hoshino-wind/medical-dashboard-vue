@@ -26,6 +26,7 @@ withDefaults(
     :size="size"
     :tone="tone"
     :base-density="0.94"
+    curtain-variant="fan"
     :show-footer="true"
   />
 </template>

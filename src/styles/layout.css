@@ -89,7 +89,9 @@
 }
 
 .screen-frame:fullscreen,
-.screen-frame.is-faux-fullscreen {
+.screen-frame.is-faux-fullscreen,
+.screen-frame.is-screen-fullscreen {
+  grid-template-rows: 4.55rem minmax(0, 1fr);
   width: 100vw;
   height: 100vh;
   max-width: none;
@@ -147,16 +149,17 @@
 .screen-grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 31.25rem) minmax(0, 51.5rem) minmax(0, 31.25rem);
   grid-template-rows: 1.16fr 0.98fr 1fr;
   gap: 0.55rem;
   height: auto;
   min-height: 0;
   isolation: isolate;
+  justify-content: center;
 }
 
 .screen-grid.layout-2x3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 31.25rem) minmax(0, 51.5rem) minmax(0, 31.25rem);
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 

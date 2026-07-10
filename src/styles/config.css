@@ -502,7 +502,7 @@
 
 .layout-slot-board {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 31.25fr) minmax(0, 51.5fr) minmax(0, 31.25fr);
   grid-template-rows: repeat(3, minmax(6.2rem, 1fr));
   gap: 0.7rem;
   min-height: 34.75rem;
@@ -883,6 +883,7 @@
 
 .dashboard-shell.config-mode .config-live-preview .screen-frame {
   display: grid;
+  grid-template-rows: 4.55rem minmax(0, 1fr);
   width: 100%;
   height: 100%;
   min-height: 0;

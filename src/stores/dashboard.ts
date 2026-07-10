@@ -35,6 +35,10 @@ function isTableModule(moduleId: string | null | undefined) {
   return Boolean(moduleId && TABLE_MODULE_IDS.has(moduleId))
 }
 
+function isWideMiddleSlot(slotIndex: number) {
+  return slotIndex % 3 === 1
+}
+
 function normalizeSlotIds(
   selectedIds: Array<string | null> | undefined,
   layout: LayoutType,
@@ -42,14 +46,52 @@ function normalizeSlotIds(
   const capacity = getLayoutCapacity(layout)
   const validIds = new Set(moduleCatalog.map((item) => item.id))
   const seen = new Set<string>()
-  const slots = Array.from({ length: capacity }, (_, index) => {
+  const candidates = Array.from({ length: capacity }, (_, index) => {
     const id = selectedIds?.[index] ?? null
     if (!id || !validIds.has(id) || seen.has(id)) return null
     seen.add(id)
-    return id
+    return { id, index }
   })
+    .filter((item): item is { id: string; index: number } => Boolean(item))
+
+  const slots = Array<string | null>(capacity).fill(null)
+  const middleSlots = Array.from({ length: Math.ceil(capacity / 3) }, (_, row) => row * 3 + 1)
+    .filter((index) => index < capacity)
+
+  for (const candidate of candidates.filter((item) => isTableModule(item.id))) {
+    const preferredMiddle = Math.floor(candidate.index / 3) * 3 + 1
+    const target =
+      preferredMiddle < capacity && !slots[preferredMiddle]
+        ? preferredMiddle
+        : middleSlots.find((index) => !slots[index])
+    if (target !== undefined) slots[target] = candidate.id
+  }
+
+  for (const candidate of candidates.filter((item) => !isTableModule(item.id))) {
+    if (!slots[candidate.index]) {
+      slots[candidate.index] = candidate.id
+      continue
+    }
+
+    const rowStart = Math.floor(candidate.index / 3) * 3
+    const rowTarget = [rowStart, rowStart + 2, rowStart + 1]
+      .filter((index) => index < capacity)
+      .find((index) => !slots[index])
+    const target = rowTarget ?? slots.findIndex((id) => !id)
+    if (target >= 0) slots[target] = candidate.id
+  }
 
   return slots
+}
+
+function hasInvalidTablePlacement(selectedIds: Array<string | null>) {
+  return selectedIds.some(
+    (moduleId, slotIndex) => isTableModule(moduleId) && !isWideMiddleSlot(slotIndex),
+  )
+}
+
+function hasInvalidTableLayout(selectedIds: Array<string | null>) {
+  return hasInvalidTablePlacement(selectedIds) || hasRowTableConflict(selectedIds)
 }
 
 function hasRowTableConflict(selectedIds: Array<string | null>) {
@@ -88,7 +130,7 @@ function normalizeSelectedModuleIds(
   layout: LayoutType,
 ) {
   if (!Array.isArray(savedSelectedIds)) {
-    return moduleOrder.slice(0, getLayoutCapacity(layout))
+    return normalizeSlotIds(moduleOrder.slice(0, getLayoutCapacity(layout)), layout)
   }
 
   return normalizeSlotIds(savedSelectedIds, layout)
@@ -201,7 +243,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       if (slotId) return false
       const next = [...currentSlots]
       next[index] = moduleId
-      return !hasRowTableConflict(next)
+      return !hasInvalidTableLayout(next)
     })
     if (targetIndex === -1) return false
 
@@ -219,7 +261,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const currentIndex = next.indexOf(moduleId)
     if (currentIndex >= 0) next[currentIndex] = null
     next[slotIndex] = moduleId
-    return !hasRowTableConflict(next)
+    return !hasInvalidTableLayout(next)
   }
 
   function placeModuleInSlot(moduleId: string, slotIndex: number) {
@@ -256,7 +298,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     if (!next[fromIndex]) return false
     ;[next[fromIndex], next[toIndex]] = [next[toIndex], next[fromIndex]]
-    return !hasRowTableConflict(next)
+    return !hasInvalidTableLayout(next)
   }
 
   function moveSelectedModule(fromIndex: number, toIndex: number) {

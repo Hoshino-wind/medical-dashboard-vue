@@ -117,7 +117,13 @@ onBeforeUnmount(() => {
   <main
     ref="screenFrameRef"
     class="screen-frame"
-    :class="[`title-style-${titleStyle}`, { 'is-faux-fullscreen': isFauxFullscreen }]"
+    :class="[
+      `title-style-${titleStyle}`,
+      {
+        'is-faux-fullscreen': isFauxFullscreen,
+        'is-screen-fullscreen': isFullscreen,
+      },
+    ]"
     data-reference-design="medical-equipment-1920x1080"
     :data-panel-border="store.config.panelBorderMode"
     :data-title-style="titleStyle"
@@ -139,7 +145,7 @@ onBeforeUnmount(() => {
         <i class="screen-energy-spine-node screen-energy-spine-node--bottom"></i>
       </span>
     </section>
-    <div class="screen-actions" aria-label="大屏快捷操作">
+    <div v-if="!isFullscreen" class="screen-actions" aria-label="大屏快捷操作">
       <button
         v-for="action in screenActions"
         :key="action.label"

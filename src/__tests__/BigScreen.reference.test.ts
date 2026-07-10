@@ -142,11 +142,14 @@ describe('BigScreen reference layout', () => {
     expect(Element.prototype.requestFullscreen).toHaveBeenCalledTimes(1)
     expect(requestFullscreenMock.mock.contexts[0]).toBe(wrapper.find('.screen-frame').element)
     expect(wrapper.find('.screen-frame').classes()).toContain('is-faux-fullscreen')
-    expect(screenButtons[0].attributes('aria-pressed')).toBe('true')
+    expect(wrapper.find('.screen-frame').classes()).toContain('is-screen-fullscreen')
+    expect(wrapper.find('.screen-actions').exists()).toBe(false)
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await flushPromises()
 
     expect(wrapper.find('.screen-frame').classes()).not.toContain('is-faux-fullscreen')
+    expect(wrapper.find('.screen-frame').classes()).not.toContain('is-screen-fullscreen')
+    expect(wrapper.findAll('.screen-action')).toHaveLength(2)
   })
 })

@@ -75,7 +75,7 @@ function publishConfig() {
   savedAt.value = new Date().toLocaleTimeString('zh-CN', { hour12: false })
 }
 
-function showLayoutWarning(message = '每一行只允许存在一个【表格】类型组件') {
+function showLayoutWarning(message = '表格组件只能放在每行中间宽栏，且每行仅允许一个表格组件') {
   layoutWarning.value = message
   if (warningTimer) window.clearTimeout(warningTimer)
   warningTimer = window.setTimeout(() => {
@@ -88,7 +88,7 @@ function addModule(module: ModuleCatalogItem) {
   if (!placed) {
     showLayoutWarning(
       moduleDisplayType(module) === 'table'
-        ? '每一行只允许存在一个【表格】类型组件'
+        ? '表格组件只能放在每行中间宽栏，且每行仅允许一个表格组件'
         : '当前布局没有可用区域',
     )
   }
@@ -267,7 +267,7 @@ onBeforeUnmount(() => {
         </div>
         <div class="config-rule-toast" :class="{ visible: layoutWarning }" role="status">
           <AlertCircle class="h-4 w-4" aria-hidden="true" />
-          <span>{{ layoutWarning || '每一行只允许存在一个【表格】类型组件' }}</span>
+          <span>{{ layoutWarning || '表格组件只能放在每行中间宽栏，且每行仅允许一个表格组件' }}</span>
         </div>
         <div class="config-shell-actions">
           <span class="config-save-state">修改自动保存到本机</span>

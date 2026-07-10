@@ -12,6 +12,7 @@ withDefaults(
     insideLabel?: string
     showFooter?: boolean
     large?: boolean
+    curtainVariant?: 'cylinder' | 'fan'
   }>(),
   {
     size: pxToRem(118),
@@ -19,6 +20,7 @@ withDefaults(
     insideLabel: '',
     showFooter: true,
     large: false,
+    curtainVariant: 'fan',
   },
 )
 </script>
@@ -33,5 +35,6 @@ withDefaults(
     :inside-label="insideLabel"
     :show-footer="showFooter"
     :large="large"
+    :curtain-variant="curtainVariant"
   />
 </template>

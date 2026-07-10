@@ -1,9 +1,21 @@
 <script setup lang="ts">
+import HologramLightCurtain from './HologramLightCurtain.vue'
+
+withDefaults(
+  defineProps<{
+    curtainVariant?: 'cylinder' | 'fan'
+  }>(),
+  {
+    curtainVariant: 'fan',
+  },
+)
+
 const uid = `hgb-${Math.random().toString(36).slice(2, 8)}`
 </script>
 
 <template>
   <div class="hologram-gauge-base" aria-hidden="true">
+    <HologramLightCurtain :variant="curtainVariant" />
     <svg class="hologram-gauge-base-svg" viewBox="0 0 220 76" focusable="false">
       <defs>
         <!-- 底部投影光晕 -->
@@ -127,12 +139,18 @@ const uid = `hgb-${Math.random().toString(36).slice(2, 8)}`
 
 <style scoped>
 .hologram-gauge-base {
+  position: relative;
   overflow: visible;
   color: var(--gauge-tone);
   pointer-events: none;
+  --hologram-curtain-tone: var(--gauge-tone);
+  --hologram-curtain-highlight: var(--gauge-tone-bright);
+  --hologram-curtain-opacity: 0.68;
 }
 
 .hologram-gauge-base-svg {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;

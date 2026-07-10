@@ -186,7 +186,7 @@ describe('ConfigPanel workbench configuration', () => {
     ])
   })
 
-  it('keeps one table component per layout row', async () => {
+  it('keeps table components in the wide middle column', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
       global: {
@@ -199,18 +199,18 @@ describe('ConfigPanel workbench configuration', () => {
     const store = useDashboardStore(pinia)
 
     store.clearSelectedModules()
-    store.placeModuleInSlot('repairOrders', 0)
+    const sidePlaced = store.placeModuleInSlot('repairOrders', 0)
+    const middlePlaced = store.placeModuleInSlot('repairOrders', 1)
     await flushPromises()
 
-    const placed = store.placeModuleInSlot('inspectionOrders', 1)
-    await flushPromises()
-
-    expect(placed).toBe(false)
-    expect(store.config.selectedModuleIds[1]).toBeNull()
+    expect(sidePlaced).toBe(false)
+    expect(middlePlaced).toBe(true)
+    expect(store.config.selectedModuleIds[0]).toBeNull()
+    expect(store.config.selectedModuleIds[1]).toBe('repairOrders')
     expect(wrapper.text()).toContain('维修工单')
   })
 
-  it('shows a warning when a second table component is dropped into the same row', async () => {
+  it('shows a warning when a table component is dropped into a narrow side slot', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
       global: {
@@ -223,16 +223,16 @@ describe('ConfigPanel workbench configuration', () => {
     const store = useDashboardStore(pinia)
 
     store.clearSelectedModules()
-    store.placeModuleInSlot('repairOrders', 0)
+    store.placeModuleInSlot('repairOrders', 1)
     await flushPromises()
 
     await wrapper.find('[data-testid="available-inspectionOrders"]').trigger('dragstart')
-    await wrapper.find('[data-testid="layout-slot-1"]').trigger('drop')
+    await wrapper.find('[data-testid="layout-slot-3"]').trigger('drop')
     await flushPromises()
 
-    expect(store.config.selectedModuleIds[1]).toBeNull()
+    expect(store.config.selectedModuleIds[3]).toBeNull()
     expect(wrapper.find('.config-rule-toast.visible').text()).toContain(
-      '每一行只允许存在一个【表格】类型组件',
+      '表格组件只能放在每行中间宽栏',
     )
   })
 
@@ -253,7 +253,7 @@ describe('ConfigPanel workbench configuration', () => {
 
     expect(store.config.selectedModuleIds).toEqual(before)
     expect(wrapper.find('.config-rule-toast.visible').text()).toContain(
-      '每一行只允许存在一个【表格】类型组件',
+      '表格组件只能放在每行中间宽栏',
     )
     expect(wrapper.find('.config-rule-toast.visible').text()).not.toContain('没有可用区域')
   })
@@ -268,17 +268,17 @@ describe('ConfigPanel workbench configuration', () => {
     })
     const store = useDashboardStore(pinia)
     store.clearSelectedModules()
-    store.placeModuleInSlot('repairOrders', 0)
+    store.placeModuleInSlot('repairOrders', 1)
     await flushPromises()
 
     await wrapper.find('[data-testid="available-inspectionOrders"]').trigger('dragstart')
 
-    expect(wrapper.find('[data-testid="layout-slot-1"]').classes()).toContain('is-drop-blocked')
-    expect(wrapper.find('[data-testid="layout-slot-3"]').classes()).toContain('is-drop-allowed')
-    expect(wrapper.find('[data-testid="layout-slot-1"]').attributes('aria-label')).toContain(
+    expect(wrapper.find('[data-testid="layout-slot-0"]').classes()).toContain('is-drop-blocked')
+    expect(wrapper.find('[data-testid="layout-slot-4"]').classes()).toContain('is-drop-allowed')
+    expect(wrapper.find('[data-testid="layout-slot-0"]').attributes('aria-label')).toContain(
       '不可放置',
     )
-    expect(wrapper.find('[data-testid="layout-slot-3"]').attributes('aria-label')).toContain(
+    expect(wrapper.find('[data-testid="layout-slot-4"]').attributes('aria-label')).toContain(
       '可以放置',
     )
     expect(wrapper.find('[data-testid="drag-placement-status"]').text()).toContain(

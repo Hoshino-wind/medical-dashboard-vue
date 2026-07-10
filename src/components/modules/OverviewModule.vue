@@ -26,12 +26,13 @@ const overviewRingSize = pxToRem(145)
         tone="var(--data-ring)"
         inside-label="设备可用率"
         :show-footer="false"
+        curtain-variant="cylinder"
         large
       />
     </div>
 
     <!-- 5 个指标环绕分布：左上 / 右上 / 左下 / 右下 / 正下 -->
-    <div class="overview-stat overview-stat--total with-icon pos-tl">
+    <div class="overview-stat overview-stat-frame overview-stat--total with-icon pos-tl">
       <MonitorCog class="overview-stat-icon text-[color:var(--data-pie-primary)]" />
       <div>
         <div class="kpi-label">设备总数</div>
@@ -40,7 +41,7 @@ const overviewRingSize = pxToRem(145)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--available with-icon pos-tr">
+    <div class="overview-stat overview-stat-frame overview-stat--available with-icon pos-tr">
       <ShieldCheck class="overview-stat-icon text-[color:var(--good)]" />
       <div>
         <div class="kpi-label">可用设备</div>
@@ -49,7 +50,7 @@ const overviewRingSize = pxToRem(145)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--repair with-icon is-alert is-danger pos-bl">
+    <div class="overview-stat overview-stat-frame overview-stat--repair with-icon is-alert is-danger pos-bl">
       <Wrench class="overview-stat-icon text-[color:var(--danger)]" />
       <div>
         <div class="kpi-label">维修中</div>
@@ -58,7 +59,7 @@ const overviewRingSize = pxToRem(145)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--maintenance with-icon is-alert is-warn pos-br">
+    <div class="overview-stat overview-stat-frame overview-stat--maintenance with-icon is-alert is-warn pos-br">
       <ClipboardList class="overview-stat-icon text-[color:var(--warn)]" />
       <div>
         <div class="kpi-label">待保养</div>
@@ -67,7 +68,7 @@ const overviewRingSize = pxToRem(145)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--inspection with-icon pos-bc">
+    <div class="overview-stat overview-stat-frame overview-stat--inspection with-icon pos-bc">
       <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
       <div>
         <div class="kpi-label">待巡检</div>

@@ -610,7 +610,7 @@ function handleFocusOut(event: FocusEvent) {
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--pie-surface) 72%, #020814);
   color: var(--pie-text);
-  font-size: 0.68rem;
+  font-size: 0.875rem;
   font-weight: 780;
   line-height: 1.32;
   pointer-events: none;

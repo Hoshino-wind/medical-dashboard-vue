@@ -100,28 +100,57 @@ describe('dashboard store configuration', () => {
     ])
   })
 
-  it('rejects more than one table component in the same row', () => {
+  it('keeps table modules in the wide middle slot of each row', () => {
     const store = useDashboardStore()
 
     store.clearSelectedModules()
 
-    expect(store.placeModuleInSlot('repairOrders', 0)).toBe(true)
+    expect(store.placeModuleInSlot('repairOrders', 0)).toBe(false)
+    expect(store.placeModuleInSlot('repairOrders', 1)).toBe(true)
     expect(store.placeModuleInSlot('inspectionOrders', 2)).toBe(false)
-    expect(store.placeModuleInSlot('inspectionOrders', 3)).toBe(true)
+    expect(store.placeModuleInSlot('inspectionOrders', 4)).toBe(true)
     expect(store.config.selectedModuleIds.slice(0, 6)).toEqual([
+      null,
       'repairOrders',
       null,
       null,
       'inspectionOrders',
       null,
-      null,
     ])
+  })
+
+  it('migrates old saved table slots into the wide middle column', () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        layout: '3x3',
+        selectedModuleIds: [
+          'repairOrders',
+          'overview',
+          'repairStats',
+          'inspectionOrders',
+          'lifeSupport',
+          'maintenanceStats',
+          'healthTrend',
+          'ultrasound',
+          'inspectionStats',
+        ],
+      }),
+    )
+    setActivePinia(createPinia())
+
+    const store = useDashboardStore()
+
+    expect(store.config.selectedModuleIds[1]).toBe('repairOrders')
+    expect(store.config.selectedModuleIds[4]).toBe('inspectionOrders')
+    expect(store.config.selectedModuleIds[7]).toBe('healthTrend')
+    expect(store.config.selectedModuleIds.filter(Boolean)).toHaveLength(9)
   })
 
   it('preflights table placement without mutating config, storage, or selection state', async () => {
     const store = useDashboardStore()
     store.clearSelectedModules()
-    store.placeModuleInSlot('repairOrders', 0)
+    store.placeModuleInSlot('repairOrders', 1)
     await nextTick()
 
     const configBefore = JSON.stringify(store.config)
@@ -129,8 +158,8 @@ describe('dashboard store configuration', () => {
     const selectedBefore = store.selectedSlotModules.map((item) => item?.id ?? null)
     const availableBefore = store.availableModules.map((item) => item.id)
 
-    expect(store.canPlaceModuleInSlot('inspectionOrders', 1)).toBe(false)
-    expect(store.canPlaceModuleInSlot('inspectionOrders', 3)).toBe(true)
+    expect(store.canPlaceModuleInSlot('inspectionOrders', 2)).toBe(false)
+    expect(store.canPlaceModuleInSlot('inspectionOrders', 4)).toBe(true)
     await nextTick()
 
     expect(JSON.stringify(store.config)).toBe(configBefore)
@@ -183,42 +212,27 @@ describe('dashboard store configuration', () => {
   it('preflights and rejects a move that would create a table-row conflict', () => {
     const store = useDashboardStore()
     store.clearSelectedModules()
-    store.placeModuleInSlot('repairOrders', 0)
-    store.placeModuleInSlot('inspectionOrders', 3)
-    store.placeModuleInSlot('overview', 4)
+    store.placeModuleInSlot('repairOrders', 1)
+    store.placeModuleInSlot('inspectionOrders', 4)
+    store.placeModuleInSlot('overview', 3)
     const before = [...store.config.selectedModuleIds]
 
-    expect(store.canMoveSelectedModule(0, 4)).toBe(false)
+    expect(store.canMoveSelectedModule(1, 3)).toBe(false)
     expect(store.config.selectedModuleIds).toEqual(before)
-    expect(store.moveSelectedModule(0, 4)).toBe(false)
+    expect(store.moveSelectedModule(1, 3)).toBe(false)
     expect(store.config.selectedModuleIds).toEqual(before)
   })
 
-  it('preflights and allows a move that resolves a table-row conflict', () => {
+  it('keeps table moves within middle-column slots', () => {
     const store = useDashboardStore()
-    store.config.selectedModuleIds = [
-      'repairOrders',
-      'inspectionOrders',
-      'overview',
-      'repairStats',
-      null,
-      null,
-      null,
-      null,
-      null,
-    ]
     const before = [...store.config.selectedModuleIds]
 
-    expect(store.canMoveSelectedModule(1, 3)).toBe(true)
+    expect(store.canMoveSelectedModule(1, 0)).toBe(false)
     expect(store.config.selectedModuleIds).toEqual(before)
-    expect(store.moveSelectedModule(1, 3)).toBe(true)
-    expect(store.config.selectedModuleIds.slice(0, 6)).toEqual([
-      'repairOrders',
-      'repairStats',
-      'overview',
-      'inspectionOrders',
-      null,
-      null,
-    ])
+    expect(store.moveSelectedModule(1, 0)).toBe(false)
+    expect(store.canMoveSelectedModule(1, 4)).toBe(true)
+    expect(store.moveSelectedModule(1, 4)).toBe(true)
+    expect(store.config.selectedModuleIds[1]).toBe('inspectionOrders')
+    expect(store.config.selectedModuleIds[4]).toBe('repairOrders')
   })
 })

@@ -41,13 +41,15 @@ describe('holographic instrument visual system', () => {
     expect(panel).not.toContain("[data-theme-mode='light'] .panel-border-flow {\n  display: none;")
   })
 
-  it('uses a central energy spine and positional panel levels without changing equal columns', () => {
+  it('uses a central energy spine and gives the work-order column the 824px instrument width', () => {
     const layout = read('styles/layout.css')
     const panel = read('styles/panel.css')
 
     expect(layout).toContain('.screen-energy-spine')
     expect(layout).toContain('animation: instrument-background-scan')
-    expect(layout).toContain('grid-template-columns: repeat(3, minmax(0, 1fr))')
+    expect(layout).toContain(
+      'grid-template-columns: minmax(0, 31.25rem) minmax(0, 51.5rem) minmax(0, 31.25rem)',
+    )
     expect(panel).toContain('.screen-grid > .panel:nth-child(3n + 2)')
     expect(panel).toContain('--panel-edge-weight: 100%')
     expect(panel).toContain('--panel-edge-weight: 84%')
@@ -86,6 +88,32 @@ describe('holographic instrument visual system', () => {
 
     expect(pedestal).toContain('pedestal-orbit-overlay')
     expect(pedestal).toContain('var(--motion-loop-instrument)')
+  })
+
+  it('reuses two theme-aware light curtain forms across gauge and pie pedestals', () => {
+    const curtain = read('components/visual/HologramLightCurtain.vue')
+    const gauge = read('components/visual/HologramGauge.vue')
+    const gaugeBase = read('components/visual/HologramGaugeBase.vue')
+    const pedestal = read('components/visual/ThreePiePedestal.vue')
+    const overview = read('components/modules/OverviewModule.vue')
+    const availability = read('components/visual/AvailabilityMetricRing.vue')
+    const modules = read('styles/modules.css')
+
+    expect(curtain).toContain("'cylinder' | 'fan'")
+    expect(curtain).toContain('hologram-light-curtain--cylinder')
+    expect(curtain).toContain('hologram-light-curtain--fan')
+    expect(curtain).toContain('var(--motion-loop-instrument)')
+    expect(curtain).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(gauge).toContain(':curtain-variant="curtainVariant"')
+    expect(gaugeBase).toContain('HologramLightCurtain')
+    expect(pedestal).toContain('HologramLightCurtain')
+    expect(overview).toContain('curtain-variant="cylinder"')
+    expect(overview.match(/overview-stat-frame/g)).toHaveLength(5)
+    expect(availability).toContain('curtain-variant="fan"')
+    expect(modules).toContain('.overview-stat-frame::before')
+    expect(modules).toContain('.overview-stat-frame::after')
+    expect(modules).toContain('--stat-tone')
+    expect(modules).toMatch(/\.overview-value\s*\{[\s\S]*?font-family: var\(--instrument-font-data\)/)
   })
 
   it('keeps the orbit footprint fixed while a clipped inner trace loops', () => {
@@ -131,6 +159,10 @@ describe('holographic instrument visual system', () => {
 
   it('styles the configuration page as a loop-enabled holographic editor', () => {
     const config = read('styles/config.css')
+    const previewFrame =
+      config.match(
+        /\.dashboard-shell\.config-mode \.config-live-preview \.screen-frame\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
 
     expect(config).toContain('.is-drop-allowed')
     expect(config).toContain('.is-drop-blocked')
@@ -146,6 +178,7 @@ describe('holographic instrument visual system', () => {
       ".dashboard-shell[data-theme-mode='light'] .layout-slot.is-drop-allowed",
     )
     expect(config).toContain('border-style: dashed')
+    expect(previewFrame).toContain('grid-template-rows: 4.55rem minmax(0, 1fr)')
     expect(config).toMatch(
       /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.layout-slot\.is-placed \{[\s\S]*?border-color:[\s\S]*?\}/,
     )

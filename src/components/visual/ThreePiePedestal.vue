@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import * as THREE from 'three'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import HologramLightCurtain from './HologramLightCurtain.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -9,6 +10,7 @@ const props = withDefaults(
     intensity?: number
     variant?: 'webgl' | 'compact'
     labelDeck?: boolean
+    curtainVariant?: 'cylinder' | 'fan'
   }>(),
   {
     color: 'var(--instrument-base)',
@@ -16,6 +18,7 @@ const props = withDefaults(
     intensity: 1,
     variant: 'webgl',
     labelDeck: false,
+    curtainVariant: 'fan',
   },
 )
 
@@ -32,6 +35,9 @@ const hostStyle = computed(() => ({
   '--pedestal-color': props.color,
   '--pedestal-accent': props.accent,
   '--pedestal-intensity': props.intensity,
+  '--hologram-curtain-tone': props.accent,
+  '--hologram-curtain-highlight': 'var(--instrument-rim)',
+  '--hologram-curtain-opacity': 0.58 * props.intensity,
 }))
 
 function cssColorToThree(value: string, fallback = '#00a8ff'): THREE.Color {
@@ -524,6 +530,7 @@ onUnmounted(() => {
     :style="hostStyle"
     aria-hidden="true"
   >
+    <HologramLightCurtain :variant="curtainVariant" />
     <span class="pedestal-orbit-overlay" aria-hidden="true"></span>
     <template v-if="props.variant === 'compact'">
       <span class="pedestal-compact-glow"></span>

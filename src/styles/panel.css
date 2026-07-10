@@ -312,7 +312,7 @@
     ),
     color-mix(in srgb, var(--chart-primary) 28%, transparent);
   color: color-mix(in srgb, var(--text) 88%, var(--chart-primary) 12%);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   box-shadow:
     inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 28%, transparent),
     0 0 0.75rem color-mix(in srgb, var(--chart-primary) 22%, transparent);
@@ -524,7 +524,7 @@
 .panel-title-suffix {
   margin-left: 0.25rem;
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 800;
 }
 
@@ -610,4 +610,48 @@
 
 .dashboard-shell[data-theme-mode='light'] .panel-header h2 {
   color: color-mix(in srgb, var(--text) 92%, var(--accent) 8%);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='borderless']
+  .panel {
+  border-color: transparent;
+  box-shadow: inset 0 0 1.35rem
+    color-mix(in srgb, var(--panel-title-primary) 7%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='borderless']
+  .panel::before {
+  box-shadow: inset 0 0 1.15rem
+    color-mix(in srgb, var(--panel-title-primary) 6%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='standard']
+  .panel {
+  border-color: color-mix(in srgb, var(--border) 92%, var(--border-strong) 8%);
+  box-shadow: var(--panel-shadow);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='stereoscopic']
+  .panel {
+  border-color: color-mix(in srgb, var(--panel-frame-rim) 62%, var(--border) 38%);
+  box-shadow:
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 42%, transparent),
+    inset 0.22rem 0.22rem 0.7rem rgba(255, 255, 255, 0.76),
+    inset -0.28rem -0.32rem 0.78rem color-mix(in srgb, var(--panel-frame-depth) 32%, transparent),
+    0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-rim) 24%, transparent),
+    0 0.5rem 1.15rem rgba(31, 58, 68, 0.14),
+    0 0 1.25rem color-mix(in srgb, var(--chart-primary) var(--panel-glow-weight), transparent);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='stereoscopic']
+  .panel::before {
+  box-shadow:
+    inset 0.0625rem 0.0625rem 0 rgba(255, 255, 255, 0.82),
+    inset -0.0625rem -0.0625rem 0 color-mix(in srgb, var(--panel-frame-depth) 52%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 10%, transparent);
 }

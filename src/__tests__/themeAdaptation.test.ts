@@ -70,7 +70,7 @@ describe('global theme adaptation', () => {
     const dataTableBlock = tableStyles.match(/\.data-table\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(tokenStyles).toContain('--dashboard-font-scale: 1.45')
-    expect(tokenStyles).toContain('--dashboard-list-font-scale: 1.18')
+    expect(tokenStyles).toContain('--dashboard-list-font-scale: 1.28')
     expect(fontSizeDeclarations.length).toBeGreaterThan(20)
     expect(
       fontSizeDeclarations.filter((declaration) =>
@@ -91,12 +91,12 @@ describe('global theme adaptation', () => {
     expect(largeGaugeValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(overviewValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(pieCenterValueBlock).not.toContain('var(--dashboard-font-scale')
-    expect(cubeBar).not.toContain('chartFontSize(')
-    expect(cubeBar).toContain('fontSize: 11')
-    expect(cubeBar).toContain('fontSize: 12')
-    expect(cubeBar).toContain('fontSize: 14')
-    expect(cubeBar).toContain('fontSize: 9')
+    expect(cubeBar).toContain('chartFontSize(')
+    expect(cubeBar).not.toMatch(/fontSize:\s*(?:9|10|11|12|13)(?:\D|$)/)
     expect(lineArea).toContain('chartFontSize(')
+    expect(moduleStyles).toContain('.overview-feature-ring .hologram-gauge-label {\n  font-size: 0.875rem;')
+    expect(panelStyles).toContain('.panel-title-suffix {\n  margin-left: 0.25rem;\n  color: var(--muted);\n  font-size: 0.875rem;')
+    expect(readSource('components/charts/Pie3D.vue')).toContain('font-size: 0.875rem')
   })
 
   it('uses theme-driven SVG stops for the top header frame', () => {
@@ -155,7 +155,7 @@ describe('global theme adaptation', () => {
     expect(valueBlock).toContain('0.17')
     expect(largeInsideValueBlock).toContain('0.18')
     expect(overviewValueBlock).toContain('font-size: 1.7rem')
-    expect(overviewLabelBlock).toContain('font-size: 0.56rem')
+    expect(overviewLabelBlock).toContain('font-size: 0.875rem')
   })
 
   it('uses theme tokens for the cube bar base instead of fixed blue and violet fills', () => {
@@ -182,7 +182,7 @@ describe('global theme adaptation', () => {
     expect(pie3d).toContain('function clampTooltipPosition')
     expect(pie3d).toContain('Math.min(Math.max')
     expect(pie3d).toContain('rect.width - TOOLTIP_WIDTH - TOOLTIP_MARGIN')
-    expect(tooltipBlock).toContain('font-size: 0.68rem')
+    expect(tooltipBlock).toContain('font-size: 0.875rem')
     expect(tooltipBlock).not.toContain('--dashboard-font-scale')
     expect(tooltipBlock).toContain('min-width: 5.25rem')
   })
@@ -236,15 +236,17 @@ describe('global theme adaptation', () => {
     expect(inspectionPieShell).not.toContain('drop-shadow')
   })
 
-  it('keeps each 3x3 dashboard row split into three equal-width cards', () => {
+  it('keeps each dashboard row centered on the 500/824/500 design widths', () => {
     const layoutStyles = readSource('styles/layout.css')
     const screenGridBlock = layoutStyles.match(/\.screen-grid\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const compactGridBlock =
       layoutStyles.match(/\.screen-grid\.layout-2x3\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
-    expect(screenGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
-    expect(screenGridBlock).not.toContain('0.98fr 1.43fr 1.04fr')
-    expect(compactGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    const expectedColumns =
+      'grid-template-columns: minmax(0, 31.25rem) minmax(0, 51.5rem) minmax(0, 31.25rem);'
+    expect(screenGridBlock).toContain(expectedColumns)
+    expect(screenGridBlock).toContain('justify-content: center')
+    expect(compactGridBlock).toContain(expectedColumns)
   })
 
   it('renders panel flowing borders with reduced-motion fallback', () => {
@@ -328,34 +330,22 @@ describe('global theme adaptation', () => {
     expect(`${moduleStyles}\n${tableStyles}`).toContain('@keyframes status-alert-flicker')
     expect(moduleStyles).toContain('.module-status-summary .is-warn')
     expect(moduleStyles).toContain('.module-status-summary .is-danger')
-    expect(tableStyles).toContain('.work-order-summary .is-danger')
-    expect(tableStyles).toContain('.work-order-summary .is-warn')
+    expect(tableStyles).toContain('.status-pill--danger')
+    expect(tableStyles).toContain('.status-pill--warn')
     expect(`${moduleStyles}\n${tableStyles}`).not.toMatch(/scan-?line|panel-scan/i)
   })
 
-  it('adapts repair work order summary colors to each status tone', () => {
+  it('removes the obsolete repair work order summary without weakening status tones', () => {
     const tableStyles = readSource('styles/tables.css')
-    const summaryBlock = tableStyles.match(/\.work-order-summary\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const itemBlock = tableStyles.match(/\.work-order-summary > div\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const labelBlock = tableStyles.match(/\.work-order-summary span\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const valueBlock = tableStyles.match(/\.work-order-summary b\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const unitBlock = tableStyles.match(/\.work-order-summary em\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const lightItemBlock =
-      tableStyles.match(
-        /\.dashboard-shell\[data-theme-mode='light'\] \.work-order-summary > div\s*\{[\s\S]*?\n\}/,
-      )?.[0] ?? ''
+    const workOrderTable = readSource('components/shared/WorkOrderTable.vue')
 
-    expect(summaryBlock).toContain('var(--surface-strong)')
-    expect(summaryBlock).not.toContain('var(--chart-primary) 9%')
-    expect(itemBlock).toContain('var(--status-tone')
-    expect(labelBlock).toContain('var(--status-tone')
-    expect(valueBlock).toContain('var(--status-tone')
-    expect(unitBlock).toContain('var(--status-tone')
-    expect(tableStyles).toContain('.work-order-summary .is-danger {\n  --status-tone: var(--danger);')
-    expect(tableStyles).toContain('.work-order-summary .is-purple {\n  --status-tone: var(--accent-3);')
-    expect(tableStyles).toContain('.work-order-summary .is-warn {\n  --status-tone: var(--warn);')
-    expect(tableStyles).toContain('.work-order-summary .is-good {\n  --status-tone: var(--good);')
-    expect(lightItemBlock).toContain('var(--status-tone')
+    expect(workOrderTable).not.toContain('work-order-summary')
+    expect(workOrderTable).not.toContain("import CountUp from './CountUp.vue'")
+    expect(tableStyles).not.toContain('.work-order-summary')
+    expect(tableStyles).toContain('.status-pill--danger {\n  --status-tone: var(--danger);')
+    expect(tableStyles).toContain('.status-pill--purple {\n  --status-tone: var(--accent-3);')
+    expect(tableStyles).toContain('.status-pill--warn {\n  --status-tone: var(--warn);')
+    expect(tableStyles).toContain('.status-pill--good {\n  --status-tone: var(--good);')
   })
 
   it('renders a chart loading layer until ECharts finishes its first frame', () => {

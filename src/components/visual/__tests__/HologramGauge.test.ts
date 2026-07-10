@@ -76,4 +76,18 @@ describe('HologramGauge', () => {
 
     wrapper.unmount()
   })
+
+  it('renders the requested theme-aware light curtain above its pedestal', () => {
+    const wrapper = mount(HologramGauge, {
+      props: {
+        value: 96.8,
+        curtainVariant: 'cylinder',
+      },
+    })
+
+    expect(wrapper.find('.hologram-light-curtain--cylinder').exists()).toBe(true)
+    expect(wrapper.find('.hologram-light-curtain--fan').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
 })
