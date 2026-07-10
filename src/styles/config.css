@@ -330,6 +330,12 @@
   color: color-mix(in srgb, var(--danger) 76%, var(--text) 24%);
 }
 
+.config-confirm-actions button:focus-visible {
+  border-color: var(--instrument-core);
+  outline: 0.125rem solid color-mix(in srgb, var(--instrument-core) 52%, transparent);
+  outline-offset: 0.125rem;
+}
+
 .config-workbench-grid {
   display: grid;
   grid-template-columns: minmax(18rem, 22rem) minmax(34rem, 1fr) minmax(18rem, 22rem);
@@ -532,15 +538,26 @@
 }
 
 .layout-slot.is-drop-allowed {
+  border-width: 0.125rem;
+  border-style: solid;
   border-color: var(--instrument-structure-bright);
+  outline: 0.0625rem solid color-mix(in srgb, var(--instrument-structure-bright) 56%, transparent);
+  outline-offset: -0.32rem;
   box-shadow:
     inset 0 0 1.4rem color-mix(in srgb, var(--instrument-structure) 20%, transparent),
     0 0 1rem color-mix(in srgb, var(--instrument-structure-bright) 28%, transparent);
 }
 
 .layout-slot.is-drop-blocked {
+  border-width: 0.125rem;
+  border-style: dashed;
   border-color: color-mix(in srgb, var(--warn) 82%, transparent);
   box-shadow: inset 0 0 1rem color-mix(in srgb, var(--warn) 16%, transparent);
+}
+
+.layout-slot.is-placed {
+  border-color: var(--instrument-structure-bright);
+  box-shadow: inset 0 0 0 0.125rem color-mix(in srgb, var(--instrument-structure) 42%, transparent);
 }
 
 .layout-slot.is-placed::after {
@@ -859,10 +876,38 @@
   background: color-mix(in srgb, var(--surface) 48%, transparent);
 }
 
+.dashboard-shell[data-theme-mode='light'] .component-type-badge {
+  border-color: color-mix(in srgb, var(--slot-tone) 42%, var(--text) 58%);
+  background: color-mix(in srgb, var(--surface-strong) 88%, var(--bg));
+  color: color-mix(in srgb, var(--slot-tone) 28%, var(--text) 72%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .config-published-state {
+  color: color-mix(in srgb, var(--good) 30%, var(--text) 70%);
+}
+
+.dashboard-shell[data-theme-mode='light'] .layout-slot.is-drop-allowed {
+  border-color: color-mix(in srgb, var(--instrument-structure) 42%, var(--text) 58%);
+  outline-color: color-mix(in srgb, var(--instrument-structure) 34%, var(--text) 66%);
+  box-shadow:
+    inset 0 0 0 0.125rem color-mix(in srgb, var(--instrument-structure) 30%, transparent),
+    0 0 0.8rem color-mix(in srgb, var(--instrument-structure) 22%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .layout-slot.is-drop-blocked {
+  border-color: color-mix(in srgb, var(--warn) 38%, var(--text) 62%);
+  box-shadow: inset 0 0 0 0.125rem color-mix(in srgb, var(--warn) 22%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .config-shell::after,
   .layout-slot.is-placed::after {
     animation: none;
+  }
+
+  .layout-slot.is-placed {
+    border-color: var(--instrument-structure-bright);
+    box-shadow: inset 0 0 0 0.125rem color-mix(in srgb, var(--instrument-structure) 48%, transparent);
   }
 }
 

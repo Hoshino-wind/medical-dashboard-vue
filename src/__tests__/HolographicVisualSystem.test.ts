@@ -124,5 +124,15 @@ describe('holographic instrument visual system', () => {
     expect(config).toContain('.config-live-preview:fullscreen')
     expect(config).toContain('var(--motion-loop-background)')
     expect(config).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(config).toContain(
+      ".dashboard-shell[data-theme-mode='light'] .component-type-badge",
+    )
+    expect(config).toContain(
+      ".dashboard-shell[data-theme-mode='light'] .layout-slot.is-drop-allowed",
+    )
+    expect(config).toContain('border-style: dashed')
+    expect(config).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.layout-slot\.is-placed \{[\s\S]*?border-color:[\s\S]*?\}/,
+    )
   })
 })
