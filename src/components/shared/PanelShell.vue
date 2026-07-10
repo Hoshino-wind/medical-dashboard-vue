@@ -19,7 +19,8 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
 
 <template>
   <section class="panel" :class="panelVariantClass">
-    <span class="panel-border-flow"></span>
+    <span class="panel-border-flow" aria-hidden="true"></span>
+    <span class="panel-corners" aria-hidden="true"></span>
     <div class="panel-header panel-header--main">
       <h2 class="panel-title-frame">
         <span class="panel-title-mini-bars panel-title-mini-bars--left" aria-hidden="true">

@@ -46,6 +46,8 @@ describe('BigScreen reference layout', () => {
       'medical-equipment-1920x1080',
     )
     expect(wrapper.find('.screen-grid').attributes('data-layout')).toBe('3x3')
+    expect(wrapper.find('.screen-energy-spine').exists()).toBe(true)
+    expect(wrapper.find('.screen-energy-spine').attributes('aria-hidden')).toBe('true')
     expect(wrapper.findAll('module-renderer-stub')).toHaveLength(9)
     expect(wrapper.text()).not.toContain('设备分布台数占比')
     expect(wrapper.find('.footer-kpi-bar').exists()).toBe(false)

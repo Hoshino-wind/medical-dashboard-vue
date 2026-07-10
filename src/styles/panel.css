@@ -8,10 +8,14 @@
 .panel {
   position: relative;
   overflow: hidden;
+  --panel-edge-weight: 72%;
+  --panel-glow-weight: 10%;
+  --panel-motion-intensity: var(--motion-intensity-c);
   --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 92%, var(--chart-primary) 8%);
   --panel-title-secondary: color-mix(in srgb, var(--chart-primary) 72%, var(--chart-secondary) 28%);
   --panel-title-accent: color-mix(in srgb, var(--warn) 78%, var(--chart-primary) 22%);
-  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 100%, transparent);
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--glass-edge) var(--panel-edge-weight), transparent);
   border-radius: 0.5rem;
   background:
     linear-gradient(
@@ -33,8 +37,21 @@
   box-shadow:
     inset 0 0 0.0625rem color-mix(in srgb, var(--instrument-rim) 34%, transparent),
     inset 0 0 1.35rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent),
-    0 0 1rem color-mix(in srgb, var(--panel-title-primary) 18%, transparent);
+    0 0 1rem color-mix(in srgb, var(--panel-title-primary) var(--panel-glow-weight), transparent);
   isolation: isolate;
+}
+
+.panel--overview,
+.panel--availability {
+  --panel-edge-weight: 84%;
+  --panel-glow-weight: 16%;
+  --panel-motion-intensity: var(--motion-intensity-b);
+}
+
+.screen-grid > .panel:nth-child(3n + 2) {
+  --panel-edge-weight: 100%;
+  --panel-glow-weight: 24%;
+  --panel-motion-intensity: var(--motion-intensity-a);
 }
 
 .panel::before {
@@ -60,40 +77,49 @@
   animation: panel-card-enter var(--motion-enter-panel) ease-out both;
 }
 
+.screen-grid > .panel:nth-child(1) {
+  --motion-phase: 0s;
+  animation-delay: 850ms;
+}
+
 .screen-grid > .panel:nth-child(2) {
-  animation-delay: 70ms;
+  --motion-phase: -1s;
+  animation-delay: 650ms;
 }
 
 .screen-grid > .panel:nth-child(3) {
-  animation-delay: 140ms;
+  --motion-phase: -2s;
+  animation-delay: 850ms;
 }
 
 .screen-grid > .panel:nth-child(4) {
-  animation-delay: 210ms;
+  --motion-phase: -3s;
+  animation-delay: 1020ms;
 }
 
 .screen-grid > .panel:nth-child(5) {
-  animation-delay: 280ms;
+  --motion-phase: -4s;
+  animation-delay: 820ms;
 }
 
 .screen-grid > .panel:nth-child(6) {
-  animation-delay: 350ms;
+  --motion-phase: -5s;
+  animation-delay: 1020ms;
 }
 
 .screen-grid > .panel:nth-child(7) {
-  animation-delay: 420ms;
+  --motion-phase: -6s;
+  animation-delay: 1190ms;
 }
 
 .screen-grid > .panel:nth-child(8) {
-  animation-delay: 490ms;
+  --motion-phase: -7s;
+  animation-delay: 990ms;
 }
 
 .screen-grid > .panel:nth-child(9) {
-  animation-delay: 560ms;
-}
-
-.screen-grid > .panel:nth-child(10) {
-  animation-delay: 630ms;
+  --motion-phase: -8s;
+  animation-delay: 1190ms;
 }
 
 /* 四边流光边框 */
@@ -126,16 +152,26 @@
     linear-gradient(#000 0 0);
   mask-composite: exclude;
   animation:
-    panel-border-flow-spin 8.4s linear infinite,
-    panel-border-breathe 3.8s ease-in-out infinite;
+    panel-border-flow-spin var(--motion-loop-panel) linear infinite,
+    panel-border-breathe var(--motion-loop-status) ease-in-out infinite;
+  animation-delay: var(--motion-phase), calc(var(--motion-phase) - 0.8s);
 }
 
-.screen-grid > .panel:nth-child(3n + 2) .panel-border-flow {
-  animation-delay: -2.1s, -0.9s;
-}
-
-.screen-grid > .panel:nth-child(3n) .panel-border-flow {
-  animation-delay: -4.2s, -1.8s;
+.panel-corners {
+  position: absolute;
+  z-index: 2;
+  inset: 0.22rem;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--instrument-edge-inner), var(--instrument-edge-inner)) left top / 0.9rem
+      0.0625rem no-repeat,
+    linear-gradient(var(--instrument-edge-inner), var(--instrument-edge-inner)) left top /
+      0.0625rem 0.9rem no-repeat,
+    linear-gradient(var(--instrument-edge-inner), var(--instrument-edge-inner)) right bottom /
+      0.9rem 0.0625rem no-repeat,
+    linear-gradient(var(--instrument-edge-inner), var(--instrument-edge-inner)) right bottom /
+      0.0625rem 0.9rem no-repeat;
+  opacity: var(--panel-motion-intensity);
 }
 
 @keyframes panel-card-enter {

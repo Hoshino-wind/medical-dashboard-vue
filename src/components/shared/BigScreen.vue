@@ -131,6 +131,12 @@ onBeforeUnmount(() => {
         />
         <div v-else class="screen-grid-empty" aria-hidden="true"></div>
       </template>
+      <span class="screen-energy-spine" aria-hidden="true">
+        <i class="screen-energy-spine-core"></i>
+        <i class="screen-energy-spine-node screen-energy-spine-node--top"></i>
+        <i class="screen-energy-spine-node screen-energy-spine-node--middle"></i>
+        <i class="screen-energy-spine-node screen-energy-spine-node--bottom"></i>
+      </span>
     </section>
     <div class="screen-actions" aria-label="大屏快捷操作">
       <button

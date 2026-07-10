@@ -27,6 +27,20 @@
   transform: translateY(-50%);
 }
 
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -0.64rem;
+  width: 0.12rem;
+  height: 0.95rem;
+  background: linear-gradient(180deg, var(--instrument-core), transparent);
+  box-shadow: 0 0 0.9rem
+    color-mix(in srgb, var(--instrument-structure-bright) 32%, transparent);
+  transform: translateX(-50%);
+  animation: instrument-energy-pulse var(--motion-loop-title) ease-in-out infinite;
+}
+
 .header-tech-frame {
   position: absolute;
   inset: -0.42rem 1.05rem auto;
@@ -664,4 +678,10 @@
 
 .dashboard-shell[data-theme-mode='light'] .screen-toggle {
   background: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-header::after {
+    animation: none;
+  }
 }

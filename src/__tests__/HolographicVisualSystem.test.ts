@@ -25,4 +25,18 @@ describe('holographic instrument visual system', () => {
     expect(motion).toContain('@media (prefers-reduced-motion: reduce)')
     expect(main).toContain("import './styles/motion.css'")
   })
+
+  it('uses a central energy spine and positional panel levels without changing equal columns', () => {
+    const layout = read('styles/layout.css')
+    const panel = read('styles/panel.css')
+
+    expect(layout).toContain('.screen-energy-spine')
+    expect(layout).toContain('animation: instrument-background-scan')
+    expect(layout).toContain('grid-template-columns: repeat(3, minmax(0, 1fr))')
+    expect(panel).toContain('.screen-grid > .panel:nth-child(3n + 2)')
+    expect(panel).toContain('--panel-edge-weight: 100%')
+    expect(panel).toContain('--panel-edge-weight: 84%')
+    expect(panel).toContain('--panel-edge-weight: 72%')
+    expect(panel).toContain('var(--motion-phase)')
+  })
 })
