@@ -6,6 +6,7 @@ import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
 import { chartFontSize } from '@/utils/fontScale'
 import { colorWithAlpha } from '@/utils/themeColor'
+import { resolveCountAxisScale } from './chartAxisScale'
 
 const props = withDefaults(
   defineProps<{
@@ -72,14 +73,13 @@ const option = computed(() => {
         { offset: 0.55, color: colorWithAlpha(lineColor, 0.32) },
         { offset: 1, color: colorWithAlpha(lineColor, 0) },
       ]
-  const yMax = props.variant === 'inspection' ? 50000 : 12000
-  const yInterval = props.variant === 'inspection' ? 10000 : 4000
+  const axisScale = resolveCountAxisScale(props.data.data)
 
   return {
     color: [lineColor],
     animationDuration: 1000,
     animationEasing: 'cubicOut',
-    grid: { left: 72, right: 48, top: 18, bottom: 28 },
+    grid: { left: 72, right: 56, top: 36, bottom: 28 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
@@ -90,8 +90,8 @@ const option = computed(() => {
     },
     yAxis: {
       type: 'value',
-      max: yMax,
-      interval: yInterval,
+      max: axisScale.max,
+      interval: axisScale.interval,
       axisLabel: { color: muted, fontSize: chartFontSize(11), fontWeight: 800 },
       splitLine: { lineStyle: { color: grid, width: 1, type: 'dashed' } },
     },
@@ -103,6 +103,14 @@ const option = computed(() => {
         symbol: 'circle',
         symbolSize: 8,
         z: 3,
+        label: {
+          show: true,
+          position: 'top',
+          color: text,
+          fontSize: chartFontSize(10),
+          fontWeight: 800,
+          distance: 8,
+        },
         itemStyle: {
           color: lineColor,
           borderColor: pointColor,

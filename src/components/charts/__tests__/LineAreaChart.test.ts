@@ -8,6 +8,7 @@ import LineAreaChart from '@/components/charts/LineAreaChart.vue'
 import ChartModule from '@/components/modules/ChartModule.vue'
 import { themes } from '@/data/themes'
 import echarts from '@/utils/echarts'
+import { chartFontSize } from '@/utils/fontScale'
 
 interface TerminalSeries {
   type: string
@@ -22,12 +23,19 @@ interface TerminalSeries {
     color?: string
     shadowColor?: string
   }
+  label?: {
+    show: boolean
+    position: string
+    color: string
+    fontSize: number
+  }
 }
 
 interface LineOption {
   animationDuration: number
-  grid: { left: number; right: number }
+  grid: { left: number; right: number; top: number }
   series: TerminalSeries[]
+  yAxis: { max: number; interval: number }
 }
 
 interface EChartsModelInspector {
@@ -126,6 +134,36 @@ describe('LineAreaChart', () => {
     expect(option.grid.left).toBeGreaterThanOrEqual(64)
     expect(option.grid.right).toBeGreaterThanOrEqual(40)
     expect(chart.props('accessibleLabel')).toContain('保养统计')
+  })
+
+  it('derives its count axis and shows every exact point value', () => {
+    stubMotionPreference()
+    const wrapper = mount(LineAreaChart, {
+      props: {
+        data: { labels: ['07-01'], data: [48] },
+        theme: themes[1],
+        variant: 'maintenance',
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+    wrappers.push(wrapper)
+
+    const option = wrapper.findComponent(EChartStub).props('option') as LineOption
+
+    expect(option.yAxis.max).toBe(60)
+    expect(option.yAxis.interval).toBe(10)
+    expect(option.series[0].label).toMatchObject({
+      show: true,
+      position: 'top',
+      color: themes[1].variables['--text'],
+      fontSize: chartFontSize(10),
+    })
+    expect(option.grid.top).toBeGreaterThan(chartFontSize(10))
+    expect(option.grid.right).toBeGreaterThan(chartFontSize(10))
   })
 
   it('uses the inspection trajectory token and accessible name', () => {

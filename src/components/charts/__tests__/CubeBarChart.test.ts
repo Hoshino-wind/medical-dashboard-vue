@@ -6,6 +6,7 @@ import CubeBarChart from '@/components/charts/CubeBarChart.vue'
 import { BAR_ANIMATION_DURATION } from '@/components/charts/cubeBarGeometry'
 import { themes } from '@/data/themes'
 import type { BarChartData } from '@/types/dashboard'
+import { chartFontSize } from '@/utils/fontScale'
 
 interface CustomChartSeries {
   data: number[][]
@@ -20,13 +21,24 @@ interface CustomChartSeries {
     children: Array<{
       type: string
       shape?: { x?: number }
-      style?: { shadowBlur?: number; shadowColor?: string }
+      style?: {
+        fontSize?: number
+        shadowBlur?: number
+        shadowColor?: string
+        text?: string
+      }
     }>
   }
 }
 
 interface CustomChartOption {
   series: CustomChartSeries[]
+  tooltip: { textStyle: { fontSize: number } }
+  yAxis: {
+    max: number
+    interval: number
+    axisLabel: { fontSize: number }
+  }
 }
 
 const chartData: BarChartData = {
@@ -139,6 +151,13 @@ describe('CubeBarChart', () => {
     const option = wrapper.findComponent(EChartStub).props('option') as CustomChartOption
     const seriesOption = option.series[0]
 
+    expect(option.yAxis).toMatchObject({
+      max: 15,
+      interval: 3,
+      axisLabel: { fontSize: chartFontSize(11) },
+    })
+    expect(option.yAxis.max).toBeLessThan(400)
+    expect(option.tooltip.textStyle.fontSize).toBe(chartFontSize(12))
     expect(seriesOption.data).toEqual([
       [0, 12],
       [1, 8],
@@ -156,12 +175,17 @@ describe('CubeBarChart', () => {
     const columnBodies = rendered.children.filter((child) => child.type === 'GlassColumnLeft')
     const columnXs = columnBodies.map((child) => child.shape?.x)
     const columnTops = rendered.children.filter((child) => child.type === 'GlassColumnTop')
+    const valueLabels = rendered.children.filter(
+      (child) => child.type === 'text' && child.style?.text !== chartData.labels[0],
+    )
 
     expect(columnBodies).toHaveLength(3)
     expect(new Set(columnXs).size).toBe(3)
     expect(columnTops[0].style?.shadowBlur ?? 0).toBeGreaterThan(0)
     expect(columnTops[0].style?.shadowColor).toBeTruthy()
     expect(columnTops.slice(1).every((child) => child.style?.shadowBlur === undefined)).toBe(true)
+    expect(valueLabels).toHaveLength(3)
+    expect(valueLabels.every((child) => child.style?.fontSize === chartFontSize(10))).toBe(true)
 
     wrapper.unmount()
   })
