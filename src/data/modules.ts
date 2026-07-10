@@ -19,6 +19,7 @@ export const moduleCatalog: ModuleCatalogItem[] = [
 export const defaultConfig: DashboardConfig = {
   themeId: 'deep-sea-instrument',
   layout: '3x3',
+  panelBorderMode: 'stereoscopic',
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
   moduleOrder: moduleCatalog.map((item) => item.id),
 }

@@ -45,6 +45,7 @@ describe('BigScreen reference layout', () => {
     expect(wrapper.find('.screen-frame').attributes('data-reference-design')).toBe(
       'medical-equipment-1920x1080',
     )
+    expect(wrapper.find('.screen-frame').attributes('data-panel-border')).toBe('stereoscopic')
     expect(wrapper.find('.screen-grid').attributes('data-layout')).toBe('3x3')
     expect(wrapper.find('.screen-energy-spine').exists()).toBe(true)
     expect(wrapper.find('.screen-energy-spine').attributes('aria-hidden')).toBe('true')

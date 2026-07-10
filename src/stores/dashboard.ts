@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { themes } from '@/data/themes'
 import { defaultConfig, moduleCatalog } from '@/data/modules'
 import { readStorage, writeStorage } from '@/utils/storage'
-import type { DashboardConfig, LayoutType } from '@/types/config'
+import type { DashboardConfig, LayoutType, PanelBorderMode } from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -11,10 +11,16 @@ const STORAGE_KEY = 'medical-dashboard-config'
 
 /** 合法的布局值,用于校验 localStorage 脏数据 */
 const VALID_LAYOUTS: LayoutType[] = ['2x3', '3x3']
+const VALID_PANEL_BORDER_MODES: PanelBorderMode[] = [
+  'borderless',
+  'standard',
+  'stereoscopic',
+]
 
 type SavedDashboardConfig = Partial<{
   themeId: ThemeId
   layout: LayoutType
+  panelBorderMode: PanelBorderMode
   selectedModuleIds: Array<string | null>
   moduleOrder: string[]
 }>
@@ -100,6 +106,10 @@ function loadConfig(): DashboardConfig {
     themeId:
       saved?.themeId && validThemeIds.has(saved.themeId) ? saved.themeId : defaultConfig.themeId,
     layout,
+    panelBorderMode:
+      saved?.panelBorderMode && VALID_PANEL_BORDER_MODES.includes(saved.panelBorderMode)
+        ? saved.panelBorderMode
+        : defaultConfig.panelBorderMode,
     selectedModuleIds: normalizeSelectedModuleIds(
       saved?.selectedModuleIds,
       moduleOrder,
@@ -161,6 +171,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
     config.layout = layout
     config.selectedModuleIds = normalizeSlotIds(config.selectedModuleIds, layout)
     syncModuleOrder()
+  }
+
+  function setPanelBorderMode(panelBorderMode: PanelBorderMode) {
+    config.panelBorderMode = panelBorderMode
   }
 
   function moveModule(fromIndex: number, toIndex: number) {
@@ -270,6 +284,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   function resetConfig() {
     config.themeId = defaultConfig.themeId
     config.layout = defaultConfig.layout
+    config.panelBorderMode = defaultConfig.panelBorderMode
     config.selectedModuleIds = [...defaultConfig.selectedModuleIds]
     config.moduleOrder = [...defaultConfig.moduleOrder]
   }
@@ -281,6 +296,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
       writeStorage(STORAGE_KEY, {
         themeId: value.themeId,
         layout: value.layout,
+        panelBorderMode: value.panelBorderMode,
         selectedModuleIds: value.selectedModuleIds,
         moduleOrder: value.moduleOrder,
       })
@@ -298,6 +314,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     availableModules,
     setTheme,
     setLayout,
+    setPanelBorderMode,
     moveModule,
     addModuleToLayout,
     canPlaceModuleInSlot,

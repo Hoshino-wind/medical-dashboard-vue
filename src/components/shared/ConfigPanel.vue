@@ -428,6 +428,52 @@ onBeforeUnmount(() => {
               </label>
             </fieldset>
 
+            <fieldset class="property-group panel-border-group">
+              <legend>边框样式</legend>
+              <label class="property-radio panel-border-radio">
+                <input
+                  type="radio"
+                  name="panel-border"
+                  value="borderless"
+                  :checked="config.panelBorderMode === 'borderless'"
+                  @change="store.setPanelBorderMode('borderless')"
+                />
+                <span
+                  class="panel-border-preview panel-border-preview--borderless"
+                  aria-hidden="true"
+                ></span>
+                <span>无边框流光</span>
+              </label>
+              <label class="property-radio panel-border-radio">
+                <input
+                  type="radio"
+                  name="panel-border"
+                  value="standard"
+                  :checked="config.panelBorderMode === 'standard'"
+                  @change="store.setPanelBorderMode('standard')"
+                />
+                <span
+                  class="panel-border-preview panel-border-preview--standard"
+                  aria-hidden="true"
+                ></span>
+                <span>标准边框</span>
+              </label>
+              <label class="property-radio panel-border-radio">
+                <input
+                  type="radio"
+                  name="panel-border"
+                  value="stereoscopic"
+                  :checked="config.panelBorderMode === 'stereoscopic'"
+                  @change="store.setPanelBorderMode('stereoscopic')"
+                />
+                <span
+                  class="panel-border-preview panel-border-preview--stereoscopic"
+                  aria-hidden="true"
+                ></span>
+                <span>立体框架</span>
+              </label>
+            </fieldset>
+
             <fieldset class="property-group">
               <legend>背景主题设置</legend>
               <label

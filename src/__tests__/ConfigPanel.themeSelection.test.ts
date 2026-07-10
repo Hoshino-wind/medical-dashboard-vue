@@ -44,6 +44,30 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.theme-radio.active').text()).toContain('浅蓝')
   })
 
+  it('renders three panel border choices and applies the selected mode', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          BigScreen: true,
+        },
+      },
+    })
+    const store = useDashboardStore(pinia)
+
+    const choices = wrapper.findAll('input[name="panel-border"]')
+    expect(choices).toHaveLength(3)
+    expect(wrapper.text()).toContain('无边框流光')
+    expect(wrapper.text()).toContain('标准边框')
+    expect(wrapper.text()).toContain('立体框架')
+
+    await wrapper.find('input[value="borderless"]').setValue()
+    await flushPromises()
+
+    expect(store.config.panelBorderMode).toBe('borderless')
+  })
+
   it('switches between 3x3 and 2x3 layout slot counts', async () => {
     const wrapper = mount(ConfigPanel, {
       global: {

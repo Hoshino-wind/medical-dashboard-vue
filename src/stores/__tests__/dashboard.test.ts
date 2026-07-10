@@ -12,6 +12,29 @@ describe('dashboard store configuration', () => {
     setActivePinia(createPinia())
   })
 
+  it('persists and validates the selected panel border mode', async () => {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ panelBorderMode: 'standard' }))
+
+    const store = useDashboardStore()
+    expect(store.config.panelBorderMode).toBe('standard')
+
+    store.setPanelBorderMode('borderless')
+    await nextTick()
+
+    expect(store.config.panelBorderMode).toBe('borderless')
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}').panelBorderMode).toBe(
+      'borderless',
+    )
+
+    store.resetConfig()
+    expect(store.config.panelBorderMode).toBe('stereoscopic')
+
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ panelBorderMode: 'unsupported' }))
+    setActivePinia(createPinia())
+
+    expect(useDashboardStore().config.panelBorderMode).toBe('stereoscopic')
+  })
+
   it('normalizes old saved module order so newly added modules stay configurable', () => {
     const oldModuleOrder = moduleCatalog
       .filter((item) => item.id !== 'deviceDistribution')

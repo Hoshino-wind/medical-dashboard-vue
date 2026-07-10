@@ -119,6 +119,7 @@ onBeforeUnmount(() => {
     class="screen-frame"
     :class="[`title-style-${titleStyle}`, { 'is-faux-fullscreen': isFauxFullscreen }]"
     data-reference-design="medical-equipment-1920x1080"
+    :data-panel-border="store.config.panelBorderMode"
     :data-title-style="titleStyle"
   >
     <HeaderBar :data="data.header" />
