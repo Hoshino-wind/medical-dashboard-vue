@@ -28,6 +28,11 @@ function ruleBlock(selector: string) {
   return normalizedPanelStyles.slice(blockStart + 1, blockEnd)
 }
 
+function numericCustomProperty(block: string, property: string) {
+  const value = block.match(new RegExp(`${property}: ([0-9.]+)`))?.[1]
+  return value ? Number(value) : Number.NaN
+}
+
 describe('light theme panel border modes', () => {
   const lightPanelSelector = ".dashboard-shell[data-theme-mode='light'] .panel"
 
@@ -66,6 +71,49 @@ describe('light theme panel border modes', () => {
     )
     expect(normalizedPanelStyles).toContain(
       'panel-border-flow-spin var(--motion-loop-panel) linear infinite',
+    )
+  })
+
+  it('keeps borderless hover transparent after the generic hover rule', () => {
+    const genericHoverSelector = '.screen-grid > .panel:hover'
+    const selector = ".screen-frame[data-panel-border='borderless'] .screen-grid > .panel:hover"
+    const block = ruleBlock(selector)
+
+    expect(ruleIndex(selector)).toBeGreaterThan(ruleIndex(genericHoverSelector))
+    expect(block).toContain('border-color: transparent')
+    expect(block).not.toContain('var(--panel-shadow)')
+  })
+
+  it('keeps stereoscopic hover on the six-layer depth roles after generic hover', () => {
+    const genericHoverSelector = '.screen-grid > .panel:hover'
+    const selector = ".screen-frame[data-panel-border='stereoscopic'] .screen-grid > .panel:hover"
+    const block = ruleBlock(selector)
+
+    expect(ruleIndex(selector)).toBeGreaterThan(ruleIndex(genericHoverSelector))
+    expect(block).toContain('var(--panel-frame-highlight)')
+    expect(block).toContain('var(--panel-frame-depth)')
+    expect(block).toContain('var(--panel-glow-weight)')
+  })
+
+  it('uses lower themeable light flow endpoints while preserving both infinite loops', () => {
+    const basePanelBlock = ruleBlock('.panel')
+    const lightPanelBlock = ruleBlock(lightPanelSelector)
+    const lightFlowBlock = ruleBlock(".dashboard-shell[data-theme-mode='light'] .panel-border-flow")
+
+    expect(numericCustomProperty(lightPanelBlock, '--panel-flow-opacity-low')).toBeLessThan(
+      numericCustomProperty(basePanelBlock, '--panel-flow-opacity-low'),
+    )
+    expect(numericCustomProperty(lightPanelBlock, '--panel-flow-opacity-high')).toBeLessThan(
+      numericCustomProperty(basePanelBlock, '--panel-flow-opacity-high'),
+    )
+    expect(normalizedPanelStyles).toContain('0%, 100% { opacity: var(--panel-flow-opacity-low);')
+    expect(normalizedPanelStyles).toContain('50% { opacity: var(--panel-flow-opacity-high);')
+    expect(lightFlowBlock).toContain('opacity: var(--panel-flow-opacity-low)')
+    expect(normalizedPanelStyles).toContain(
+      'panel-border-flow-spin var(--motion-loop-panel) linear infinite',
+    )
+    expect(normalizedPanelStyles).toContain(
+      'panel-border-breathe var(--motion-loop-status) ease-in-out infinite',
     )
   })
 })

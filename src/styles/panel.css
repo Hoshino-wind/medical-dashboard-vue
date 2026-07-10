@@ -11,6 +11,8 @@
   --panel-edge-weight: 72%;
   --panel-glow-weight: 10%;
   --panel-motion-intensity: var(--motion-intensity-c);
+  --panel-flow-opacity-low: 0.72;
+  --panel-flow-opacity-high: 1;
   --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 92%, var(--chart-primary) 8%);
   --panel-title-secondary: color-mix(in srgb, var(--chart-primary) 72%, var(--chart-secondary) 28%);
   --panel-title-accent: color-mix(in srgb, var(--warn) 78%, var(--chart-primary) 22%);
@@ -145,6 +147,23 @@
     0 0 1.2rem color-mix(in srgb, var(--panel-title-primary) 24%, transparent);
 }
 
+.screen-frame[data-panel-border='borderless'] .screen-grid > .panel:hover {
+  border-color: transparent;
+  box-shadow: inset 0 0 1.35rem
+    color-mix(in srgb, var(--panel-title-primary) 7%, transparent);
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .screen-grid > .panel:hover {
+  border-color: color-mix(in srgb, var(--panel-frame-rim) 88%, transparent);
+  box-shadow:
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 28%, transparent),
+    inset 0.22rem 0.22rem 0.7rem color-mix(in srgb, var(--instrument-rim) 5%, transparent),
+    inset -0.28rem -0.32rem 0.78rem color-mix(in srgb, var(--panel-frame-depth) 58%, transparent),
+    0 0 0 0.0625rem color-mix(in srgb, var(--chart-primary) 32%, transparent),
+    0 0.5rem 1.15rem color-mix(in srgb, var(--bg) 64%, transparent),
+    0 0 1.25rem color-mix(in srgb, var(--chart-primary) var(--panel-glow-weight), transparent);
+}
+
 .screen-grid > .panel {
   animation: panel-card-enter var(--motion-enter-panel) ease-out both;
 }
@@ -267,12 +286,12 @@
 @keyframes panel-border-breathe {
   0%,
   100% {
-    opacity: 0.72;
+    opacity: var(--panel-flow-opacity-low);
     filter: brightness(0.92);
   }
 
   50% {
-    opacity: 1;
+    opacity: var(--panel-flow-opacity-high);
     filter: brightness(1.18);
   }
 }
@@ -555,6 +574,8 @@
 }
 
 .dashboard-shell[data-theme-mode='light'] .panel {
+  --panel-flow-opacity-low: 0.24;
+  --panel-flow-opacity-high: 0.46;
   --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 84%, var(--accent) 16%);
   --panel-title-secondary: color-mix(in srgb, var(--accent) 78%, var(--chart-secondary) 22%);
   --panel-title-accent: color-mix(in srgb, var(--warn) 86%, var(--accent) 14%);
@@ -585,7 +606,7 @@
 .dashboard-shell[data-theme-mode='light'] .panel-border-flow {
   display: block;
   mix-blend-mode: multiply;
-  opacity: 0.34;
+  opacity: var(--panel-flow-opacity-low);
 }
 
 .dashboard-shell[data-theme-mode='light'] .panel-title-plate {
