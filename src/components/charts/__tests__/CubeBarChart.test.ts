@@ -40,7 +40,7 @@ const chartData: BarChartData = {
 
 const EChartStub = {
   name: 'EChart',
-  props: ['option', 'height'],
+  props: ['option', 'height', 'accessibleLabel'],
   template: '<div data-test="echart"></div>',
 }
 
@@ -99,6 +99,25 @@ describe('CubeBarChart', () => {
 
     expect(new Set(swatchStyles).size).toBe(3)
 
+    wrapper.unmount()
+  })
+
+  it('names the shared chart image for assistive technology', () => {
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: chartData,
+        theme: themes[1],
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    expect(wrapper.findComponent(EChartStub).props('accessibleLabel')).toBe(
+      '保修统计 2.5D 柱状图',
+    )
     wrapper.unmount()
   })
 

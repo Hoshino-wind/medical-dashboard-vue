@@ -99,6 +99,26 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.text()).toContain('设备分布台数占比')
   })
 
+  it('keeps keyboard focus on the emptied slot after an explicit removal', async () => {
+    const wrapper = mount(ConfigPanel, {
+      attachTo: document.body,
+      global: {
+        plugins: [createPinia()],
+        stubs: { BigScreen: true },
+      },
+    })
+    const removeButton = wrapper.find('[data-testid="remove-layout-slot-0"]')
+
+    ;(removeButton.element as HTMLElement).focus()
+    await removeButton.trigger('click')
+    await flushPromises()
+
+    const emptiedSlot = wrapper.find('[data-testid="layout-slot-0"]')
+    expect(document.activeElement).toBe(emptiedSlot.element)
+    expect(emptiedSlot.attributes('aria-label')).toContain('空布局位置 1')
+    wrapper.unmount()
+  })
+
   it('removes a layout component when it is dragged back to the business component pool', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
@@ -231,6 +251,15 @@ describe('ConfigPanel workbench configuration', () => {
 
     expect(wrapper.find('[data-testid="layout-slot-1"]').classes()).toContain('is-drop-blocked')
     expect(wrapper.find('[data-testid="layout-slot-3"]').classes()).toContain('is-drop-allowed')
+    expect(wrapper.find('[data-testid="layout-slot-1"]').attributes('aria-label')).toContain(
+      '不可放置',
+    )
+    expect(wrapper.find('[data-testid="layout-slot-3"]').attributes('aria-label')).toContain(
+      '可以放置',
+    )
+    expect(wrapper.find('[data-testid="drag-placement-status"]').text()).toContain(
+      '拖拽预检',
+    )
   })
 
   it('marks a successful installation briefly and then clears the placement state', async () => {
@@ -273,6 +302,9 @@ describe('ConfigPanel workbench configuration', () => {
     const dialogButtons = wrapper.findAll('[role="alertdialog"] button')
     expect(dialog.exists()).toBe(true)
     expect(dialog.attributes('aria-labelledby')).toBe('config-confirm-title')
+    expect(wrapper.find('.config-shell-header').attributes('inert')).toBeDefined()
+    expect(wrapper.find('.config-workbench-grid').attributes('inert')).toBeDefined()
+    expect(wrapper.find('.config-preview-panel').attributes('inert')).toBeDefined()
     expect(document.activeElement).toBe(dialogButtons[0].element)
 
     const confirmButton = dialogButtons[1].element as HTMLElement
@@ -283,6 +315,9 @@ describe('ConfigPanel workbench configuration', () => {
     await dialog.trigger('keydown', { key: 'Escape' })
     await flushPromises()
     expect(wrapper.find('[role="alertdialog"]').exists()).toBe(false)
+    expect(wrapper.find('.config-shell-header').attributes('inert')).toBeUndefined()
+    expect(wrapper.find('.config-workbench-grid').attributes('inert')).toBeUndefined()
+    expect(wrapper.find('.config-preview-panel').attributes('inert')).toBeUndefined()
     expect(document.activeElement).toBe(clearTrigger.element)
     expect(store.config.selectedModuleIds).toEqual(original)
 

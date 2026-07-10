@@ -7,7 +7,7 @@ const props = withDefaults(
   defineProps<{
     option: EChartsOption
     height?: string
-    ariaLabel?: string
+    accessibleLabel: string
   }>(),
   {
     height: pxToRem(170),
@@ -82,7 +82,7 @@ onUnmounted(() => {
     :class="{ 'is-ready': isChartReady }"
     :style="{ height }"
     role="img"
-    :aria-label="ariaLabel"
+    :aria-label="accessibleLabel"
   >
     <div ref="chartEl" class="chart-canvas w-full" />
     <div class="chart-loading-layer" aria-hidden="true">

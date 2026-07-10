@@ -161,7 +161,7 @@ const option = computed(() => {
   <EChart
     :class="`chart-${variant}`"
     :option="option"
-    :aria-label="`${variant === 'inspection' ? '巡检统计' : '保养统计'}时间轨迹图`"
+    :accessible-label="`${variant === 'inspection' ? '巡检统计' : '保养统计'}时间轨迹图`"
     height="100%"
   />
 </template>

@@ -537,6 +537,11 @@ const option = computed(() => {
         <i :style="item.swatchStyle"></i>{{ item.name }}
       </span>
     </div>
-    <EChart class="chart-bar" :option="option" height="100%" />
+    <EChart
+      class="chart-bar"
+      :option="option"
+      height="100%"
+      accessible-label="保修统计 2.5D 柱状图"
+    />
   </div>
 </template>

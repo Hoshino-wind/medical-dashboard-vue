@@ -43,7 +43,7 @@ const chartData = {
 
 const EChartStub = {
   name: 'EChart',
-  props: ['option', 'height', 'ariaLabel'],
+  props: ['option', 'height', 'accessibleLabel'],
   template: '<div data-test="echart"></div>',
 }
 
@@ -125,7 +125,7 @@ describe('LineAreaChart', () => {
     )
     expect(option.grid.left).toBeGreaterThanOrEqual(64)
     expect(option.grid.right).toBeGreaterThanOrEqual(40)
-    expect(chart.props('ariaLabel')).toContain('保养统计')
+    expect(chart.props('accessibleLabel')).toContain('保养统计')
   })
 
   it('uses the inspection trajectory token and accessible name', () => {
@@ -143,7 +143,7 @@ describe('LineAreaChart', () => {
     expect(option.series[1].itemStyle?.shadowColor).toBe(
       themes[1].variables['--data-inspection-line'],
     )
-    expect(chart.props('ariaLabel')).toContain('巡检统计')
+    expect(chart.props('accessibleLabel')).toContain('巡检统计')
   })
 
   it('renders a static visible terminal point when reduced motion is initially enabled', () => {
@@ -192,7 +192,7 @@ describe('LineAreaChart', () => {
     const wrapper = mount(EChart, {
       props: {
         option: {},
-        ariaLabel: '保养统计时间轨迹图',
+        accessibleLabel: '保养统计时间轨迹图',
       } as unknown as InstanceType<typeof EChart>['$props'],
     })
     wrappers.push(wrapper)

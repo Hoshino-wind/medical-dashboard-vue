@@ -20,6 +20,7 @@ const { config, availableModules, selectedModules, selectedSlotModules, activeTh
 const PREVIEW_BASE_WIDTH = 1920
 const PREVIEW_BASE_HEIGHT = 1080
 const previewRef = ref<HTMLElement | null>(null)
+const layoutSlotBoardRef = ref<HTMLElement | null>(null)
 const previewScale = ref(1)
 let previewObserver: ResizeObserver | undefined
 
@@ -113,6 +114,29 @@ function slotDropState(index: number): 'allowed' | 'blocked' | null {
   return allowed ? 'allowed' : 'blocked'
 }
 
+function slotAriaLabel(module: ModuleCatalogItem | null, index: number) {
+  const baseLabel = module ? `布局位置 ${index + 1}：${module.title}` : `空布局位置 ${index + 1}`
+  const dropState = slotDropState(index)
+  if (dropState === 'allowed') return `${baseLabel}，可以放置`
+  if (dropState === 'blocked') return `${baseLabel}，不可放置`
+  return baseLabel
+}
+
+const dragPlacementAnnouncement = computed(() => {
+  if (!draggedModuleId.value) return ''
+
+  const allowed: number[] = []
+  const blocked: number[] = []
+  slotItems.value.forEach((_, index) => {
+    if (slotDropState(index) === 'allowed') allowed.push(index + 1)
+    else blocked.push(index + 1)
+  })
+
+  const allowedLabel = allowed.length > 0 ? allowed.join('、') : '无'
+  const blockedLabel = blocked.length > 0 ? blocked.join('、') : '无'
+  return `拖拽预检：可以放置到位置 ${allowedLabel}；不可放置到位置 ${blockedLabel}`
+})
+
 function markSlotPlaced(index: number) {
   placedSlotIndex.value = index
   if (placedTimer) window.clearTimeout(placedTimer)
@@ -156,6 +180,14 @@ function handleComponentPoolDrop() {
     store.removeModuleFromLayout(draggedSlotIndex.value)
   }
   clearDragState()
+}
+
+async function removeModuleFromSlot(index: number) {
+  store.removeModuleFromLayout(index)
+  await nextTick()
+  layoutSlotBoardRef.value
+    ?.querySelector<HTMLElement>(`[data-testid="layout-slot-${index}"]`)
+    ?.focus()
 }
 
 async function openConfirmation(action: Exclude<ConfirmAction, null>, event: MouseEvent) {
@@ -228,7 +260,7 @@ onBeforeUnmount(() => {
 <template>
   <main class="screen-frame config-workbench">
     <section class="config-shell panel">
-      <div class="config-shell-header">
+      <div class="config-shell-header" :inert="confirmAction ? true : undefined">
         <div class="config-shell-title">
           <ChevronDown class="h-4 w-4" aria-hidden="true" />
           <span>配置信息</span>
@@ -260,19 +292,22 @@ onBeforeUnmount(() => {
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="config-confirm-title"
+        @mousedown.self.prevent
         @keydown.esc.prevent="closeConfirmation"
         @keydown.tab="trapConfirmationFocus"
       >
-        <strong id="config-confirm-title">
-          {{ confirmAction === 'clear' ? '确认清空当前布局？' : '确认恢复默认配置？' }}
-        </strong>
-        <div class="config-confirm-actions">
-          <button type="button" @click="closeConfirmation">取消</button>
-          <button type="button" class="is-danger" @click="confirmDestructiveAction">确认</button>
+        <div class="config-confirm-card">
+          <strong id="config-confirm-title">
+            {{ confirmAction === 'clear' ? '确认清空当前布局？' : '确认恢复默认配置？' }}
+          </strong>
+          <div class="config-confirm-actions">
+            <button type="button" @click="closeConfirmation">取消</button>
+            <button type="button" class="is-danger" @click="confirmDestructiveAction">确认</button>
+          </div>
         </div>
       </div>
 
-      <div class="config-workbench-grid">
+      <div class="config-workbench-grid" :inert="confirmAction ? true : undefined">
         <section class="config-column config-column-components" aria-label="可选业务组件">
           <h2>可选业务组件</h2>
           <div
@@ -306,9 +341,18 @@ onBeforeUnmount(() => {
         <section class="config-column config-column-layout" aria-label="大屏布局">
           <h2>大屏布局</h2>
           <div
+            ref="layoutSlotBoardRef"
             class="layout-slot-board"
             :class="{ 'layout-slot-board-2x3': config.layout === '2x3' }"
           >
+            <p
+              data-testid="drag-placement-status"
+              class="config-drag-status"
+              role="status"
+              aria-live="polite"
+            >
+              {{ dragPlacementAnnouncement }}
+            </p>
             <div
               v-for="(module, index) in slotItems"
               :key="index"
@@ -321,9 +365,8 @@ onBeforeUnmount(() => {
                 dragOverSlot === index && 'is-drag-over',
               ]"
               role="group"
-              :aria-label="
-                module ? `布局位置 ${index + 1}：${module.title}` : `空布局位置 ${index + 1}`
-              "
+              :aria-label="slotAriaLabel(module, index)"
+              tabindex="-1"
               :draggable="Boolean(module)"
               :data-testid="`layout-slot-${index}`"
               @dragstart="handleSlotDragStart(index, module)"
@@ -340,7 +383,7 @@ onBeforeUnmount(() => {
                 type="button"
                 :data-testid="`remove-layout-slot-${index}`"
                 :aria-label="`移除${module.title}`"
-                @click.stop="store.removeModuleFromLayout(index)"
+                @click.stop="removeModuleFromSlot(index)"
               >
                 <X class="h-3.5 w-3.5" aria-hidden="true" />
               </button>
@@ -422,7 +465,11 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="config-preview-panel panel" aria-label="效果预览">
+    <section
+      class="config-preview-panel panel"
+      aria-label="效果预览"
+      :inert="confirmAction ? true : undefined"
+    >
       <div class="config-preview-header">
         <h2>效果预览</h2>
         <div class="config-preview-actions">
