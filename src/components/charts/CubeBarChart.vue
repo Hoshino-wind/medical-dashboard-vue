@@ -7,7 +7,7 @@ import type { Theme } from '@/types/theme'
 import { pxToRem } from '@/utils/rem'
 import { chartFontSize } from '@/utils/fontScale'
 import { colorWithAlpha } from '@/utils/themeColor'
-import { resolveCountAxisScale } from './chartAxisScale'
+import { formatMonthAxisLabel, resolveCountAxisScale } from './chartAxisScale'
 import {
   BASE_DROP,
   BASE_VERTICAL_OFFSET,
@@ -385,7 +385,7 @@ const option = computed(() => {
           children.push({
             type: 'text',
             style: {
-              text: label,
+              text: formatMonthAxisLabel(label),
               x: barX,
               y: baseGeometry.labelY,
               textAlign: 'center',

@@ -17,3 +17,8 @@ export function resolveCountAxisScale(values: number[]): { max: number; interval
 
   return { max, interval }
 }
+
+export function formatMonthAxisLabel(label: string): string {
+  const match = /^(?:\d{4})-(\d{2})$/.exec(label)
+  return match ? `${match[1]}月` : label
+}

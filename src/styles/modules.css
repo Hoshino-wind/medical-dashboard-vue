@@ -464,7 +464,7 @@
 
 .compact-order-table th {
   padding: 0.34rem 0.56rem 0.3rem;
-  font-size: calc(0.68rem * var(--dashboard-list-font-scale, 1.28));
+  font-size: calc(0.6875rem * var(--dashboard-list-font-scale, 1.28));
   line-height: 1.2;
 }
 

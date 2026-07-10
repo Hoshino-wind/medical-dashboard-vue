@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { resolveCountAxisScale } from '@/components/charts/chartAxisScale'
+import {
+  formatMonthAxisLabel,
+  resolveCountAxisScale,
+} from '@/components/charts/chartAxisScale'
 
 describe('resolveCountAxisScale', () => {
   it('adds headroom above a two-digit peak', () => {
@@ -12,5 +15,10 @@ describe('resolveCountAxisScale', () => {
 
   it('provides a usable count axis for an empty series', () => {
     expect(resolveCountAxisScale([])).toEqual({ max: 5, interval: 1 })
+  })
+
+  it('compacts full year-month labels for a 500px chart without changing other labels', () => {
+    expect(formatMonthAxisLabel('2025-07')).toBe('07月')
+    expect(formatMonthAxisLabel('07-01')).toBe('07-01')
   })
 })

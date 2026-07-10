@@ -67,6 +67,8 @@ describe('global theme adaptation', () => {
       moduleStyles.match(/\.pie-summary-title\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const compactTableBlock =
       moduleStyles.match(/\.compact-order-table\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const compactTableHeaderBlock =
+      moduleStyles.match(/\.compact-order-table th\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const dataTableBlock = tableStyles.match(/\.data-table\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(tokenStyles).toContain('--dashboard-font-scale: 1.45')
@@ -81,6 +83,9 @@ describe('global theme adaptation', () => {
     expect(dataTableBlock).not.toContain('var(--dashboard-font-scale')
     expect(compactTableBlock).toContain('var(--dashboard-list-font-scale')
     expect(compactTableBlock).not.toContain('var(--dashboard-font-scale')
+    expect(compactTableHeaderBlock).toContain(
+      'font-size: calc(0.6875rem * var(--dashboard-list-font-scale, 1.28))',
+    )
     expect(restoredHeaderTextBlocks.every(Boolean)).toBe(true)
     expect(restoredPanelTitleBlocks.every(Boolean)).toBe(true)
     expect(restoredHeaderTextBlocks.join('\n')).not.toContain('var(--dashboard-font-scale')
