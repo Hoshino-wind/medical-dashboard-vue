@@ -73,6 +73,31 @@ describe('holographic instrument visual system', () => {
     expect(pedestal).toContain('var(--motion-loop-instrument)')
   })
 
+  it('keeps the orbit footprint fixed while a clipped inner trace loops', () => {
+    const pedestal = read('components/visual/ThreePiePedestal.vue')
+    const orbit = pedestal.match(/\.pedestal-orbit-overlay\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const trace = pedestal.match(/\.pedestal-orbit-overlay::after\s*\{[\s\S]*?\}/)?.[0] ?? ''
+
+    expect(orbit).not.toContain('instrument-orbit-sweep')
+    expect(orbit).not.toContain('animation:')
+    expect(orbit).toContain(
+      'transform: translateX(-50%) perspective(14rem) rotateX(66deg);',
+    )
+    expect(orbit).toContain('overflow: hidden')
+    expect(orbit).toContain('border-radius: 50%')
+    expect(trace).toContain("content: ''")
+    expect(trace).toContain('background: linear-gradient')
+    expect(trace).toContain('transform: translate3d')
+    expect(trace).toContain(
+      'animation: pedestal-orbit-trace-sweep var(--motion-loop-instrument) linear infinite;',
+    )
+    expect(pedestal).toContain('@keyframes pedestal-orbit-trace-sweep')
+    expect(pedestal).toContain(
+      '.pedestal-orbit-overlay::after {\n    animation: none;\n    opacity: 0;\n  }',
+    )
+    expect(pedestal).toContain('.pedestal-orbit-overlay {\n    opacity: 0.28;\n  }')
+  })
+
   it('leaves diagnostic pedestal positioning to its absolute-positioned consumers', () => {
     const pedestal = read('components/visual/ThreePiePedestal.vue')
     const completion = read('components/modules/CompletionModule.vue')

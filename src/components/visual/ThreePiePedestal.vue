@@ -550,11 +550,31 @@ onUnmounted(() => {
   top: 24%;
   width: 92%;
   height: 42%;
+  overflow: hidden;
   border: 0.0625rem dashed color-mix(in srgb, var(--pedestal-accent) 56%, transparent);
   border-radius: 50%;
   opacity: calc(0.44 * var(--pedestal-intensity, 1));
   transform: translateX(-50%) perspective(14rem) rotateX(66deg);
-  animation: instrument-orbit-sweep var(--motion-loop-instrument) linear infinite;
+}
+
+.pedestal-orbit-overlay::after {
+  content: '';
+  position: absolute;
+  top: -18%;
+  bottom: -18%;
+  left: -34%;
+  width: 34%;
+  background: linear-gradient(
+    90deg,
+    transparent 0,
+    color-mix(in srgb, var(--instrument-rim) 24%, transparent) 28%,
+    color-mix(in srgb, var(--pedestal-accent) 76%, transparent) 54%,
+    color-mix(in srgb, var(--instrument-rim) 34%, transparent) 72%,
+    transparent 100%
+  );
+  opacity: 0.08;
+  transform: translate3d(0, 0, 0);
+  animation: pedestal-orbit-trace-sweep var(--motion-loop-instrument) linear infinite;
   animation-delay: calc(var(--motion-phase, 0s) - 1.6s);
 }
 
@@ -695,10 +715,31 @@ onUnmounted(() => {
   opacity: 0.48;
 }
 
+@keyframes pedestal-orbit-trace-sweep {
+  0% {
+    opacity: 0.08;
+    transform: translate3d(0, 0, 0);
+  }
+
+  12%,
+  88% {
+    opacity: 0.72;
+  }
+
+  100% {
+    opacity: 0.08;
+    transform: translate3d(400%, 0, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pedestal-orbit-overlay {
-    animation: none;
     opacity: 0.28;
+  }
+
+  .pedestal-orbit-overlay::after {
+    animation: none;
+    opacity: 0;
   }
 }
 </style>
