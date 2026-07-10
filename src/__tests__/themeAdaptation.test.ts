@@ -244,6 +244,7 @@ describe('global theme adaptation', () => {
   it('renders panel flowing borders with reduced-motion fallback', () => {
     const panelShell = readSource('components/shared/PanelShell.vue')
     const panelStyles = readSource('styles/panel.css')
+    const tokenStyles = readSource('styles/tokens.css')
     const panelBeforeBlock = panelStyles.match(/\.panel::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(panelShell).toContain('panel-border-flow')
@@ -251,7 +252,8 @@ describe('global theme adaptation', () => {
     expect(panelStyles).toContain('@keyframes panel-card-enter')
     expect(panelStyles).toContain('@keyframes panel-border-breathe')
     expect(panelStyles).toContain('@keyframes panel-border-flow-spin')
-    expect(panelStyles).toContain('panel-card-enter 520ms ease-out both')
+    expect(tokenStyles).toContain('--motion-enter-panel: 520ms')
+    expect(panelStyles).toContain('var(--motion-enter-panel)')
     expect(panelStyles).toContain('panel-border-breathe')
     expect(panelStyles).toContain('.screen-grid > .panel:nth-child(2)')
     expect(panelStyles).toContain('prefers-reduced-motion: reduce')

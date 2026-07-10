@@ -1,0 +1,28 @@
+@keyframes instrument-energy-pulse {
+  0%, 100% { opacity: 0.34; filter: brightness(0.92); }
+  46% { opacity: 0.82; filter: brightness(1.18); }
+}
+
+@keyframes instrument-background-scan {
+  0% { opacity: 0; transform: translate3d(0, -115%, 0); }
+  12%, 72% { opacity: 0.22; }
+  100% { opacity: 0; transform: translate3d(0, 115%, 0); }
+}
+
+@keyframes instrument-orbit-sweep {
+  from { transform: translateX(-50%) perspective(14rem) rotateX(66deg) rotateZ(0deg); }
+  to { transform: translateX(-50%) perspective(14rem) rotateX(66deg) rotateZ(360deg); }
+}
+
+@keyframes instrument-data-scan {
+  0% { opacity: 0; transform: translate3d(0, -120%, 0); }
+  16%, 68% { opacity: 0.34; }
+  100% { opacity: 0; transform: translate3d(0, 120%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-frame *,
+  .config-workbench * {
+    scroll-behavior: auto;
+  }
+}
