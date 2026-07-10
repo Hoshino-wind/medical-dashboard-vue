@@ -26,6 +26,7 @@ interface TerminalSeries {
 
 interface LineOption {
   animationDuration: number
+  grid: { left: number; right: number }
   series: TerminalSeries[]
 }
 
@@ -122,6 +123,8 @@ describe('LineAreaChart', () => {
     expect(option.series[1].itemStyle?.shadowColor).toBe(
       themes[1].variables['--data-maintenance-line'],
     )
+    expect(option.grid.left).toBeGreaterThanOrEqual(64)
+    expect(option.grid.right).toBeGreaterThanOrEqual(40)
     expect(chart.props('ariaLabel')).toContain('保养统计')
   })
 

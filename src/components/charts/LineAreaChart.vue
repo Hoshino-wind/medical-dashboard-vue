@@ -79,7 +79,7 @@ const option = computed(() => {
     color: [lineColor],
     animationDuration: 1000,
     animationEasing: 'cubicOut',
-    grid: { left: 54, right: 24, top: 18, bottom: 28 },
+    grid: { left: 72, right: 48, top: 18, bottom: 28 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
