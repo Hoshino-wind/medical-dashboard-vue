@@ -5,6 +5,7 @@ import {
   BAR_ANIMATION_DURATION,
   createColumnBasePoint,
   createBaseCuboidGeometry,
+  findPeakSeriesIndex,
   interpolateBarValue,
 } from '../cubeBarGeometry'
 
@@ -46,5 +47,10 @@ describe('cube bar geometry', () => {
 
   it('uses a slower opening animation duration', () => {
     expect(BAR_ANIMATION_DURATION).toBeGreaterThanOrEqual(2400)
+  })
+
+  it('finds the peak series index and reports an empty collection', () => {
+    expect(findPeakSeriesIndex([4, 12, 8])).toBe(1)
+    expect(findPeakSeriesIndex([])).toBe(-1)
   })
 })

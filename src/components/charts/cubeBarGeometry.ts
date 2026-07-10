@@ -72,6 +72,11 @@ export function createColumnBasePoint({
   return [categoryX + slant * COLUMN_BASE_X_RATIO, axisY - depth * COLUMN_BASE_Y_RATIO]
 }
 
+export function findPeakSeriesIndex(values: number[]): number {
+  if (values.length === 0) return -1
+  return values.reduce((peak, value, index) => (value > values[peak] ? index : peak), 0)
+}
+
 function easeInOutCubic(progress: number): number {
   const clamped = Math.min(1, Math.max(0, progress))
   if (clamped < 0.5) return 4 * clamped * clamped * clamped

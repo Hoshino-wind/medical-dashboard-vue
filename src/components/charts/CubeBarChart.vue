@@ -12,6 +12,7 @@ import {
   BAR_ANIMATION_DURATION,
   createColumnBasePoint,
   createBaseCuboidGeometry,
+  findPeakSeriesIndex,
   interpolateBarValue,
 } from './cubeBarGeometry'
 
@@ -130,6 +131,11 @@ const props = defineProps<{
   data: BarChartData
   theme: Theme
 }>()
+
+const peakSeriesIndex = computed(() => {
+  const totals = props.data.series.map((item) => item.data.reduce((sum, value) => sum + value, 0))
+  return findPeakSeriesIndex(totals)
+})
 
 const animationProgress = ref(0)
 let animationFrame = 0
@@ -409,6 +415,7 @@ const option = computed(() => {
             const columnX = columnBase[0]
             const tone = resolveTone(seriesIndex)
             const fills = columnFills(tone)
+            const isPeakSeries = seriesIndex === peakSeriesIndex.value
 
             if (seriesValue <= 0) {
               // 值为 0 时不渲染任何底图/占位，直接跳过
@@ -444,6 +451,12 @@ const option = computed(() => {
                   fill: fills.top,
                   stroke: colorWithAlpha(tone.accent, 0.72),
                   lineWidth: 1,
+                  ...(isPeakSeries
+                    ? {
+                        shadowBlur: isLight ? 5 : 10,
+                        shadowColor: colorWithAlpha(tone.accent, isLight ? 0.2 : 0.42),
+                      }
+                    : {}),
                 },
               },
               {
@@ -517,7 +530,8 @@ const option = computed(() => {
 </script>
 
 <template>
-  <div class="cube-bar-chart">
+  <div class="cube-bar-chart" :data-peak-series="peakSeriesIndex">
+    <span class="cube-bar-ground-scan" aria-hidden="true"></span>
     <div class="cube-bar-legend" aria-hidden="true">
       <span v-for="item in legendItems" :key="item.name" :style="item.textStyle">
         <i :style="item.swatchStyle"></i>{{ item.name }}

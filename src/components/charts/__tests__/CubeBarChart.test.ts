@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -15,7 +16,13 @@ interface CustomChartSeries {
       coord: (value: number[]) => number[]
       size: (value: number[]) => number[]
     },
-  ) => { children: Array<{ type: string; shape?: { x?: number } }> }
+  ) => {
+    children: Array<{
+      type: string
+      shape?: { x?: number }
+      style?: { shadowBlur?: number; shadowColor?: string }
+    }>
+  }
 }
 
 interface CustomChartOption {
@@ -36,6 +43,8 @@ const EChartStub = {
   props: ['option', 'height'],
   template: '<div data-test="echart"></div>',
 }
+
+const chartStyles = readFileSync('src/styles/charts.css', 'utf8')
 
 describe('CubeBarChart', () => {
   beforeEach(() => {
@@ -127,9 +136,73 @@ describe('CubeBarChart', () => {
     )
     const columnBodies = rendered.children.filter((child) => child.type === 'GlassColumnLeft')
     const columnXs = columnBodies.map((child) => child.shape?.x)
+    const columnTops = rendered.children.filter((child) => child.type === 'GlassColumnTop')
 
     expect(columnBodies).toHaveLength(3)
     expect(new Set(columnXs).size).toBe(3)
+    expect(columnTops[0].style?.shadowBlur ?? 0).toBeGreaterThan(0)
+    expect(columnTops[0].style?.shadowColor).toBeTruthy()
+    expect(columnTops.slice(1).every((child) => child.style?.shadowBlur === undefined)).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('exposes the highest aggregate warranty series after the opening animation', async () => {
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: chartData,
+        theme: themes[1],
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    await finishAnimation()
+
+    expect(wrapper.find('.cube-bar-chart').attributes('data-peak-series')).toBe('0')
+
+    wrapper.unmount()
+  })
+
+  it('keeps a persistent decorative perspective scan beneath the interactive chart', async () => {
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: chartData,
+        theme: themes[1],
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    await finishAnimation()
+
+    const groundScan = wrapper.find('.cube-bar-ground-scan')
+    const groundScanBlock = chartStyles.match(/\.cube-bar-ground-scan\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const groundScanAfterBlock =
+      chartStyles.match(/\.cube-bar-ground-scan::after\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const groundScanReducedMotionBlock =
+      chartStyles.match(
+        /@media \(prefers-reduced-motion: reduce\) \{\s*\.cube-bar-ground-scan::after\s*\{[\s\S]*?\n\s*\}\s*\}/,
+      )?.[0] ?? ''
+    const chartBarBlock = chartStyles.match(/\.chart-bar\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+
+    expect(groundScan.exists()).toBe(true)
+    expect(groundScan.attributes('aria-hidden')).toBe('true')
+    expect(groundScanBlock).toContain('z-index: 0')
+    expect(groundScanBlock).toContain('pointer-events: none')
+    expect(groundScanBlock).toContain('perspective(')
+    expect(groundScanBlock).toContain('var(--instrument-structure)')
+    expect(groundScanAfterBlock).toContain('var(--instrument-core)')
+    expect(groundScanAfterBlock).toContain('var(--motion-loop-background)')
+    expect(chartBarBlock).toContain('z-index: 1')
+    expect(`${groundScanBlock}\n${groundScanAfterBlock}`).not.toMatch(/#[\da-f]{3,8}|rgba?\(/i)
+    expect(groundScanReducedMotionBlock).toContain('animation: none')
 
     wrapper.unmount()
   })
