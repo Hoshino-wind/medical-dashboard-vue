@@ -18,7 +18,6 @@ describe('holographic instrument visual system', () => {
     expect(tokens).toContain('--instrument-reflection: var(--chart-tertiary)')
     expect(tokens).toContain('--motion-loop-panel: 10.8s')
     expect(tokens).toContain('--motion-loop-instrument: 7.2s')
-    expect(tokens).toContain('--motion-loop-spine: 12.8s')
     expect(motion).toContain('@keyframes instrument-energy-pulse')
     expect(motion).toContain('@keyframes instrument-background-scan')
     expect(loopingConsumers).toContain('infinite')
@@ -41,11 +40,11 @@ describe('holographic instrument visual system', () => {
     expect(panel).not.toContain("[data-theme-mode='light'] .panel-border-flow {\n  display: none;")
   })
 
-  it('uses a central energy spine and gives the work-order column the 824px instrument width', () => {
+  it('omits the central energy spine and keeps the work-order column at 824px', () => {
     const layout = read('styles/layout.css')
     const panel = read('styles/panel.css')
 
-    expect(layout).toContain('.screen-energy-spine')
+    expect(layout).not.toContain('.screen-energy-spine')
     expect(layout).toContain('animation: instrument-background-scan')
     expect(layout).toContain(
       'grid-template-columns: minmax(0, 31.25rem) minmax(0, 51.5rem) minmax(0, 31.25rem)',

@@ -409,41 +409,11 @@
   gap: 0.25rem 0.75rem;
 }
 
-.inspection-order-grid::after,
-.health-status-grid::after {
-  content: '';
-  position: absolute;
-  top: 0.5rem;
-  bottom: 3rem;
-  left: var(--module-list-width, 64%);
-  width: 0.125rem;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    color-mix(in srgb, var(--instrument-core) 24%, transparent) 16%,
-    color-mix(in srgb, var(--instrument-core) 82%, transparent) 50%,
-    color-mix(in srgb, var(--instrument-core) 24%, transparent) 84%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 0.24rem color-mix(in srgb, var(--instrument-core) 58%, transparent),
-    0 0 0.82rem color-mix(in srgb, var(--instrument-core) 26%, transparent);
-  transform: translateX(-50%);
-  animation: instrument-energy-pulse var(--motion-loop-status) ease-in-out infinite;
-  animation-delay: var(--motion-phase);
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .overview-stat-frame::after {
     left: 58%;
     animation: none;
     opacity: 0.4;
-  }
-
-  .inspection-order-grid::after,
-  .health-status-grid::after {
-    animation: none;
   }
 }
 

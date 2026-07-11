@@ -131,14 +131,8 @@ describe('work order style panels', () => {
     expect(moduleStyles).toContain('--data-health-pie-repairing')
     expect(moduleStyles).toContain('--data-health-pie-pending')
 
-    const separatorRule =
-      moduleStyles.match(
-        /\.inspection-order-grid::after,\s*\.health-status-grid::after\s*\{[\s\S]*?\n\}/,
-      )?.[0] ?? ''
-    expect(separatorRule).toContain('box-shadow:')
-    expect(moduleStyles).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.inspection-order-grid::after/,
-    )
+    expect(moduleStyles).not.toContain('.inspection-order-grid::after')
+    expect(moduleStyles).not.toContain('.health-status-grid::after')
   })
 
   it('does not render a stale static summary below repair orders', () => {
