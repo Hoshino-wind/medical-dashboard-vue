@@ -112,7 +112,7 @@ describe('work order style panels', () => {
     ).toEqual({ data: dashboardData.maintenanceOrders, theme, variant: 'maintenance' })
   })
 
-  it('uses status tone variables for bottom summary numbers', () => {
+  it('uses status tone variables and a breathing divider for completion orders', () => {
     const moduleStyles = readFileSync(join(testDir, '../styles/modules.css'), 'utf8')
 
     expect(moduleStyles).toContain('--status-tone')
@@ -133,6 +133,12 @@ describe('work order style panels', () => {
 
     expect(moduleStyles).not.toContain('.inspection-order-grid::after')
     expect(moduleStyles).not.toContain('.health-status-grid::after')
+    expect(moduleStyles).toContain('.pie-summary-panel::before')
+    expect(moduleStyles).toContain('.pie-summary-panel::after')
+    expect(moduleStyles).toContain('@keyframes completion-divider-breathe')
+    expect(moduleStyles).toContain(
+      'animation: completion-divider-breathe var(--motion-loop-status) ease-in-out infinite',
+    )
   })
 
   it('does not render a stale static summary below repair orders', () => {
