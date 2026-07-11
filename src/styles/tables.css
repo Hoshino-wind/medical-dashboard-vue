@@ -42,7 +42,7 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: calc(0.7rem * var(--dashboard-list-font-scale, 1.18));
+  font-size: calc(0.85rem * var(--dashboard-list-font-scale, 1.18));
   line-height: 1.28;
   table-layout: fixed;
 }
@@ -129,7 +129,7 @@
   height: auto;
   padding: 0;
   border-radius: 0;
-  font-size: calc(0.6875rem * var(--dashboard-list-font-scale, 1.18));
+  font-size: calc(0.85rem * var(--dashboard-list-font-scale, 1.18));
   font-weight: 900;
 }
 
@@ -210,7 +210,7 @@
   height: 1.18rem;
   align-items: center;
   color: color-mix(in srgb, var(--status-tone, var(--chart-primary)) 50%, var(--muted) 50%);
-  font-size: calc(0.66rem * var(--dashboard-font-scale, 1.45));
+  font-size: calc(0.69rem * var(--dashboard-font-scale, 1.45));
   font-style: normal;
   font-weight: 850;
   line-height: 1;

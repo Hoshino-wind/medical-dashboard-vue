@@ -84,9 +84,13 @@ async function toggleFullscreen() {
 }
 
 function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && isFauxFullscreen.value) {
-    isFauxFullscreen.value = false
-    syncFullscreenState()
+  if (event.key === 'Escape') {
+    if (isFauxFullscreen.value) {
+      isFauxFullscreen.value = false
+      syncFullscreenState()
+    } else if (typeof document !== 'undefined' && document.fullscreenElement) {
+      void document.exitFullscreen?.()
+    }
   }
 }
 
@@ -132,7 +136,7 @@ onBeforeUnmount(() => {
         <div v-else class="screen-grid-empty" aria-hidden="true"></div>
       </template>
     </section>
-    <div class="screen-actions" aria-label="大屏快捷操作">
+    <div v-if="!isFullscreen" class="screen-actions" aria-label="大屏快捷操作">
       <button
         v-for="action in screenActions"
         :key="action.label"
