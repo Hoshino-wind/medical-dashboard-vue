@@ -71,6 +71,245 @@
     inset 0 0 1.15rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent);
 }
 
+.panel-mecha-frame {
+  --panel-mecha-trace-opacity-low: 0.32;
+  --panel-mecha-trace-opacity-high: 0.65;
+  --panel-mecha-corner-opacity-low: 0.62;
+  --panel-mecha-corner-opacity-high: 0.86;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.panel-mecha-frame *,
+.panel-mecha-frame *::before,
+.panel-mecha-frame *::after {
+  pointer-events: none;
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel-mecha-frame {
+  display: block;
+}
+
+.panel-mecha-rail {
+  --panel-mecha-trace-x-start: 0%;
+  --panel-mecha-trace-y-start: 0%;
+  --panel-mecha-trace-x-end: 0%;
+  --panel-mecha-trace-y-end: 0%;
+  --panel-mecha-trace-x-static: 0%;
+  --panel-mecha-trace-y-static: 0%;
+  position: absolute;
+  display: block;
+}
+
+.panel-mecha-rail--top,
+.panel-mecha-rail--bottom {
+  --panel-mecha-trace-x-start: -200%;
+  --panel-mecha-trace-x-end: 780%;
+  --panel-mecha-trace-x-static: 360%;
+  right: 0;
+  left: 0;
+  height: 0.3125rem;
+  background:
+    linear-gradient(
+        90deg,
+        transparent 0 38%,
+        var(--panel-frame-highlight) 38% 62%,
+        transparent 62% 100%
+      )
+      0 0 / 100% 0.125rem no-repeat,
+    linear-gradient(
+        90deg,
+        transparent 0 11%,
+        var(--panel-frame-highlight) 11% 33%,
+        transparent 33% 38%,
+        var(--panel-frame-rim) 38% 62%,
+        transparent 62% 67%,
+        var(--panel-frame-highlight) 67% 89%,
+        transparent 89% 100%
+      )
+      0 0 / 100% 0.0625rem no-repeat,
+    linear-gradient(
+        90deg,
+        transparent 0 11%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 11% 33%,
+        transparent 33% 38%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 38% 62%,
+        transparent 62% 67%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 67% 89%,
+        transparent 89% 100%
+      )
+      0 0.0625rem / 100% 0.1875rem no-repeat,
+    linear-gradient(
+        90deg,
+        transparent 0 11%,
+        var(--panel-frame-rim) 11% 33%,
+        transparent 33% 38%,
+        var(--panel-frame-highlight) 38% 62%,
+        transparent 62% 67%,
+        var(--panel-frame-rim) 67% 89%,
+        transparent 89% 100%
+      )
+      0 0.25rem / 100% 0.0625rem no-repeat;
+}
+
+.panel-mecha-rail--top {
+  top: 0;
+}
+
+.panel-mecha-rail--bottom {
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
+.panel-mecha-rail--right,
+.panel-mecha-rail--left {
+  --panel-mecha-trace-y-start: -200%;
+  --panel-mecha-trace-y-end: 780%;
+  --panel-mecha-trace-y-static: 360%;
+  top: 0;
+  bottom: 0;
+  width: 0.3125rem;
+  background:
+    linear-gradient(
+        180deg,
+        transparent 0 38%,
+        var(--panel-frame-highlight) 38% 62%,
+        transparent 62% 100%
+      )
+      0 0 / 0.125rem 100% no-repeat,
+    linear-gradient(
+        180deg,
+        transparent 0 11%,
+        var(--panel-frame-highlight) 11% 33%,
+        transparent 33% 38%,
+        var(--panel-frame-rim) 38% 62%,
+        transparent 62% 67%,
+        var(--panel-frame-highlight) 67% 89%,
+        transparent 89% 100%
+      )
+      0 0 / 0.0625rem 100% no-repeat,
+    linear-gradient(
+        180deg,
+        transparent 0 11%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 11% 33%,
+        transparent 33% 38%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 38% 62%,
+        transparent 62% 67%,
+        color-mix(in srgb, var(--panel-frame-depth) 92%, transparent) 67% 89%,
+        transparent 89% 100%
+      )
+      0.0625rem 0 / 0.1875rem 100% no-repeat,
+    linear-gradient(
+        180deg,
+        transparent 0 11%,
+        var(--panel-frame-rim) 11% 33%,
+        transparent 33% 38%,
+        var(--panel-frame-highlight) 38% 62%,
+        transparent 62% 67%,
+        var(--panel-frame-rim) 67% 89%,
+        transparent 89% 100%
+      )
+      0.25rem 0 / 0.0625rem 100% no-repeat;
+}
+
+.panel-mecha-rail--right {
+  right: 0;
+  transform: rotate(180deg);
+}
+
+.panel-mecha-rail--left {
+  left: 0;
+}
+
+.panel-mecha-rail::after {
+  content: '';
+  position: absolute;
+  background: radial-gradient(
+    ellipse at center,
+    var(--panel-frame-highlight) 0,
+    color-mix(in srgb, var(--chart-primary) 78%, transparent) 42%,
+    transparent 76%
+  );
+  opacity: var(--panel-mecha-trace-opacity-low);
+  filter: drop-shadow(0 0 0.22rem var(--chart-primary));
+  transform: translate3d(var(--panel-mecha-trace-x-start), var(--panel-mecha-trace-y-start), 0);
+  animation: panel-mecha-trace-sweep var(--motion-loop-panel) linear infinite;
+  animation-delay: var(--motion-phase);
+}
+
+.panel-mecha-rail--top::after,
+.panel-mecha-rail--bottom::after {
+  top: 0;
+  left: 11%;
+  width: 9%;
+  height: 100%;
+}
+
+.panel-mecha-rail--right::after,
+.panel-mecha-rail--left::after {
+  top: 11%;
+  left: 0;
+  width: 100%;
+  height: 9%;
+}
+
+.panel-mecha-corner {
+  position: absolute;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(
+    135deg,
+    var(--panel-frame-highlight) 0 7%,
+    var(--panel-frame-rim) 7% 11%,
+    color-mix(in srgb, var(--panel-frame-depth) 96%, transparent) 11% 19%,
+    color-mix(in srgb, var(--panel-frame-rim) 66%, transparent) 19% 23%,
+    transparent 23% 100%
+  );
+  opacity: var(--panel-mecha-corner-opacity-high);
+  filter: drop-shadow(0 0 0.28rem color-mix(in srgb, var(--chart-primary) 54%, transparent));
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 0.3125rem,
+    1rem 0.3125rem,
+    0.625rem 0.625rem,
+    0.3125rem 1rem,
+    0.3125rem 100%,
+    0 100%
+  );
+  animation: panel-mecha-corner-breathe 5.6s ease-in-out infinite;
+  animation-delay: var(--motion-phase);
+}
+
+.panel-mecha-corner--top-left {
+  top: 0;
+  left: 0;
+}
+
+.panel-mecha-corner--top-right {
+  top: 0;
+  right: 0;
+  transform: rotate(90deg);
+}
+
+.panel-mecha-corner--bottom-right {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
+.panel-mecha-corner--bottom-left {
+  bottom: 0;
+  left: 0;
+  transform: rotate(270deg);
+}
+
 .screen-frame[data-panel-border='borderless'] .panel {
   border-color: transparent;
   box-shadow: inset 0 0 1.35rem color-mix(in srgb, var(--panel-title-primary) 7%, transparent);
@@ -95,9 +334,9 @@
 }
 
 .screen-frame[data-panel-border='stereoscopic'] .panel {
-  border-color: color-mix(in srgb, var(--panel-frame-rim) 88%, transparent);
+  border-color: color-mix(in srgb, var(--panel-frame-highlight) 92%, transparent);
   box-shadow:
-    inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 28%, transparent),
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 42%, transparent),
     inset 0.22rem 0.22rem 0.7rem color-mix(in srgb, var(--instrument-rim) 5%, transparent),
     inset -0.28rem -0.32rem 0.78rem color-mix(in srgb, var(--panel-frame-depth) 58%, transparent),
     0 0 0 0.0625rem color-mix(in srgb, var(--chart-primary) 32%, transparent),
@@ -106,11 +345,12 @@
 }
 
 .screen-frame[data-panel-border='stereoscopic'] .panel::before {
-  inset: 0.22rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--panel-frame-rim) 42%, transparent);
+  inset: 0.3125rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--panel-frame-rim) 72%, transparent);
   border-radius: 0.28rem;
   box-shadow:
-    inset 0.0625rem 0.0625rem 0 color-mix(in srgb, var(--panel-frame-highlight) 38%, transparent),
+    0 0 0 0.1875rem color-mix(in srgb, var(--panel-frame-depth) 82%, transparent),
+    inset 0.0625rem 0.0625rem 0 color-mix(in srgb, var(--panel-frame-highlight) 46%, transparent),
     inset -0.0625rem -0.0625rem 0 color-mix(in srgb, var(--panel-frame-depth) 72%, transparent),
     0 0 0.75rem color-mix(in srgb, var(--chart-primary) 12%, transparent);
 }
@@ -119,7 +359,7 @@
   content: '';
   position: absolute;
   z-index: 2;
-  inset: 0.42rem;
+  inset: 0.5rem;
   pointer-events: none;
   border-right: 0.125rem solid color-mix(in srgb, var(--panel-frame-depth) 76%, transparent);
   border-bottom: 0.125rem solid color-mix(in srgb, var(--panel-frame-depth) 76%, transparent);
@@ -131,13 +371,7 @@
 }
 
 .screen-frame[data-panel-border='stereoscopic'] .panel-corners {
-  inset: 0.12rem;
-  background:
-    linear-gradient(var(--panel-frame-highlight), var(--panel-frame-highlight)) left top / 1.22rem 0.125rem no-repeat,
-    linear-gradient(var(--panel-frame-highlight), var(--panel-frame-highlight)) left top / 0.125rem 1.22rem no-repeat,
-    linear-gradient(var(--panel-frame-rim), var(--panel-frame-rim)) right bottom / 1.22rem 0.125rem no-repeat,
-    linear-gradient(var(--panel-frame-rim), var(--panel-frame-rim)) right bottom / 0.125rem 1.22rem no-repeat;
-  opacity: 1;
+  opacity: 0;
 }
 
 .screen-grid > .panel:hover {
@@ -248,6 +482,11 @@
   animation-delay: var(--motion-phase), calc(var(--motion-phase) - 0.8s);
 }
 
+.screen-frame[data-panel-border='stereoscopic'] .panel-border-flow {
+  animation: none;
+  opacity: 0;
+}
+
 .panel-corners {
   position: absolute;
   z-index: 2;
@@ -293,6 +532,39 @@
   50% {
     opacity: var(--panel-flow-opacity-high);
     filter: brightness(1.18);
+  }
+}
+
+@keyframes panel-mecha-trace-sweep {
+  0%,
+  8% {
+    opacity: var(--panel-mecha-trace-opacity-low);
+    transform: translate3d(var(--panel-mecha-trace-x-start), var(--panel-mecha-trace-y-start), 0);
+  }
+
+  50% {
+    opacity: var(--panel-mecha-trace-opacity-high);
+  }
+
+  92%,
+  100% {
+    opacity: var(--panel-mecha-trace-opacity-low);
+    transform: translate3d(var(--panel-mecha-trace-x-end), var(--panel-mecha-trace-y-end), 0);
+  }
+}
+
+@keyframes panel-mecha-corner-breathe {
+  0%,
+  100% {
+    opacity: var(--panel-mecha-corner-opacity-low);
+    filter: drop-shadow(0 0 0.2rem color-mix(in srgb, var(--chart-primary) 42%, transparent))
+      brightness(0.92);
+  }
+
+  50% {
+    opacity: var(--panel-mecha-corner-opacity-high);
+    filter: drop-shadow(0 0 0.32rem color-mix(in srgb, var(--chart-primary) 58%, transparent))
+      brightness(1.08);
   }
 }
 
@@ -438,6 +710,51 @@
   opacity: 0.72;
 }
 
+.screen-frame[data-panel-border='stereoscopic'] .panel-title-plate {
+  border-color: color-mix(in srgb, var(--panel-frame-rim) 78%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--panel-frame-highlight) 18%, transparent),
+      color-mix(in srgb, var(--panel-frame-depth) 18%, transparent) 52%,
+      transparent 54%
+    ),
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--chart-primary) 28%, var(--surface-strong)) 18% 82%,
+      transparent
+    );
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--panel-frame-highlight) 62%, transparent),
+    inset 0 -0.125rem 0 color-mix(in srgb, var(--panel-frame-depth) 68%, transparent),
+    0 0.125rem 0 color-mix(in srgb, var(--panel-frame-depth) 72%, transparent),
+    0 0 0.8rem color-mix(in srgb, var(--chart-primary) 18%, transparent);
+  clip-path: polygon(
+    0.625rem 0,
+    calc(100% - 0.625rem) 0,
+    100% 50%,
+    calc(100% - 0.625rem) 100%,
+    0.625rem 100%,
+    0 50%
+  );
+}
+
+.screen-frame[data-panel-border='stereoscopic'] .panel-title-plate::after {
+  right: 18%;
+  left: 18%;
+  height: 0.125rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--panel-frame-rim) 18% 34%,
+    var(--panel-frame-highlight) 34% 66%,
+    var(--panel-frame-rim) 66% 82%,
+    transparent
+  );
+  box-shadow: 0 0 0.45rem color-mix(in srgb, var(--chart-primary) 72%, transparent);
+}
+
 .panel-title-text {
   position: relative;
   z-index: 1;
@@ -533,6 +850,17 @@
   .panel-border-flow {
     animation: none;
     opacity: 0.72;
+  }
+
+  .panel-mecha-rail::after {
+    animation: none;
+    opacity: var(--panel-mecha-trace-opacity-low);
+    transform: translate3d(var(--panel-mecha-trace-x-static), var(--panel-mecha-trace-y-static), 0);
+  }
+
+  .panel-mecha-corner {
+    animation: none;
+    opacity: var(--panel-mecha-corner-opacity-low);
   }
 
   .panel-title-mini-bars i {
@@ -658,6 +986,9 @@
 .dashboard-shell[data-theme-mode='light']
   .screen-frame[data-panel-border='stereoscopic']
   .panel {
+  --panel-frame-rim: color-mix(in srgb, var(--accent) 30%, var(--border) 70%);
+  --panel-frame-depth: color-mix(in srgb, var(--border-strong) 72%, var(--bg) 28%);
+  --panel-frame-highlight: color-mix(in srgb, var(--instrument-rim) 76%, var(--surface-strong) 24%);
   border-color: color-mix(in srgb, var(--panel-frame-rim) 62%, var(--border) 38%);
   box-shadow:
     inset 0 0 0 0.0625rem color-mix(in srgb, var(--panel-frame-highlight) 42%, transparent),
@@ -672,7 +1003,48 @@
   .screen-frame[data-panel-border='stereoscopic']
   .panel::before {
   box-shadow:
-    inset 0.0625rem 0.0625rem 0 rgba(255, 255, 255, 0.82),
+    0 0 0 0.1875rem color-mix(in srgb, var(--panel-frame-depth) 48%, transparent),
+    inset 0.0625rem 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 82%, transparent),
     inset -0.0625rem -0.0625rem 0 color-mix(in srgb, var(--panel-frame-depth) 52%, transparent),
     0 0 0.75rem color-mix(in srgb, var(--chart-primary) 10%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='stereoscopic']
+  .panel-mecha-frame {
+  --panel-mecha-trace-opacity-low: 0.28;
+  --panel-mecha-trace-opacity-high: 0.42;
+  --panel-mecha-corner-opacity-low: 0.28;
+  --panel-mecha-corner-opacity-high: 0.4;
+  mix-blend-mode: normal;
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='stereoscopic']
+  .panel-border-flow {
+  animation: none;
+  opacity: 0;
+}
+
+.dashboard-shell[data-theme-mode='light']
+  .screen-frame[data-panel-border='stereoscopic']
+  .panel-title-plate {
+  border-color: color-mix(in srgb, var(--panel-frame-rim) 72%, var(--border) 28%);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--instrument-rim) 82%, transparent),
+      transparent 48%
+    ),
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--panel-frame-rim) 12%, var(--surface-strong)) 18% 82%,
+      transparent
+    );
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 88%, transparent),
+    inset 0 -0.125rem 0 color-mix(in srgb, var(--panel-frame-depth) 42%, transparent),
+    0 0.125rem 0 color-mix(in srgb, var(--panel-frame-depth) 36%, transparent),
+    0 0.2rem 0.55rem color-mix(in srgb, var(--panel-frame-depth) 14%, transparent);
 }

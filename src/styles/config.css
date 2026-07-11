@@ -756,22 +756,104 @@
 }
 
 .panel-border-preview--stereoscopic {
-  border: 0.0625rem solid var(--instrument-edge-outer);
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--instrument-rim) 74%, var(--instrument-edge-outer));
+  border-radius: 0;
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--instrument-rim) 10%, transparent),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--surface-strong) 74%, var(--bg) 26%),
+      color-mix(in srgb, var(--surface) 58%, var(--bg) 42%)
+    );
   box-shadow:
-    inset 0 0 0 0.125rem color-mix(in srgb, var(--instrument-structure) 16%, transparent),
-    inset 0 0 0.9rem color-mix(in srgb, var(--instrument-structure) 22%, transparent);
+    inset 0 0 0 0.1875rem color-mix(in srgb, var(--instrument-edge-outer) 82%, transparent),
+    inset 0.2rem 0.2rem 0.45rem color-mix(in srgb, var(--instrument-rim) 8%, transparent),
+    inset -0.24rem -0.24rem 0.52rem color-mix(in srgb, var(--bg) 72%, transparent),
+    0 0 0.42rem color-mix(in srgb, var(--instrument-structure) 24%, transparent);
+  clip-path: polygon(
+    0.625rem 0,
+    calc(100% - 0.625rem) 0,
+    100% 0.625rem,
+    100% calc(100% - 0.625rem),
+    calc(100% - 0.625rem) 100%,
+    0.625rem 100%,
+    0 calc(100% - 0.625rem),
+    0 0.625rem
+  );
 }
 
 .panel-border-preview--stereoscopic::before {
-  inset: 0.25rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--instrument-structure-bright) 62%, transparent);
-  clip-path: polygon(0 0, 34% 0, 34% 8%, 8% 8%, 8% 34%, 0 34%, 0 100%, 100% 100%, 100% 0);
+  inset: 0.3125rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--instrument-structure-bright) 58%, transparent);
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  box-shadow:
+    inset 0.0625rem 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 34%, transparent),
+    inset -0.125rem -0.125rem 0 color-mix(in srgb, var(--instrument-edge-outer) 72%, transparent);
+  clip-path: polygon(
+    0.3125rem 0,
+    calc(100% - 0.3125rem) 0,
+    100% 0.3125rem,
+    100% calc(100% - 0.3125rem),
+    calc(100% - 0.3125rem) 100%,
+    0.3125rem 100%,
+    0 calc(100% - 0.3125rem),
+    0 0.3125rem
+  );
 }
 
 .panel-border-preview--stereoscopic::after {
-  inset: 0.45rem;
-  border-right: 0.125rem solid color-mix(in srgb, var(--instrument-core) 58%, transparent);
-  border-bottom: 0.125rem solid color-mix(in srgb, var(--instrument-core) 58%, transparent);
+  inset: 0.125rem;
+  background:
+    linear-gradient(var(--instrument-rim), var(--instrument-rim)) top center / 24% 0.125rem
+      no-repeat,
+    linear-gradient(var(--instrument-core), var(--instrument-core)) bottom center / 24% 0.125rem
+      no-repeat,
+    linear-gradient(
+        90deg,
+        transparent 0 11%,
+        var(--instrument-structure-bright) 11% 33%,
+        transparent 33% 67%,
+        var(--instrument-structure-bright) 67% 89%,
+        transparent 89% 100%
+      )
+      top / 100% 0.0625rem no-repeat,
+    linear-gradient(
+        90deg,
+        transparent 0 11%,
+        var(--instrument-structure) 11% 33%,
+        transparent 33% 67%,
+        var(--instrument-structure) 67% 89%,
+        transparent 89% 100%
+      )
+      bottom / 100% 0.0625rem no-repeat,
+    linear-gradient(
+        180deg,
+        transparent 0 11%,
+        var(--instrument-structure-bright) 11% 33%,
+        transparent 33% 38%,
+        var(--instrument-rim) 38% 62%,
+        transparent 62% 67%,
+        var(--instrument-structure-bright) 67% 89%,
+        transparent 89% 100%
+      )
+      left / 0.0625rem 100% no-repeat,
+    linear-gradient(
+        180deg,
+        transparent 0 11%,
+        var(--instrument-structure) 11% 33%,
+        transparent 33% 38%,
+        var(--instrument-core) 38% 62%,
+        transparent 62% 67%,
+        var(--instrument-structure) 67% 89%,
+        transparent 89% 100%
+      )
+      right / 0.0625rem 100% no-repeat;
+  filter: drop-shadow(0 0 0.24rem color-mix(in srgb, var(--instrument-core) 54%, transparent));
 }
 
 .layout-choice-preview {

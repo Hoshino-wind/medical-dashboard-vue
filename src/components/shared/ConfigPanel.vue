@@ -470,7 +470,7 @@ onBeforeUnmount(() => {
                   class="panel-border-preview panel-border-preview--stereoscopic"
                   aria-hidden="true"
                 ></span>
-                <span>立体框架</span>
+                <span>机甲立体框</span>
               </label>
             </fieldset>
 
