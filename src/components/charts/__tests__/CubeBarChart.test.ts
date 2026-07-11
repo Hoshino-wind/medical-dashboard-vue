@@ -19,6 +19,10 @@ interface CustomChartSeries {
 }
 
 interface CustomChartOption {
+  yAxis: {
+    max: number
+    interval: number
+  }
   series: CustomChartSeries[]
 }
 
@@ -130,6 +134,35 @@ describe('CubeBarChart', () => {
 
     expect(columnBodies).toHaveLength(3)
     expect(new Set(columnXs).size).toBe(3)
+
+    wrapper.unmount()
+  })
+
+  it('scales the y axis to the warranty data maximum with compact headroom', () => {
+    const warrantyAxisData: BarChartData = {
+      labels: ['2025-07', '2025-08'],
+      series: [
+        { name: '全保', data: [23, 11] },
+        { name: '技保', data: [10, 48] },
+        { name: '厂保', data: [12, 36] },
+      ],
+    }
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: warrantyAxisData,
+        theme: themes[1],
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    const option = wrapper.findComponent(EChartStub).props('option') as CustomChartOption
+
+    expect(option.yAxis.max).toBe(60)
+    expect(option.yAxis.interval).toBe(20)
 
     wrapper.unmount()
   })

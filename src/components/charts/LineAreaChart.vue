@@ -4,6 +4,7 @@ import EChart from './EChart.vue'
 import type { LineChartData } from '@/types/dashboard'
 import type { Theme, ThemeVariables } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
+import { resolveChartAxisRange } from '@/utils/chartAxis'
 import { chartFontSize } from '@/utils/fontScale'
 import { colorWithAlpha } from '@/utils/themeColor'
 
@@ -48,8 +49,7 @@ const option = computed(() => {
         { offset: 0.55, color: colorWithAlpha(lineColor, 0.32) },
         { offset: 1, color: colorWithAlpha(lineColor, 0) },
       ]
-  const yMax = props.variant === 'inspection' ? 50000 : 12000
-  const yInterval = props.variant === 'inspection' ? 10000 : 4000
+  const yAxisRange = resolveChartAxisRange(Math.max(0, ...props.data.data))
 
   return {
     color: [lineColor],
@@ -60,15 +60,15 @@ const option = computed(() => {
       type: 'category',
       boundaryGap: false,
       data: props.data.labels,
-      axisLabel: { color: muted, fontSize: chartFontSize(11), fontWeight: 800 },
+      axisLabel: { color: muted, fontSize: chartFontSize(9), fontWeight: 800 },
       axisLine: { lineStyle: { color: grid } },
       axisTick: { show: false },
     },
     yAxis: {
       type: 'value',
-      max: yMax,
-      interval: yInterval,
-      axisLabel: { color: muted, fontSize: chartFontSize(11), fontWeight: 800 },
+      max: yAxisRange.max,
+      interval: yAxisRange.interval,
+      axisLabel: { color: muted, fontSize: chartFontSize(9), fontWeight: 800 },
       splitLine: { lineStyle: { color: grid, width: 1, type: 'dashed' } },
     },
     series: [
@@ -106,7 +106,7 @@ const option = computed(() => {
       borderColor: colorWithAlpha(lineColor, isLight ? 0.36 : 0.8),
       borderWidth: 1,
       padding: [8, 12],
-      textStyle: { color: text, fontSize: chartFontSize(12), fontWeight: 700 },
+      textStyle: { color: text, fontSize: chartFontSize(10), fontWeight: 700 },
       axisPointer: {
         lineStyle: { color: colorWithAlpha(lineColor, isLight ? 0.34 : 0.6), width: 1, type: 'dashed' },
         shadowStyle: { color: colorWithAlpha(lineColor, isLight ? 0.05 : 0.08) },

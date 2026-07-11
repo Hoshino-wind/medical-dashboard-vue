@@ -392,13 +392,14 @@
 
 .inspection-pie-shell {
   width: 100%;
-  transform: translateY(-0.08rem);
+  transform: translateY(-1.1rem);
 }
 
 .inspection-pie-base {
   position: absolute;
   left: 50%;
-  bottom: -0.2rem;
+  top: 3rem;
+  bottom: auto;
   z-index: 0;
   width: min(16.25rem, 124%);
   height: 6.25rem;
@@ -661,11 +662,12 @@
 .health-pie-panel .health-pie-chart {
   width: 100%;
   min-height: 7.75rem;
-  transform: translateY(-0.08rem);
+  transform: translateY(-1.1rem);
 }
 
 .health-pie-panel .health-pie-base {
-  bottom: -0.2rem;
+  top: 3rem;
+  bottom: auto;
   display: block;
   width: min(16.25rem, 124%);
   height: 6.25rem;

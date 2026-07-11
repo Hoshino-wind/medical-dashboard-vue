@@ -92,10 +92,10 @@ describe('global theme adaptation', () => {
     expect(overviewValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(pieCenterValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(cubeBar).not.toContain('chartFontSize(')
+    expect(cubeBar).toContain('fontSize: 10')
     expect(cubeBar).toContain('fontSize: 11')
     expect(cubeBar).toContain('fontSize: 12')
-    expect(cubeBar).toContain('fontSize: 14')
-    expect(cubeBar).toContain('fontSize: 9')
+    expect(cubeBar).toContain('fontSize: 8')
     expect(lineArea).toContain('chartFontSize(')
   })
 
@@ -374,8 +374,9 @@ describe('global theme adaptation', () => {
     expect(base).toContain('gauge-base-deck')
     expect(base).not.toContain('ThreePiePedestal')
     expect(base).not.toContain('WebGLRenderer')
-    expect(source).not.toContain('gauge-base-tier')
-    expect(source).not.toContain('gauge-base-beam')
+    expect(source).toContain('gauge-base-tier')
+    expect(source).toContain('gauge-base-beam')
+    expect(source).toContain('gauge-base-orbit--rotating')
     expect(gauge).toContain('gauge-ring-track')
     expect(gauge).toContain('gauge-ring-progress')
     expect(source).not.toMatch(/gauge-(?:tube|water|glass)|pipe-|tube-|water-pipe/i)
@@ -409,27 +410,45 @@ describe('global theme adaptation', () => {
     expect(progressStyles).not.toMatch(/var\(--data-ring|var\(--data-pie-primary/)
   })
 
-  it('uses instrument-style pedestal geometry for 3D pie bases', () => {
+  it('reuses the overview hologram base for both work-order pie charts', () => {
     const completionModule = readSource('components/modules/CompletionModule.vue')
-    const pedestal = readSource('components/visual/ThreePiePedestal.vue')
+    const healthPie = readSource('components/charts/HealthPieChart.vue')
+    const legacyPedestalPath = sourcePath('components/visual/ThreePiePedestal.vue')
     const moduleStyles = readSource('styles/modules.css')
     const healthBaseBlock =
       moduleStyles.match(/\.health-pie-panel\s+\.health-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
 
     expect(completionModule).toContain(
-      "import ThreePiePedestal from '../visual/ThreePiePedestal.vue'",
+      "import HologramGaugeBase from '../visual/HologramGaugeBase.vue'",
     )
+    expect(healthPie).toContain(
+      "import HologramGaugeBase from '../visual/HologramGaugeBase.vue'",
+    )
+    expect(completionModule).not.toContain('ThreePiePedestal')
+    expect(healthPie).not.toContain('ThreePiePedestal')
+    expect(existsSync(legacyPedestalPath)).toBe(false)
+    expect(completionModule).toContain('<HologramGaugeBase')
+    expect(healthPie).toContain('<HologramGaugeBase')
     expect(completionModule).toContain('class="inspection-pie-base"')
-    expect(pedestal).toContain('makeStepTier')
-    expect(pedestal).toContain('makeTickBand')
-    expect(pedestal).toContain('makeInstrumentMarker')
-    expect(pedestal).toContain('supportsWebGL')
-    expect(pedestal).toContain('WebGLRenderingContext')
-    expect(pedestal).toContain("variant?: 'webgl' | 'compact'")
-    expect(pedestal).toContain('three-pie-pedestal--compact')
-    expect(pedestal).toContain("cssColorToThree('var(--instrument-base-rim)'")
+    expect(completionModule).toContain(':speed="7.2"')
+    expect(completionModule).toContain('direction="clockwise"')
+    expect(healthPie).toContain(':speed="8.4"')
+    expect(healthPie).toContain('direction="counter-clockwise"')
     expect(healthBaseBlock).toContain('display: block')
     expect(healthBaseBlock).not.toContain('display: none')
+  })
+
+  it('removes the unused Three.js hologram base and dependencies', () => {
+    const packageJson = JSON.parse(readSource('../package.json')) as {
+      dependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
+    }
+    const ringStyles = readSource('styles/rings.css')
+
+    expect(existsSync(sourcePath('components/visual/ThreeHologramBase.vue'))).toBe(false)
+    expect(packageJson.dependencies).not.toHaveProperty('three')
+    expect(packageJson.devDependencies).not.toHaveProperty('@types/three')
+    expect(ringStyles).not.toContain('.three-hologram-base')
   })
 
   it('uses the same 2.5D pie geometry with simplified pedestals', () => {
@@ -447,9 +466,15 @@ describe('global theme adaptation', () => {
 
     expect(healthPie).toContain('const chartHeight = pxToRem(136)')
     expect(healthPie).toContain(':thickness="7"')
+    expect(healthPie).toContain('auto-rotate')
+    expect(healthPie).not.toContain('variant="compact"')
+    expect(healthPie).toContain(':speed="8.4"')
+    expect(healthPie).toContain('direction="counter-clockwise"')
     expect(healthPie).not.toContain('label-deck')
     expect(completionModule).toContain('const chartHeight = pxToRem(136)')
     expect(completionModule).toContain(':thickness="7"')
+    expect(completionModule).toContain('auto-rotate')
+    expect(completionModule).not.toContain('variant="compact"')
     expect(completionModule).not.toContain('label-deck')
     expect(healthCoreBlock).toContain('width: 12.85rem')
     expect(healthCoreBlock).toContain('height: 8.5rem')
@@ -459,10 +484,14 @@ describe('global theme adaptation', () => {
     expect(inspectionPieBlock).toContain('transform: translateY(0)')
     expect(healthBaseBlock).toContain('width: min(16.25rem, 124%)')
     expect(healthBaseBlock).toContain('height: 6.25rem')
-    expect(healthBaseBlock).toContain('bottom: -0.2rem')
+    expect(healthBaseBlock).toContain('top: 3rem')
+    expect(healthBaseBlock).toContain('bottom: auto')
+    expect(healthBaseBlock).not.toContain('bottom: -0.2rem')
     expect(inspectionBaseBlock).toContain('width: min(16.25rem, 124%)')
     expect(inspectionBaseBlock).toContain('height: 6.25rem')
-    expect(inspectionBaseBlock).toContain('bottom: -0.2rem')
+    expect(inspectionBaseBlock).toContain('top: 3rem')
+    expect(inspectionBaseBlock).toContain('bottom: auto')
+    expect(inspectionBaseBlock).not.toContain('bottom: -0.2rem')
   })
 
   it('extracts the hologram base component and positions it below the ring', () => {

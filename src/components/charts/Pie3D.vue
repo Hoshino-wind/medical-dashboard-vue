@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, getCurrentInstance, reactive, ref } from 'vue'
+import { computed, getCurrentInstance, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { buildPie3DSegments, type Pie3DInputItem, type Pie3DSegment } from '@/utils/pie3dSegments'
 import { pxToRem } from '@/utils/rem'
 import type { Theme } from '@/types/theme'
@@ -20,6 +20,8 @@ const TOOLTIP_WIDTH = 92
 const TOOLTIP_HEIGHT = 38
 const TOOLTIP_GAP = 8
 const TOOLTIP_MARGIN = 6
+const AUTO_ROTATION_DEGREES_PER_MS = 0.012
+const AUTO_ROTATION_FRAME_MS = 32
 
 const props = withDefaults(
   defineProps<{
@@ -42,8 +44,15 @@ const props = withDefaults(
   },
 )
 
+const rotationOffset = ref(0)
+let rotationFrame = 0
+let previousRotationTimestamp: number | null = null
+let accumulatedRotationMs = 0
+
 // 起始角度：基础 -90°（12 点方向）+ 顺时针旋转偏移（rotation 为正=顺时针）
-const startAngle = computed(() => BASE_START_ANGLE + (props.rotation * Math.PI) / 180)
+const startAngle = computed(
+  () => BASE_START_ANGLE + ((props.rotation + rotationOffset.value) * Math.PI) / 180,
+)
 
 interface EllipsePoint {
   x: number
@@ -78,6 +87,7 @@ interface DepthLayer {
 
 const host = ref<HTMLDivElement | null>(null)
 const activeSegmentIndex = ref<number | null>(null)
+const isInteracting = ref(false)
 const componentUid = getCurrentInstance()?.uid ?? 0
 const filterId = `pie3d-ambient-shadow-${componentUid}`
 const total = computed(() =>
@@ -179,6 +189,18 @@ const totalDepth = computed(() => depthLayerCount.value * DEPTH_STEP)
 const frontWallSegments = computed<WallSegment[]>(() =>
   renderedSegments.value.flatMap((segment) => frontWallForSegment(segment)),
 )
+
+/**
+ * 连续的底部外缘弧线（前壁底边），独立于扇区，避免扇区间隙导致边界线断续。
+ */
+const bottomRimPath = computed(() => {
+  const pts = sampledArcPoints(0, Math.PI, OUTER_RX, OUTER_RY)
+  const bottomPts = pts.map((p) => ({ x: p.x, y: p.y + totalDepth.value }))
+  return [
+    `M ${formatPoint(bottomPts[0])}`,
+    ...bottomPts.slice(1).map((p) => `L ${formatPoint(p)}`),
+  ].join(' ')
+})
 
 function isLightTheme(): boolean {
   return props.theme?.id.startsWith('light-') ?? false
@@ -291,6 +313,7 @@ function moveTooltip(event: PointerEvent) {
 }
 
 function showTooltip(segment: RenderedSegment, event: PointerEvent) {
+  isInteracting.value = true
   activeSegmentIndex.value = segment.index
   tooltip.visible = true
   tooltip.name = segment.name
@@ -300,6 +323,7 @@ function showTooltip(segment: RenderedSegment, event: PointerEvent) {
 }
 
 function showKeyboardTooltip(segment: RenderedSegment) {
+  isInteracting.value = true
   const rect = host.value?.getBoundingClientRect()
   activeSegmentIndex.value = segment.index
   tooltip.visible = true
@@ -323,9 +347,56 @@ function showKeyboardTooltip(segment: RenderedSegment) {
 }
 
 function hideTooltip() {
+  isInteracting.value = false
   activeSegmentIndex.value = null
   tooltip.visible = false
 }
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+function stopAutoRotation() {
+  cancelAnimationFrame(rotationFrame)
+  rotationFrame = 0
+  previousRotationTimestamp = null
+  accumulatedRotationMs = 0
+}
+
+function runAutoRotation(timestamp: number) {
+  if (previousRotationTimestamp === null) {
+    previousRotationTimestamp = timestamp
+  } else {
+    const delta = Math.min(100, Math.max(0, timestamp - previousRotationTimestamp))
+    previousRotationTimestamp = timestamp
+
+    if (!isInteracting.value) {
+      accumulatedRotationMs += delta
+      if (accumulatedRotationMs >= AUTO_ROTATION_FRAME_MS) {
+        rotationOffset.value =
+          (rotationOffset.value + accumulatedRotationMs * AUTO_ROTATION_DEGREES_PER_MS) % 360
+        accumulatedRotationMs = 0
+      }
+    }
+  }
+
+  rotationFrame = requestAnimationFrame(runAutoRotation)
+}
+
+function syncAutoRotation() {
+  stopAutoRotation()
+  if (props.autoRotate && !prefersReducedMotion()) {
+    rotationFrame = requestAnimationFrame(runAutoRotation)
+  }
+}
+
+onMounted(syncAutoRotation)
+watch(() => props.autoRotate, syncAutoRotation)
+onUnmounted(stopAutoRotation)
 </script>
 
 <template>
@@ -333,6 +404,7 @@ function hideTooltip() {
     ref="host"
     class="pie3d-three-shell pie3d-25d-shell"
     :style="shellStyle"
+    @pointerenter="isInteracting = true"
     @pointerleave="hideTooltip"
   >
     <svg
@@ -393,6 +465,12 @@ function hideTooltip() {
           stroke-width="0.9"
         />
       </g>
+
+      <!-- 连续底部外缘弧线：弥补扇区间隙导致的边界线缺失 -->
+      <path
+        class="pie3d-bottom-rim"
+        :d="bottomRimPath"
+      />
 
       <g class="pie3d-top-stack" :filter="`url(#${filterId})`">
         <path
@@ -495,6 +573,14 @@ function hideTooltip() {
   fill: transparent;
   stroke: color-mix(in srgb, var(--pie-accent) 44%, transparent);
   stroke-width: 1.2;
+}
+
+.pie3d-bottom-rim {
+  fill: none;
+  stroke: color-mix(in srgb, var(--pie-edge) 52%, var(--pie-surface) 48%);
+  stroke-width: 1;
+  opacity: 0.7;
+  vector-effect: non-scaling-stroke;
 }
 
 .pie3d-three-tooltip {

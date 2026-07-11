@@ -66,4 +66,26 @@ describe('HologramGauge', () => {
 
     wrapper.unmount()
   })
+
+  it('renders a configurable layered hologram pedestal', () => {
+    const wrapper = mount(HologramGauge, {
+      props: {
+        value: 90,
+        baseSpeed: 8,
+        baseDirection: 'counter-clockwise',
+        baseIntensity: 0.76,
+      },
+    })
+
+    const base = wrapper.find('.hologram-gauge-base')
+
+    expect(base.attributes('style')).toContain('--holo-speed: 8s')
+    expect(base.attributes('style')).toContain('--holo-intensity: 0.76')
+    expect(base.classes()).toContain('is-counter-clockwise')
+    expect(wrapper.findAll('.gauge-base-tier')).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-orbit--rotating')).toHaveLength(2)
+    expect(wrapper.find('.gauge-base-beam').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
 })

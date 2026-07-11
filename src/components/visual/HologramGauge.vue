@@ -15,6 +15,9 @@ const props = withDefaults(
     showFooter?: boolean
     large?: boolean
     baseDensity?: number
+    baseSpeed?: number
+    baseDirection?: 'clockwise' | 'counter-clockwise'
+    baseIntensity?: number
   }>(),
   {
     unit: '台',
@@ -23,6 +26,9 @@ const props = withDefaults(
     showFooter: true,
     large: false,
     baseDensity: undefined,
+    baseSpeed: 6.4,
+    baseDirection: 'clockwise',
+    baseIntensity: 1,
   },
 )
 
@@ -161,7 +167,11 @@ onUnmounted(() => {
     :style="rootStyle"
   >
     <div class="hologram-gauge-stage">
-      <HologramGaugeBase />
+      <HologramGaugeBase
+        :speed="baseSpeed"
+        :direction="baseDirection"
+        :intensity="baseIntensity"
+      />
 
       <div class="hologram-gauge-ring">
         <svg class="hologram-gauge-svg" viewBox="0 0 120 120" aria-hidden="true">

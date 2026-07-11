@@ -5,6 +5,7 @@ import EChart from './EChart.vue'
 import type { BarChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 import { pxToRem } from '@/utils/rem'
+import { resolveChartAxisRange } from '@/utils/chartAxis'
 import { colorWithAlpha } from '@/utils/themeColor'
 import {
   BASE_DROP,
@@ -165,10 +166,6 @@ const legendItems = computed<LegendItem[]>(() => {
   })
 })
 
-function roundAxisMax(maxValue: number): number {
-  return Math.max(400, Math.ceil(maxValue / 100) * 100)
-}
-
 // 柱宽与间距均随 band 自适应：组宽占 band 的 64%，组内柱子紧凑排列，柱间留 16% 间隙
 function resolveBarMetrics(band: number, seriesCount: number) {
   const sc = Math.max(1, seriesCount)
@@ -218,7 +215,7 @@ const option = computed(() => {
   const animatedCategoryMaxValues = animatedSeriesValues.map((values) =>
     Math.max(0, ...values),
   )
-  const axisMax = roundAxisMax(Math.max(0, ...categoryMaxValues))
+  const axisRange = resolveChartAxisRange(Math.max(0, ...categoryMaxValues))
   const text = token('--text')
   const muted = token('--muted')
   const grid = token('--chart-grid')
@@ -292,9 +289,9 @@ const option = computed(() => {
     },
     yAxis: {
       type: 'value',
-      max: axisMax,
-      interval: 100,
-      axisLabel: { color: muted, fontSize: 11, fontWeight: 800 },
+      max: axisRange.max,
+      interval: axisRange.interval,
+      axisLabel: { color: muted, fontSize: 10, fontWeight: 800 },
       splitLine: { lineStyle: { color: grid, width: 1, type: 'dashed' } },
     },
     series: [
@@ -387,7 +384,7 @@ const option = computed(() => {
               textAlign: 'center',
               textVerticalAlign: 'middle',
               fill: text,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 900,
               textBorderColor: themed(dataBar, 0.16),
               textBorderWidth: 1,
@@ -455,7 +452,7 @@ const option = computed(() => {
                   textAlign: 'center',
                   textVerticalAlign: 'bottom',
                   fill: text,
-                  fontSize: 9,
+                  fontSize: 8,
                   fontWeight: 900,
                   textBorderColor: themed(tone.base, 0.28),
                   textBorderWidth: 1,
@@ -475,7 +472,7 @@ const option = computed(() => {
                 textAlign: 'center',
                 textVerticalAlign: 'bottom',
                 fill: text,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: 900,
                 textBorderColor: themed(dataBar, 0.18),
                 textBorderWidth: 1,
@@ -498,7 +495,7 @@ const option = computed(() => {
       borderColor: themed(dataBar, 0.8),
       borderWidth: 1,
       padding: [8, 12],
-      textStyle: { color: text, fontSize: 12, fontWeight: 700 },
+      textStyle: { color: text, fontSize: 11, fontWeight: 700 },
       extraCssText: tooltipExtraCssText,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       formatter(params: any) {

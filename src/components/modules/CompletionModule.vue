@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import Pie3D from '../charts/Pie3D.vue'
 import CountUp from '../shared/CountUp.vue'
-import ThreePiePedestal from '../visual/ThreePiePedestal.vue'
+import HologramGaugeBase from '../visual/HologramGaugeBase.vue'
 import { pxToRem } from '@/utils/rem'
 import { usePagedList } from '@/composables/usePagedList'
 import type { InspectionOrders } from '@/types/dashboard'
@@ -80,14 +80,16 @@ const inspectionPieItems = computed(() => {
     <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月巡检完成率">
       <div class="pie-summary-title">本月巡检完成率</div>
       <div class="pie-chart-shell inspection-pie-shell">
-        <ThreePiePedestal
+        <HologramGaugeBase
           class="inspection-pie-base"
-          :color="themeColor('--instrument-base', '#33566c')"
-          :accent="themeColor('--data-inspection-pie-finished', '#20e8ff')"
+          :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
           :intensity="isLightTheme(theme) ? 0.72 : 0.96"
+          :speed="7.2"
+          direction="clockwise"
         />
         <Pie3D
           :items="inspectionPieItems"
+          auto-rotate
           :height="chartHeight"
           :thickness="7"
           :rotation="150"

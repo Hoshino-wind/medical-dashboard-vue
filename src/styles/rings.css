@@ -30,12 +30,6 @@
   filter: saturate(1.03);
 }
 
-.three-hologram-base canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 .hologram-gauge-ring {
   position: relative;
   z-index: 3;
