@@ -8,6 +8,25 @@ import PanelShell from '@/components/shared/PanelShell.vue'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (path: string) => readFileSync(join(root, path), 'utf8')
 
+function cssBlock(source: string, marker: string) {
+  const markerIndex = source.indexOf(`${marker} {`)
+  if (markerIndex < 0) throw new Error(`Missing CSS marker: ${marker}`)
+
+  const blockStart = source.indexOf('{', markerIndex)
+  if (blockStart < 0) throw new Error(`Missing CSS block for: ${marker}`)
+
+  let depth = 0
+  for (let index = blockStart; index < source.length; index += 1) {
+    if (source[index] === '{') depth += 1
+    if (source[index] !== '}') continue
+
+    depth -= 1
+    if (depth === 0) return source.slice(blockStart + 1, index)
+  }
+
+  throw new Error(`Unclosed CSS block for: ${marker}`)
+}
+
 describe('mecha panel frame', () => {
   it('renders a decorative four-rail and four-corner chassis for the shared main panel', () => {
     const wrapper = mount(PanelShell, { props: { title: '设备总览' } })
@@ -29,5 +48,28 @@ describe('mecha panel frame', () => {
       /prefers-reduced-motion:[\s\S]*?\.panel-mecha-rail::after[\s\S]*?animation: none/,
     )
     expect(configPanel).toContain('机甲立体框')
+  })
+
+  it('keeps the dark mecha highlight weights stable while hovering', () => {
+    const panel = read('styles/panel.css')
+    const base = cssBlock(panel, ".screen-frame[data-panel-border='stereoscopic'] .panel")
+    const hover = cssBlock(
+      panel,
+      ".screen-frame[data-panel-border='stereoscopic'] .screen-grid > .panel:hover",
+    )
+
+    expect(base).toContain('var(--panel-frame-highlight) 92%')
+    expect(base).toContain('var(--panel-frame-highlight) 42%')
+    expect(hover).toContain('var(--panel-frame-highlight) 92%')
+    expect(hover).toContain('var(--panel-frame-highlight) 42%')
+  })
+
+  it('breathes mecha corners with opacity only', () => {
+    const panel = read('styles/panel.css')
+    const cornerBreathe = cssBlock(panel, '@keyframes panel-mecha-corner-breathe')
+
+    expect(cornerBreathe).toContain('opacity: var(--panel-mecha-corner-opacity-low)')
+    expect(cornerBreathe).toContain('opacity: var(--panel-mecha-corner-opacity-high)')
+    expect(cornerBreathe).not.toMatch(/\bfilter\s*:/)
   })
 })
