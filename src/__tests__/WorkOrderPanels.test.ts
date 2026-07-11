@@ -136,8 +136,13 @@ describe('work order style panels', () => {
     expect(moduleStyles).toContain('.pie-summary-panel::before')
     expect(moduleStyles).toContain('.pie-summary-panel::after')
     expect(moduleStyles).toContain('@keyframes completion-divider-breathe')
+    expect(moduleStyles).toContain('@keyframes completion-divider-flow')
+    expect(moduleStyles).toContain('clip-path: polygon(')
     expect(moduleStyles).toContain(
       'animation: completion-divider-breathe var(--motion-loop-status) ease-in-out infinite',
+    )
+    expect(moduleStyles).toContain(
+      'animation: completion-divider-flow var(--motion-loop-status) cubic-bezier(0.45, 0, 0.55, 1)',
     )
   })
 
