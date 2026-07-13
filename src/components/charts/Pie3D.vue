@@ -169,7 +169,7 @@ const renderedSegments = computed<RenderedSegment[]>(() => {
       endAngle: Math.max(start + 0.001, end),
       path: annularSectorPath(start, Math.max(start + 0.001, end)),
       topColor: segment.color,
-      depthColor: colorMix(segment.color, isLightTheme() ? 64 : 48, isLightTheme() ? '#c3dbe1' : '#020814'),
+      depthColor: colorMix(segment.color, isLightTheme() ? 72 : 68, isLightTheme() ? '#c3dbe1' : '#020814'),
       strokeColor: colorMix(segment.color, isLightTheme() ? 70 : 72, props.theme?.variables['--instrument-rim'] ?? '#d7fbff'),
       labelX: label.x,
       labelY: label.y,
@@ -231,9 +231,9 @@ function frontWallForSegment(segment: RenderedSegment): WallSegment[] {
     {
       key: `front-wall-${segment.index}`,
       path: sideWallPath(start, end, OUTER_RX, OUTER_RY, totalDepth.value),
-      fill: colorMix(segment.topColor, isLightTheme() ? 56 : 42, isLightTheme() ? '#b9d6df' : '#020814'),
+      fill: colorMix(segment.topColor, isLightTheme() ? 72 : 78, isLightTheme() ? '#b9d6df' : '#020814'),
       stroke: segment.strokeColor,
-      opacity: isLightTheme() ? 0.76 : 0.94,
+      opacity: isLightTheme() ? 0.86 : 1,
     },
   ]
 }
@@ -541,7 +541,7 @@ onUnmounted(stopAutoRotation)
 }
 
 .pie3d-front-wall {
-  filter: saturate(0.95) brightness(0.88);
+  filter: saturate(1.02);
   vector-effect: non-scaling-stroke;
 }
 
@@ -577,9 +577,9 @@ onUnmounted(stopAutoRotation)
 
 .pie3d-bottom-rim {
   fill: none;
-  stroke: color-mix(in srgb, var(--pie-edge) 52%, var(--pie-surface) 48%);
-  stroke-width: 1;
-  opacity: 0.7;
+  stroke: var(--pie-edge, var(--glass-edge));
+  stroke-width: 1.1;
+  opacity: 0.9;
   vector-effect: non-scaling-stroke;
 }
 

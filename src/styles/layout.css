@@ -131,7 +131,7 @@
 
 .screen-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
   grid-template-rows: 1.16fr 0.98fr 1fr;
   gap: 0.55rem;
   height: auto;
@@ -139,7 +139,7 @@
 }
 
 .screen-grid.layout-2x3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
