@@ -35,6 +35,30 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.theme-radio.active').text()).toContain('浅蓝')
   })
 
+  it('switches the card frame style independently from the color theme', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          BigScreen: true,
+        },
+      },
+    })
+    const store = useDashboardStore(pinia)
+    const initialThemeId = store.config.themeId
+
+    const chamferedStyle = wrapper.find('[data-testid="panel-style-chamfered-instrument"]')
+
+    expect(chamferedStyle.exists()).toBe(true)
+    await chamferedStyle.setValue()
+    await flushPromises()
+
+    expect(store.config.panelStyle).toBe('chamfered-instrument')
+    expect(store.config.themeId).toBe(initialThemeId)
+    expect(wrapper.find('.panel-style-radio.active').text()).toContain('立体切角')
+  })
+
   it('switches between 3x3 and 2x3 layout slot counts', async () => {
     const wrapper = mount(ConfigPanel, {
       global: {

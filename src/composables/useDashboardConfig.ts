@@ -23,6 +23,7 @@ export function useDashboardConfig() {
     // 响应式状态(来自 store)
     config,
     themeId: config.value.themeId,
+    panelStyle: config.value.panelStyle,
     layout: config.value.layout,
     selectedModuleIds: config.value.selectedModuleIds,
     moduleOrder: config.value.moduleOrder,
@@ -33,6 +34,7 @@ export function useDashboardConfig() {
     availableModules,
     // actions(直接透传 store 方法)
     setTheme: store.setTheme,
+    setPanelStyle: store.setPanelStyle,
     setLayout: store.setLayout,
     moveModule: store.moveModule,
     addModuleToLayout: store.addModuleToLayout,

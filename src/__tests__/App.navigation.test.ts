@@ -1,7 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { themes } from '@/data/themes'
@@ -48,6 +48,28 @@ describe('App view switch', () => {
     expect(router.currentRoute.value.name).toBe('screen')
   })
 
+  it('keeps only fullscreen and config controls on the dashboard', async () => {
+    const router = makeRouter()
+    router.push('/')
+    await router.isReady()
+    const fullscreenListener = vi.fn()
+    window.addEventListener('dashboard:toggle-fullscreen', fullscreenListener)
+
+    const wrapper = mount(App, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+
+    const buttons = wrapper.find('.view-switch').findAll('button')
+    expect(buttons.map((button) => button.text().trim())).toEqual(['全屏', '配置'])
+
+    await buttons[0].trigger('click')
+
+    expect(fullscreenListener).toHaveBeenCalledTimes(1)
+    window.removeEventListener('dashboard:toggle-fullscreen', fullscreenListener)
+  })
+
   it('projects the active theme variables onto the document chrome', async () => {
     const router = makeRouter()
     router.push('/')
@@ -76,6 +98,30 @@ describe('App view switch', () => {
     )
     expect(document.documentElement.style.getPropertyValue('--bg-top')).toBe(
       lightTheme!.variables['--bg-top'],
+    )
+  })
+
+  it('projects the selected panel style onto the dashboard shell', async () => {
+    const router = makeRouter()
+    router.push('/')
+    await router.isReady()
+    const pinia = createPinia()
+
+    const wrapper = mount(App, {
+      global: {
+        plugins: [pinia, router],
+      },
+    })
+
+    const store = useDashboardStore(pinia)
+
+    expect(wrapper.find('.dashboard-shell').attributes('data-panel-style')).toBe('glass-flow')
+
+    store.setPanelStyle('chamfered-instrument')
+    await flushPromises()
+
+    expect(wrapper.find('.dashboard-shell').attributes('data-panel-style')).toBe(
+      'chamfered-instrument',
     )
   })
 })

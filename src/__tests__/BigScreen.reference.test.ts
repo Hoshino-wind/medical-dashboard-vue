@@ -1,4 +1,4 @@
-import { flushPromises, mount } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -6,6 +6,8 @@ import BigScreen from '@/components/shared/BigScreen.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 
 const originalRequestFullscreen = Element.prototype.requestFullscreen
+
+enableAutoUnmount(afterEach)
 
 function makeRouter() {
   return createRouter({
@@ -77,33 +79,7 @@ describe('BigScreen reference layout', () => {
     expect(wrapper.text()).not.toContain('巡检统计')
   })
 
-  it('provides a theme configuration action that opens the config route', async () => {
-    const router = makeRouter()
-    router.push('/')
-    await router.isReady()
-
-    const wrapper = mount(BigScreen, {
-      global: {
-        plugins: [createPinia(), router],
-        stubs: {
-          HeaderBar: true,
-          ModuleRenderer: true,
-        },
-      },
-    })
-
-    const themeConfigButton = wrapper
-      .findAll('.screen-action')
-      .find((button) => button.text().includes('主题配置'))
-
-    expect(themeConfigButton).toBeTruthy()
-    await themeConfigButton!.trigger('click')
-    await flushPromises()
-
-    expect(router.currentRoute.value.name).toBe('config')
-  })
-
-  it('keeps only the screen, fullscreen and theme actions and opens fullscreen', async () => {
+  it('removes the duplicate bottom actions and responds to the right-side fullscreen control', async () => {
     const router = makeRouter()
     router.push('/')
     await router.isReady()
@@ -122,24 +98,18 @@ describe('BigScreen reference layout', () => {
       },
     })
 
-    const screenButtons = wrapper.findAll('.screen-action')
-    const screenLabels = screenButtons.map((button) => button.text())
-
     expect(wrapper.find('footer').exists()).toBe(false)
     expect(wrapper.find('.screen-footer-nav').exists()).toBe(false)
-    expect(screenLabels).toEqual(['全屏显示', '主题配置'])
-    expect(screenLabels).not.toContain('大屏模式')
-    expect(screenLabels).not.toContain('数据导出')
-    expect(screenLabels).not.toContain('设备地图')
-    expect(screenLabels).not.toContain('告警中心')
+    expect(wrapper.find('.screen-actions').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('全屏显示')
+    expect(wrapper.text()).not.toContain('主题配置')
 
-    await screenButtons[0].trigger('click')
+    window.dispatchEvent(new Event('dashboard:toggle-fullscreen'))
     await flushPromises()
 
     expect(Element.prototype.requestFullscreen).toHaveBeenCalledTimes(1)
-    expect(requestFullscreenMock.mock.contexts[0]).toBe(wrapper.find('.screen-frame').element)
+    expect(requestFullscreenMock.mock.contexts[0]).toBe(document.documentElement)
     expect(wrapper.find('.screen-frame').classes()).toContain('is-faux-fullscreen')
-    expect(screenButtons[0].attributes('aria-pressed')).toBe('true')
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await flushPromises()

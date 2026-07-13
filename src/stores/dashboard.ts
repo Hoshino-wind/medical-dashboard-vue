@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { themes } from '@/data/themes'
 import { defaultConfig, moduleCatalog } from '@/data/modules'
 import { readStorage, writeStorage } from '@/utils/storage'
-import type { DashboardConfig, LayoutType } from '@/types/config'
+import { PANEL_STYLES, type DashboardConfig, type LayoutType, type PanelStyle } from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -11,9 +11,11 @@ const STORAGE_KEY = 'medical-dashboard-config'
 
 /** 合法的布局值,用于校验 localStorage 脏数据 */
 const VALID_LAYOUTS: LayoutType[] = ['2x3', '3x3']
+const VALID_PANEL_STYLES = new Set<PanelStyle>(PANEL_STYLES)
 
 type SavedDashboardConfig = Partial<{
   themeId: ThemeId
+  panelStyle: PanelStyle
   layout: LayoutType
   selectedModuleIds: Array<string | null>
   moduleOrder: string[]
@@ -99,6 +101,10 @@ function loadConfig(): DashboardConfig {
   return {
     themeId:
       saved?.themeId && validThemeIds.has(saved.themeId) ? saved.themeId : defaultConfig.themeId,
+    panelStyle:
+      saved?.panelStyle && VALID_PANEL_STYLES.has(saved.panelStyle)
+        ? saved.panelStyle
+        : defaultConfig.panelStyle,
     layout,
     selectedModuleIds: normalizeSelectedModuleIds(
       saved?.selectedModuleIds,
@@ -155,6 +161,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   function setTheme(themeId: ThemeId) {
     config.themeId = themeId
+  }
+
+  function setPanelStyle(panelStyle: PanelStyle) {
+    config.panelStyle = panelStyle
   }
 
   function setLayout(layout: LayoutType) {
@@ -257,6 +267,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   function resetConfig() {
     config.themeId = defaultConfig.themeId
+    config.panelStyle = defaultConfig.panelStyle
     config.layout = defaultConfig.layout
     config.selectedModuleIds = [...defaultConfig.selectedModuleIds]
     config.moduleOrder = [...defaultConfig.moduleOrder]
@@ -268,6 +279,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     (value) => {
       writeStorage(STORAGE_KEY, {
         themeId: value.themeId,
+        panelStyle: value.panelStyle,
         layout: value.layout,
         selectedModuleIds: value.selectedModuleIds,
         moduleOrder: value.moduleOrder,
@@ -285,6 +297,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     selectedSlotModules,
     availableModules,
     setTheme,
+    setPanelStyle,
     setLayout,
     moveModule,
     addModuleToLayout,

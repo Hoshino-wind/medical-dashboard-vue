@@ -18,19 +18,14 @@
   position: fixed;
   right: 1rem;
   bottom: 1rem;
-  z-index: 20;
+  z-index: 1100;
   display: flex;
   gap: 0.5rem;
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
 .view-switch.screen-mode {
-  opacity: 0;
-  transform: translateY(0.625rem);
-}
-
-.view-switch.screen-mode:hover,
-.view-switch.screen-mode:focus-within {
+  bottom: 0.1rem;
   opacity: 1;
   transform: translateY(0);
 }
@@ -522,6 +517,10 @@
   min-width: 4.4rem;
 }
 
+.panel-style-radio {
+  min-width: 6.6rem;
+}
+
 .property-summary {
   display: inline-flex;
   align-items: center;
@@ -582,10 +581,6 @@
 
 .dashboard-shell.config-mode .config-live-preview .screen-frame::before {
   display: block;
-}
-
-.dashboard-shell.config-mode .config-live-preview .screen-actions {
-  display: none;
 }
 
 .dashboard-shell.config-mode .config-live-preview .screen-grid {

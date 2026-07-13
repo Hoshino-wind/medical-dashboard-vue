@@ -22,7 +22,7 @@ const pieItems = computed(() => {
     { name: '运行正常', value: props.data.online, color: props.theme.variables['--data-health-pie-good'] },
     { name: '维保预警', value: props.data.warning, color: props.theme.variables['--data-health-pie-warning'] },
     { name: '维修中', value: props.data.repairing, color: props.theme.variables['--data-health-pie-repairing'] },
-    { name: '即将保养', value: props.data.pending, color: props.theme.variables['--data-health-pie-pending'] },
+    { name: '待保养', value: props.data.pending, color: props.theme.variables['--data-health-pie-pending'] },
   ]
 })
 
@@ -60,8 +60,8 @@ const pieTotal = computed(
       </div>
     </div>
 
-    <aside class="pie-summary-panel health-pie-panel" aria-label="设备健康状态">
-      <div class="pie-summary-title">设备健康状态</div>
+    <aside class="pie-summary-panel health-pie-panel" aria-label="本月保养完成率">
+      <div class="pie-summary-title">本月保养完成率</div>
       <HealthPieChart
         :items="pieItems"
         :total="pieTotal"
@@ -81,7 +81,7 @@ const pieTotal = computed(
         <span>维修中</span><b><CountUp :value="data.repairing" /></b><em>台</em>
       </div>
       <div class="is-purple">
-        <span>即将保养</span><b><CountUp :value="data.pending" /></b><em>台</em>
+        <span>待保养</span><b><CountUp :value="data.pending" /></b><em>台</em>
       </div>
     </div>
   </div>

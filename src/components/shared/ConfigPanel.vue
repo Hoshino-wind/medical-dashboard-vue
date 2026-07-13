@@ -5,7 +5,7 @@ import { AlertCircle, Check, ChevronDown, LayoutGrid, RotateCcw, Save, X } from 
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
 import BigScreen from './BigScreen.vue'
-import type { LayoutType } from '@/types/config'
+import type { LayoutType, PanelStyle } from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -40,6 +40,11 @@ const layoutWarning = ref('')
 let warningTimer: number | undefined
 
 const tableModuleIds = new Set(['repairOrders', 'inspectionOrders', 'healthTrend'])
+
+const panelStyleOptions: Array<{ id: PanelStyle; label: string }> = [
+  { id: 'glass-flow', label: '流光玻璃' },
+  { id: 'chamfered-instrument', label: '立体切角' },
+]
 
 const slotItems = computed(() => selectedSlotModules.value)
 
@@ -289,6 +294,31 @@ onBeforeUnmount(() => {
                 />
                 <span>{{ themeLabel(theme) }}</span>
                 <Check v-if="theme.id === config.themeId" class="h-3.5 w-3.5" aria-hidden="true" />
+              </label>
+            </fieldset>
+
+            <fieldset class="property-group">
+              <legend>卡片样式设置</legend>
+              <label
+                v-for="style in panelStyleOptions"
+                :key="style.id"
+                class="property-radio panel-style-radio"
+                :class="{ active: style.id === config.panelStyle }"
+              >
+                <input
+                  :data-testid="`panel-style-${style.id}`"
+                  type="radio"
+                  name="panel-style"
+                  :value="style.id"
+                  :checked="style.id === config.panelStyle"
+                  @change="store.setPanelStyle(style.id)"
+                />
+                <span>{{ style.label }}</span>
+                <Check
+                  v-if="style.id === config.panelStyle"
+                  class="h-3.5 w-3.5"
+                  aria-hidden="true"
+                />
               </label>
             </fieldset>
 

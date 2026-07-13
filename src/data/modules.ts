@@ -18,6 +18,7 @@ export const moduleCatalog: ModuleCatalogItem[] = [
 /** 默认配置 */
 export const defaultConfig: DashboardConfig = {
   themeId: 'deep-sea-instrument',
+  panelStyle: 'glass-flow',
   layout: '3x3',
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
   moduleOrder: moduleCatalog.map((item) => item.id),

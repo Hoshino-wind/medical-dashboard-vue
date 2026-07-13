@@ -2,6 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { moduleCatalog } from '@/data/modules'
 import { useDashboardStore } from '@/stores/dashboard'
+import { nextTick } from 'vue'
 
 const STORAGE_KEY = 'medical-dashboard-config'
 
@@ -33,6 +34,28 @@ describe('dashboard store configuration', () => {
     store.moveModule(9, 8)
 
     expect(store.config.moduleOrder[8]).toBe('deviceDistribution')
+  })
+
+  it('defaults old saved configs to the glass panel style and persists a new selection', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        themeId: 'deep-sea-instrument',
+        layout: '3x3',
+      }),
+    )
+
+    const store = useDashboardStore()
+
+    expect(store.config.panelStyle).toBe('glass-flow')
+
+    store.setPanelStyle('chamfered-instrument')
+    await nextTick()
+
+    expect(store.config.panelStyle).toBe('chamfered-instrument')
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}').panelStyle).toBe(
+      'chamfered-instrument',
+    )
   })
 
   it('replaces an occupied layout slot when placing an available module into it', () => {
