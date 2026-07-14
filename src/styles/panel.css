@@ -422,7 +422,7 @@
   color: color-mix(in srgb, var(--text) 92%, var(--accent) 8%);
 }
 
-/* 立体机械边框：直接复用参考图四边的九宫格切片，保留原始折线与分段结构。 */
+/* 立体机械边框：源图必须保留在 src/assets，交由 Vite 解析并输出可部署的资源地址。 */
 :where(.dashboard-shell[data-panel-style='chamfered-instrument']) .screen-grid > .panel {
   border: 0;
   border-radius: 0;
