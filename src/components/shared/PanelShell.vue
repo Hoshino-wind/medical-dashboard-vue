@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import MechanicalFrame from '../visual/MechanicalFrame.vue'
 import type { ModuleKind } from '@/types/module'
 
 const props = withDefaults(
@@ -18,10 +19,12 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
 </script>
 
 <template>
-  <section class="panel" :class="panelVariantClass">
+  <section class="panel mechanical-frame-host" :class="panelVariantClass">
+    <MechanicalFrame variant="panel" />
     <span class="panel-border-flow"></span>
     <div class="panel-header panel-header--main">
-      <h2 class="panel-title-frame">
+      <h2 class="panel-title-frame mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span class="panel-title-mini-bars panel-title-mini-bars--left" aria-hidden="true">
           <i></i><i></i><i></i>
         </span>

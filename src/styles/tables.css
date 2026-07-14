@@ -268,3 +268,48 @@
       transparent 70%
     );
 }
+
+/* 浅色玻璃主题：维修、巡检、保养工单共享透明表格材质。 */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  :is(.work-order-module, .work-order-table-wrap, .order-list-panel, .paged-viewport, .paged-track, .paged-page) {
+  background: transparent;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .data-table th {
+  border-bottom-color: rgba(103, 145, 182, 0.18);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.07)
+  );
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .data-table td {
+  border-bottom-color: rgba(103, 145, 182, 0.13);
+  background: transparent;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .data-table tbody tr:hover {
+  background: rgba(62, 151, 231, 0.055);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .work-order-summary {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.58);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .work-order-summary
+  > div {
+  border-right-color: rgba(103, 145, 182, 0.14);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--status-tone, var(--chart-primary)) 4%, transparent),
+    transparent 58%
+  );
+}

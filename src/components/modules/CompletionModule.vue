@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import Pie3D from '../charts/Pie3D.vue'
 import CountUp from '../shared/CountUp.vue'
 import HologramGaugeBase from '../visual/HologramGaugeBase.vue'
+import MechanicalFrame from '../visual/MechanicalFrame.vue'
 import { pxToRem } from '@/utils/rem'
 import { usePagedList } from '@/composables/usePagedList'
 import type { InspectionOrders } from '@/types/dashboard'
@@ -102,13 +103,16 @@ const inspectionPieItems = computed(() => {
     </aside>
 
     <div class="module-status-summary inspection-status-summary">
-      <div class="is-total">
+      <div class="is-total mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>总数</span><b><CountUp :value="data.total" /></b><em>单</em>
       </div>
-      <div class="is-good">
+      <div class="is-good mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>已完成</span><b><CountUp :value="data.finished" /></b><em>单</em>
       </div>
-      <div class="is-purple">
+      <div class="is-purple mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>待巡检</span><b><CountUp :value="data.waiting" /></b><em>单</em>
       </div>
     </div>

@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import CountUp from '../shared/CountUp.vue'
 import HealthPieChart from '../charts/HealthPieChart.vue'
+import MechanicalFrame from '../visual/MechanicalFrame.vue'
 import { usePagedList } from '@/composables/usePagedList'
 import type { HealthTrendData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
@@ -19,17 +20,32 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
 
 const pieItems = computed(() => {
   return [
-    { name: '运行正常', value: props.data.online, color: props.theme.variables['--data-health-pie-good'] },
-    { name: '维保预警', value: props.data.warning, color: props.theme.variables['--data-health-pie-warning'] },
-    { name: '维修中', value: props.data.repairing, color: props.theme.variables['--data-health-pie-repairing'] },
-    { name: '待保养', value: props.data.pending, color: props.theme.variables['--data-health-pie-pending'] },
+    {
+      name: '运行正常',
+      value: props.data.online,
+      color: props.theme.variables['--data-health-pie-good'],
+    },
+    {
+      name: '维保预警',
+      value: props.data.warning,
+      color: props.theme.variables['--data-health-pie-warning'],
+    },
+    {
+      name: '维修中',
+      value: props.data.repairing,
+      color: props.theme.variables['--data-health-pie-repairing'],
+    },
+    {
+      name: '待保养',
+      value: props.data.pending,
+      color: props.theme.variables['--data-health-pie-pending'],
+    },
   ]
 })
 
 const pieTotal = computed(
   () => props.data.online + props.data.warning + props.data.repairing + props.data.pending,
 )
-
 </script>
 
 <template>
@@ -71,16 +87,20 @@ const pieTotal = computed(
     </aside>
 
     <div class="module-status-summary health-status-summary">
-      <div class="is-good">
+      <div class="is-good mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>运行正常</span><b><CountUp :value="data.online" /></b><em>台</em>
       </div>
-      <div class="is-warn">
+      <div class="is-warn mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>维保预警</span><b><CountUp :value="data.warning" /></b><em>台</em>
       </div>
-      <div class="is-danger">
+      <div class="is-danger mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>维修中</span><b><CountUp :value="data.repairing" /></b><em>台</em>
       </div>
-      <div class="is-purple">
+      <div class="is-purple mechanical-frame-host">
+        <MechanicalFrame variant="compact" />
         <span>待保养</span><b><CountUp :value="data.pending" /></b><em>台</em>
       </div>
     </div>

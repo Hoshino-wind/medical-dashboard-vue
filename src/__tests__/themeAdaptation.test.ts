@@ -463,18 +463,21 @@ describe('global theme adaptation', () => {
       moduleStyles.match(/\.inspection-pie-shell\s+\.pie3d-three-shell\s*\{[\s\S]*?\}/)?.[0] ?? ''
     const inspectionBaseBlock =
       moduleStyles.match(/\.inspection-pie-base\s*\{[\s\S]*?\}/)?.[0] ?? ''
+    const healthBaseTag = healthPie.match(/<HologramGaugeBase[\s\S]*?\/>/)?.[0] ?? ''
+    const inspectionBaseTag =
+      completionModule.match(/<HologramGaugeBase[\s\S]*?\/>/)?.[0] ?? ''
 
     expect(healthPie).toContain('const chartHeight = pxToRem(136)')
     expect(healthPie).toContain(':thickness="7"')
     expect(healthPie).toContain('auto-rotate')
-    expect(healthPie).not.toContain('variant="compact"')
+    expect(healthBaseTag).not.toContain('variant="compact"')
     expect(healthPie).toContain(':speed="8.4"')
     expect(healthPie).toContain('direction="counter-clockwise"')
     expect(healthPie).not.toContain('label-deck')
     expect(completionModule).toContain('const chartHeight = pxToRem(136)')
     expect(completionModule).toContain(':thickness="7"')
     expect(completionModule).toContain('auto-rotate')
-    expect(completionModule).not.toContain('variant="compact"')
+    expect(inspectionBaseTag).not.toContain('variant="compact"')
     expect(completionModule).not.toContain('label-deck')
     expect(healthCoreBlock).toContain('width: 12.85rem')
     expect(healthCoreBlock).toContain('height: 8.5rem')
