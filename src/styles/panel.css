@@ -234,7 +234,7 @@
 }
 
 .panel-header h2 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 950;
   line-height: 1.05;
   color: color-mix(in srgb, var(--text) 96%, var(--panel-title-primary) 4%);
@@ -259,10 +259,38 @@
   display: block;
   min-width: 0;
   max-width: min(100%, 17.25rem);
+  padding: 0 0.125rem 0.3125rem;
   overflow: hidden;
+  color: inherit;
+  font-family: 'STHeiti', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.06em;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.panel-title-text::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.0625rem;
+  width: min(96%, 8.5rem);
+  height: 0.22rem;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(71, 205, 255, 0.45) 18%,
+    #7de4ff 38%,
+    #ffffff 50%,
+    #7de4ff 62%,
+    rgba(71, 205, 255, 0.45) 82%,
+    transparent 100%
+  );
+  clip-path: ellipse(50% 50% at 50% 50%);
+  filter: drop-shadow(0 0 0.15rem rgba(91, 221, 255, 0.95))
+    drop-shadow(0 0 0.4rem rgba(50, 178, 255, 0.65));
+  transform: translateX(-50%);
 }
 
 .panel-title-mini-bars {

@@ -16,24 +16,44 @@
 
 .view-switch {
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
+  right: 0;
+  bottom: 0;
   z-index: 1100;
   display: flex;
   gap: 0.5rem;
-  transition: opacity 180ms ease, transform 180ms ease;
+  padding: 1rem;
 }
 
 .view-switch.screen-mode {
-  bottom: 0.1rem;
+  bottom: 0;
+}
+
+.view-switch .app-button {
+  opacity: 0;
+  transform: translateY(0.5rem);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.view-switch:hover .app-button,
+.view-switch:focus-within .app-button {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 .app-button.active,
 .app-button:hover {
   border-color: color-mix(in srgb, var(--glass-edge) 86%, transparent);
   background: color-mix(in srgb, var(--glass-strong) 90%, transparent);
+}
+
+@media (hover: none) {
+  .view-switch .app-button {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
 }
 
 .theme-card {
