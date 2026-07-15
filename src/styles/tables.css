@@ -1,24 +1,7 @@
-/* Data tables */
-.work-order-module {
-  display: grid;
-  height: 100%;
-  min-height: 0;
-  grid-template-rows: minmax(0, 1fr) 2.65rem;
-  gap: 0.375rem;
-}
-
-.work-order-table-wrap {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
 /* 通用整页翻页列表:表头单独成表固定,表体按可视区高度整页向上翻(工单表 / 巡检表共用) */
 .paged-head-table {
   flex: none;
 }
-
 /* 翻页可视区:裁掉溢出的页,内部轨道每页占满一个可视区高度 */
 .paged-viewport {
   position: relative;
@@ -26,19 +9,16 @@
   min-height: 0;
   overflow: hidden;
 }
-
 .paged-track {
   display: grid;
   grid-auto-rows: 100%;
   height: 100%;
   will-change: transform;
 }
-
 /* 每页顶端对齐,行数不足一页时下方留白 */
 .paged-page {
   min-height: 0;
 }
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -46,21 +26,20 @@
   line-height: 1.28;
   table-layout: fixed;
 }
-
-
 .data-table th {
-  color: var(--muted);
+  color: var(--data-table-th-color, var(--muted));
   font-weight: 900;
   text-align: left;
   padding: 0.36rem 0.5rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 76%, transparent);
+  background: var(--data-table-th-bg, transparent);
+  border-bottom: 0.0625rem solid var(--data-table-th-border, color-mix(in srgb, var(--glass-edge) 76%, transparent));
   line-height: 1.2;
   white-space: nowrap;
 }
-
 .data-table td {
   padding: 0.36rem 0.5rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 48%, transparent);
+  background: var(--data-table-td-bg, transparent);
+  border-bottom: 0.0625rem solid var(--data-table-td-border, color-mix(in srgb, var(--glass-edge) 48%, transparent));
   color: var(--text);
   font-weight: 760;
   line-height: 1.24;
@@ -69,70 +48,36 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .data-table th:nth-child(1),
 .data-table td:nth-child(1) {
   width: 20%;
 }
-
 .data-table th:nth-child(2),
 .data-table td:nth-child(2) {
   width: 21%;
 }
-
 .data-table th:nth-child(3),
 .data-table td:nth-child(3) {
   width: 18%;
 }
-
 .data-table th:nth-child(4),
 .data-table td:nth-child(4) {
   width: 18%;
 }
-
 .data-table th:nth-child(5),
 .data-table td:nth-child(5) {
   width: 11%;
 }
-
 .data-table th:nth-child(6),
 .data-table td:nth-child(6) {
   width: 12%;
 }
-
 .data-table tbody tr {
   transition: background 140ms ease, transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .data-table tbody tr:hover {
-  background: color-mix(in srgb, var(--chart-primary) 10%, transparent);
+  background: var(--data-table-hover-bg, color-mix(in srgb, var(--chart-primary) 10%, transparent));
 }
-
-.work-order-pinned-table {
-  flex: none;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--warn) 12%, transparent), color-mix(in srgb, var(--warn) 5%, transparent));
-}
-
-.work-order-pinned-table .is-pending-repair td {
-  border-bottom-color: color-mix(in srgb, var(--warn) 50%, transparent);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--warn) 24%, transparent), color-mix(in srgb, var(--warn) 8%, transparent));
-  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--warn) 18%, transparent);
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  height: auto;
-  padding: 0;
-  border-radius: 0;
-  font-size: calc(0.85rem * var(--dashboard-list-font-scale, 1.18));
-  font-weight: 900;
-}
-
 .work-order-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -150,7 +95,6 @@
     inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 18%, transparent),
     0 0 0.875rem color-mix(in srgb, var(--surface-strong) 10%, transparent);
 }
-
 .work-order-summary > div {
   display: flex;
   align-items: center;
@@ -172,11 +116,9 @@
     );
   white-space: nowrap;
 }
-
 .work-order-summary > div:last-child {
   border-right: 0;
 }
-
 .work-order-summary span {
   display: inline-flex;
   height: 1.18rem;
@@ -186,7 +128,6 @@
   font-weight: 850;
   line-height: 1;
 }
-
 .work-order-summary b {
   display: inline-flex;
   height: 1.18rem;
@@ -197,14 +138,12 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-
 .work-order-summary b > span {
   display: inline-flex;
   height: 1.18rem;
   align-items: center;
   line-height: 1;
 }
-
 .work-order-summary em {
   display: inline-flex;
   height: 1.18rem;
@@ -215,45 +154,33 @@
   font-weight: 850;
   line-height: 1;
 }
-
 .work-order-summary .is-danger {
   --status-tone: var(--danger);
   animation: status-alert-flicker 2.65s ease-in-out infinite;
 }
-
 .work-order-summary .is-purple {
   --status-tone: var(--accent-3);
 }
-
 .work-order-summary .is-warn {
   --status-tone: var(--warn);
   animation: status-alert-flicker 3.2s ease-in-out infinite;
 }
-
 .work-order-summary .is-good {
   --status-tone: var(--good);
 }
-
-.dashboard-shell[data-theme-mode='light'] .data-table th {
-  border-bottom-color: color-mix(in srgb, var(--border) 82%, transparent);
-  background: color-mix(in srgb, var(--bg-soft) 26%, #ffffff);
-  color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+/* 浅色主题:数据表集中覆盖(仅在此调 light 值) */
+.dashboard-shell[data-theme-mode='light'] {
+  --data-table-th-bg: color-mix(in srgb, var(--bg-soft) 26%, #ffffff);
+  --data-table-th-border: color-mix(in srgb, var(--border) 82%, transparent);
+  --data-table-th-color: color-mix(in srgb, var(--text) 70%, var(--muted) 30%);
+  --data-table-td-border: color-mix(in srgb, var(--border) 52%, transparent);
+  --data-table-hover-bg: color-mix(in srgb, var(--chart-primary) 3%, #ffffff);
 }
-
-.dashboard-shell[data-theme-mode='light'] .data-table td {
-  border-bottom-color: color-mix(in srgb, var(--border) 52%, transparent);
-}
-
-.dashboard-shell[data-theme-mode='light'] .data-table tbody tr:hover {
-  background: color-mix(in srgb, var(--chart-primary) 3%, #ffffff);
-}
-
 .dashboard-shell[data-theme-mode='light'] .work-order-summary {
   border-color: color-mix(in srgb, var(--border) 86%, transparent);
   background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--bg-soft) 24%, #ffffff));
   box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
 }
-
 .dashboard-shell[data-theme-mode='light'] .work-order-summary > div {
   border-right-color: color-mix(in srgb, var(--border) 72%, transparent);
   background:
@@ -268,41 +195,25 @@
       transparent 70%
     );
 }
-
 /* 浅色玻璃主题：维修、巡检、保养工单共享透明表格材质。 */
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
   :is(.work-order-module, .work-order-table-wrap, .order-list-panel, .paged-viewport, .paged-track, .paged-page) {
   background: transparent;
 }
-
-.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
-  .data-table th {
-  border-bottom-color: rgba(103, 145, 182, 0.18);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.22),
-    rgba(255, 255, 255, 0.07)
-  );
+/* 浅色 + 切角面板:数据表集中覆盖(比通用浅色更具体,变量自动胜出) */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument'] {
+  --data-table-th-border: rgba(103, 145, 182, 0.18);
+  --data-table-th-bg: linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.07));
+  --data-table-td-border: rgba(103, 145, 182, 0.13);
+  --data-table-td-bg: transparent;
+  --data-table-hover-bg: rgba(62, 151, 231, 0.055);
 }
-
-.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
-  .data-table td {
-  border-bottom-color: rgba(103, 145, 182, 0.13);
-  background: transparent;
-}
-
-.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
-  .data-table tbody tr:hover {
-  background: rgba(62, 151, 231, 0.055);
-}
-
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
   .work-order-summary {
   border-color: rgba(255, 255, 255, 0.48);
   background: rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.58);
 }
-
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
   .work-order-summary
   > div {

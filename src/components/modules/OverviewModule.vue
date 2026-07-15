@@ -88,3 +88,127 @@ const overviewRingSize = pxToRem(132)
     </div>
   </div>
 </template>
+
+<style scoped>
+/* 设备总览：环形缩小居中，5 个指标卡环绕分布（grid 区域布局，天然防重叠） */
+.overview-layout {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  /* 内边距让环绕指标卡不贴面板边缘 */
+  padding: 0.35rem 0.6rem;
+  /* 左列 | 环形 | 右列，环形跨上下两行 */
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: 1fr 1fr auto;
+  grid-template-areas:
+    'tl   ring tr'
+    'bl   ring br'
+    'bc   bc   bc';
+  align-items: center;
+  justify-items: center;
+  gap: 0.35rem 0.5rem;
+  box-sizing: border-box;
+}
+.overview-ring {
+  grid-area: ring;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* —— grid-area 分配 —— */
+.overview-stat.pos-tl {
+  grid-area: tl;
+  justify-self: start;
+}
+.overview-stat.pos-tr {
+  grid-area: tr;
+  justify-self: end;
+}
+.overview-stat.pos-bl {
+  grid-area: bl;
+  justify-self: start;
+}
+.overview-stat.pos-br {
+  grid-area: br;
+  justify-self: end;
+}
+.overview-stat.pos-bc {
+  grid-area: bc;
+  justify-self: center;
+  width: min(100%, 11rem);
+}
+/* 指标卡基础样式（紧凑版，适配环绕布局） */
+.overview-stat {
+  min-width: 0;
+  width: 100%;
+  max-width: 9rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 48%, transparent);
+  border-radius: 0.375rem;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, currentColor 12%, transparent), transparent 68%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-strong) 22%, transparent),
+      color-mix(in srgb, var(--surface) 12%, transparent)
+    );
+  padding: 0.3rem 0.5rem;
+  box-shadow:
+    inset 0.1875rem 0 0 color-mix(in srgb, currentColor 58%, transparent),
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 18%, transparent);
+}
+.overview-stat.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.overview-stat.with-icon > div {
+  min-width: 0;
+  flex: 1;
+}
+.overview-stat-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  padding: 0.3rem;
+  border: 0.0625rem solid color-mix(in srgb, currentColor 48%, transparent);
+  border-radius: 0.1875rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, currentColor 24%, transparent),
+    color-mix(in srgb, var(--surface-strong) 48%, transparent)
+  );
+}
+.overview-value {
+  margin-top: 0.12rem;
+  overflow: hidden;
+  font-size: calc(0.98rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.overview-value span {
+  margin-left: 0.125rem;
+  color: var(--muted);
+  font-size: calc(0.69rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 800;
+}
+/* kpi-label 也同步缩小一点，和紧凑卡更协调 */
+.overview-stat .kpi-label {
+  font-size: calc(0.69rem * var(--dashboard-font-scale, 1.45));
+  line-height: 1.1;
+}
+.kpi-label {
+  color: var(--muted);
+  font-size: calc(0.875rem * var(--dashboard-font-scale, 1.45));
+  line-height: 1;
+  white-space: nowrap;
+}
+.overview-stat.is-warn {
+  --status-tone: var(--warn);
+}
+.overview-stat.is-danger {
+  --status-tone: var(--danger);
+}
+</style>

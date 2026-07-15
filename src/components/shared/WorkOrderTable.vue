@@ -83,3 +83,42 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Data tables */
+.work-order-module {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) 2.65rem;
+  gap: 0.375rem;
+}
+.work-order-table-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.work-order-pinned-table {
+  flex: none;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--warn) 12%, transparent), color-mix(in srgb, var(--warn) 5%, transparent));
+}
+.work-order-pinned-table .is-pending-repair td {
+  border-bottom-color: color-mix(in srgb, var(--warn) 50%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--warn) 24%, transparent), color-mix(in srgb, var(--warn) 8%, transparent));
+  box-shadow: inset 0 0.0625rem 0 color-mix(in srgb, var(--warn) 18%, transparent);
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border-radius: 0;
+  font-size: calc(0.85rem * var(--dashboard-list-font-scale, 1.18));
+  font-weight: 900;
+}
+</style>

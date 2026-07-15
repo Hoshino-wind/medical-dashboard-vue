@@ -129,4 +129,9 @@ onUnmounted(stopAutoPaging)
     transition-duration: 0.2s;
   }
 }
+
+.availability-grid.availability-life,
+.availability-grid.availability-ultrasound {
+  transform: translate(0, 0.35rem);
+}
 </style>

@@ -34,3 +34,10 @@ const resolvedProps = computed(() => entry.value.resolveProps(props.module, ctx.
     <component :is="entry.component" v-bind="resolvedProps" />
   </PanelShell>
 </template>
+
+<!-- module-wide 由本组件加到子组件 PanelShell 的根上,走全局(非 scoped) -->
+<style>
+.module-wide {
+  min-width: 0;
+}
+</style>

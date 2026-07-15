@@ -35,7 +35,8 @@ describe('global theme adaptation', () => {
       })),
     )
     const ringStyles = readSource('styles/rings.css')
-    const headerStyles = readSource('styles/header.css')
+    // 头部文字样式已随 HeaderBar 组件化搬入其 <style scoped>
+    const headerStyles = readSource('components/shared/HeaderBar.vue')
     const moduleStyles = readSource('styles/modules.css')
     const panelStyles = readSource('styles/panel.css')
     const tableStyles = readSource('styles/tables.css')

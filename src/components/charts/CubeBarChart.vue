@@ -523,3 +523,41 @@ const option = computed(() => {
     <EChart class="chart-bar" :option="option" height="100%" />
   </div>
 </template>
+
+<style scoped>
+.cube-bar-chart {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.cube-bar-legend {
+  position: absolute;
+  top: 0;
+  right: 1.125rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  color: var(--text);
+  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+.cube-bar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  white-space: nowrap;
+}
+.cube-bar-legend i {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 0.1875rem;
+  border: 0.0625rem solid currentColor;
+}
+.chart-bar {
+  transform: none;
+}
+</style>

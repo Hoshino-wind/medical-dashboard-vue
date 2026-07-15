@@ -56,3 +56,66 @@ const lineFooter = computed(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.line-chart-module {
+  display: grid;
+  height: 100%;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) 2.25rem;
+  gap: 0.25rem;
+}
+.line-chart-body {
+  min-height: 0;
+}
+.line-chart-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 0.0625rem solid var(--line-footer-border, color-mix(in srgb, var(--border) 34%, transparent));
+  color: var(--muted);
+  background: var(
+    --line-footer-bg,
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--glass-highlight) 12%, transparent), transparent)
+  );
+}
+.line-chart-footer > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+.line-chart-footer > div:first-child {
+  border-right: 0.0625rem solid var(--line-footer-divider, color-mix(in srgb, var(--border) 24%, transparent));
+}
+.line-chart-footer span {
+  font-size: calc(0.64rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 850;
+}
+.line-chart-footer b {
+  color: var(--text);
+  font-size: calc(0.86rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 950;
+  font-style: normal;
+}
+.line-chart-footer em {
+  font-size: calc(0.58rem * var(--dashboard-font-scale, 1.45));
+  font-style: normal;
+  font-weight: 850;
+}
+.line-chart-trend strong {
+  font-size: calc(0.88rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 950;
+}
+.line-chart-trend.is-up b,
+.line-chart-trend.is-up strong {
+  color: var(--good);
+}
+.line-chart-trend.is-down b,
+.line-chart-trend.is-down strong {
+  color: var(--good);
+}
+</style>

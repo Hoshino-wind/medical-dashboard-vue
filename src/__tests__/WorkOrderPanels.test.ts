@@ -138,7 +138,8 @@ describe('work order style panels', () => {
   })
 
   it('pins pending repair orders before the scrolling repair list with distinct status colors and no vertical warning stripes', () => {
-    const tableStyles = readFileSync(join(testDir, '../styles/tables.css'), 'utf8')
+    // work-order-pinned-table 样式已随 WorkOrderTable 组件化搬入其 <style scoped>
+    const tableStyles = readFileSync(join(testDir, '../components/shared/WorkOrderTable.vue'), 'utf8')
     const wrapper = mount(WorkOrderTable, {
       props: {
         headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
