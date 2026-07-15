@@ -20,6 +20,22 @@ const props = withDefaults(
 
 const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
 
+// 环图多色交叉:每个环按序取不同主题色(6 色循环),基座随 --gauge-tone 自动跟色。
+// 两个可用率模块(life/ultrasound)错开起点,避免整屏配色雷同。
+const RING_PALETTE = [
+  'var(--data-bar)',
+  'var(--data-health-pie-warning)',
+  'var(--data-pie-pending)',
+  'var(--data-health-pie-good)',
+  'var(--data-health-pie-repairing)',
+  'var(--data-bar-3)',
+]
+function ringColorAt(localIndex: number): string {
+  const offset = props.variant === 'ultrasound' ? 3 : 0
+  const globalIndex = currentIndex.value * PAGE_SIZE + localIndex + offset
+  return RING_PALETTE[globalIndex % RING_PALETTE.length]
+}
+
 const pages = computed(() => {
   const result: AvailabilityItem[][] = []
   for (let index = 0; index < props.items.length; index += PAGE_SIZE) {
@@ -80,12 +96,13 @@ onUnmounted(stopAutoPaging)
         class="availability-page grid h-full grid-cols-3 items-center gap-1"
       >
         <AvailabilityMetricRing
-          v-for="item in currentPage"
+          v-for="(item, localIndex) in currentPage"
           :key="item.name"
           :value="item.value"
           :label="item.name"
           :count="item.count"
           :size="ringSize"
+          :tone="ringColorAt(localIndex)"
         />
       </div>
     </Transition>

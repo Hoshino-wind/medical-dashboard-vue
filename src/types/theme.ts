@@ -44,6 +44,8 @@ export interface ThemeVariables {
   '--chart-tertiary': string
   '--data-bar': string
   '--data-bar-secondary': string
+  '--data-bar-2': string
+  '--data-bar-3': string
   '--data-maintenance-line': string
   '--data-inspection-line': string
   '--data-ring': string

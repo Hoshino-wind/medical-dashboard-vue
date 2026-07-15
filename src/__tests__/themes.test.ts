@@ -36,6 +36,8 @@ const requiredVariableKeys: Array<keyof ThemeVariables> = [
   '--chart-tertiary',
   '--data-bar',
   '--data-bar-secondary',
+  '--data-bar-2',
+  '--data-bar-3',
   '--data-maintenance-line',
   '--data-inspection-line',
   '--data-ring',
@@ -150,9 +152,9 @@ describe('dashboard themes', () => {
     expect(theme.variables['--data-health-pie-good']).toBe('#237804')
     expect(theme.variables['--data-inspection-pie-finished']).toBe('#237804')
     expect(theme.variables['--data-inspection-line']).toBe('#20b486')
-    expect(theme.variables['--data-health-pie-pending']).toBe('#9ccaff')
+    expect(theme.variables['--data-health-pie-pending']).toBe('#7c3aed')
     expect(theme.variables['--good']).toBe('#2fbf8f')
-    expect(theme.variables['--warn']).toBe('#e8a43d')
-    expect(theme.variables['--danger']).toBe('#e86f80')
+    expect(theme.variables['--warn']).toBe('#d97706')
+    expect(theme.variables['--danger']).toBe('#e11d48')
   })
 })

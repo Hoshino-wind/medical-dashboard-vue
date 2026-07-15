@@ -50,7 +50,7 @@ describe('work order style panels', () => {
     expect(wrapper.find('.inspection-status-summary').exists()).toBe(true)
     expect(wrapper.find('.inspection-pie-panel .inspection-status-summary').exists()).toBe(false)
     expect(wrapper.text()).toContain('血液科层流病房')
-    expect(wrapper.text()).toContain('本月巡检完成率')
+    expect(wrapper.text()).toContain('本月保养完成率')
     expect(wrapper.text()).toContain('总数1482单')
     expect(wrapper.text()).toContain('已完成1411单')
     expect(wrapper.text()).toContain('待巡检71单')

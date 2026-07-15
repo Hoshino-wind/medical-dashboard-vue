@@ -37,7 +37,7 @@ const inspectionPieItems = computed(() => {
       color: themeColor('--data-inspection-pie-finished', '#20e8ff'),
     },
     {
-      name: '待巡检',
+      name: '待保养',
       value: props.data.waiting,
       color: themeColor('--data-inspection-pie-waiting', '#7efcff'),
     },
@@ -78,8 +78,8 @@ const inspectionPieItems = computed(() => {
       </div>
     </div>
 
-    <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月巡检完成率">
-      <div class="pie-summary-title">本月巡检完成率</div>
+    <aside class="pie-summary-panel inspection-pie-panel" aria-label="本月保养完成率">
+      <div class="pie-summary-title">本月保养完成率</div>
       <div class="pie-chart-shell inspection-pie-shell">
         <HologramGaugeBase
           class="inspection-pie-base"
@@ -113,7 +113,7 @@ const inspectionPieItems = computed(() => {
       </div>
       <div class="is-purple mechanical-frame-host">
         <MechanicalFrame variant="compact" />
-        <span>待巡检</span><b><CountUp :value="data.waiting" /></b><em>单</em>
+        <span>待保养</span><b><CountUp :value="data.waiting" /></b><em>单</em>
       </div>
     </div>
   </div>

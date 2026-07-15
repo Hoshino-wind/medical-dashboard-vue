@@ -116,8 +116,8 @@ const palette = computed<GaugePalette>(() => {
 
   return {
     tone: props.tone,
-    toneSoft: `color-mix(in srgb, ${props.tone} 58%, #ffffff 42%)`,
-    toneBright: `color-mix(in srgb, ${props.tone} 18%, #ffffff 82%)`,
+    toneSoft: `color-mix(in srgb, ${props.tone} 80%, #ffffff 20%)`,
+    toneBright: `color-mix(in srgb, ${props.tone} 52%, #ffffff 48%)`,
     track: thresholdPalette.value.track,
   }
 })

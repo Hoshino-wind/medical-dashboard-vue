@@ -1,8 +1,13 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import ConfigPanel from '@/components/shared/ConfigPanel.vue'
 import { useDashboardStore } from '@/stores/dashboard'
+
+const testDir = dirname(fileURLToPath(import.meta.url))
 
 describe('ConfigPanel workbench configuration', () => {
   beforeEach(() => {
@@ -56,7 +61,36 @@ describe('ConfigPanel workbench configuration', () => {
 
     expect(store.config.panelStyle).toBe('chamfered-instrument')
     expect(store.config.themeId).toBe(initialThemeId)
-    expect(wrapper.find('.panel-style-radio.active').text()).toContain('立体切角')
+    expect(wrapper.find('.panel-style-radio.active').text()).toContain('立体边框')
+  })
+
+  it('offers borderless as the middle of three card styles', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          BigScreen: true,
+        },
+      },
+    })
+    const store = useDashboardStore(pinia)
+    const styleOptions = wrapper.findAll('.panel-style-radio')
+
+    expect(styleOptions).toHaveLength(3)
+    expect(styleOptions.map((option) => option.text())).toEqual([
+      '流光玻璃',
+      '无边框',
+      '立体边框',
+    ])
+
+    const borderlessStyle = wrapper.find('[data-testid="panel-style-borderless"]')
+    expect(borderlessStyle.exists()).toBe(true)
+    await borderlessStyle.setValue()
+    await flushPromises()
+
+    expect(store.config.panelStyle).toBe('borderless')
+    expect(wrapper.find('.panel-style-radio.active').text()).toContain('无边框')
   })
 
   it('switches between 3x3 and 2x3 layout slot counts', async () => {
@@ -80,6 +114,111 @@ describe('ConfigPanel workbench configuration', () => {
     await flushPromises()
 
     expect(wrapper.findAll('.layout-slot')).toHaveLength(6)
+  })
+
+  it('does not show the configured slot count in the properties panel', () => {
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [createPinia()],
+        stubs: {
+          BigScreen: true,
+        },
+      },
+    })
+
+    expect(wrapper.find('.property-summary').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('已配置')
+  })
+
+  it('uses active theme colors for available business component cards', () => {
+    const configPanel = readFileSync(
+      join(testDir, '../components/shared/ConfigPanel.vue'),
+      'utf8',
+    )
+    const cardBlock =
+      configPanel.match(/\.business-component-card\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const interactiveBlock =
+      configPanel.match(
+        /\.business-component-card:hover,[\s\S]*?\.business-component-card:focus-visible\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(cardBlock).toContain('var(--accent)')
+    expect(cardBlock).toContain('var(--surface-strong)')
+    expect(cardBlock).not.toContain('#f2f3f5')
+    expect(interactiveBlock).toContain('var(--accent)')
+    expect(interactiveBlock).not.toContain('background: #ffffff')
+  })
+
+  it('renders property group legends as theme-aware section dividers', () => {
+    const configPanel = readFileSync(
+      join(testDir, '../components/shared/ConfigPanel.vue'),
+      'utf8',
+    )
+    const legendBlock = configPanel.match(/\.property-group legend\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const markerBlock =
+      configPanel.match(/\.property-group legend::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+
+    expect(legendBlock).toContain('width: 100%')
+    expect(legendBlock).toContain('var(--accent)')
+    expect(legendBlock).toContain('var(--text)')
+    expect(legendBlock).not.toContain('background: #111')
+    expect(markerBlock).toContain("content: ''")
+    expect(markerBlock).toContain('var(--accent)')
+  })
+
+  it('removes all panel border layers in borderless mode', () => {
+    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const borderlessPanelBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.screen-grid\s*>\s*\.panel\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const borderlessBeforeBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.panel::before\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const borderlessFlowBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.panel-border-flow\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(borderlessPanelBlock).toContain('border: 0')
+    expect(borderlessPanelBlock).toContain('box-shadow: none')
+    expect(borderlessBeforeBlock).toContain('display: none')
+    expect(borderlessFlowBlock).toContain('display: none')
+  })
+
+  it('keeps chamfered panel titles below the outer mechanical frame', () => {
+    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const chamferedTitleBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-header--main\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedBodyBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?>\s*\.panel-body\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedTitleFrameBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-title-frame\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedTitleTextBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-title-text\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedUnderlineBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-title-text::after\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(chamferedTitleBlock).toContain('padding-top: 1.375rem')
+    expect(chamferedTitleBlock).toContain('padding-bottom: 0.0625rem')
+    expect(chamferedTitleBlock).toContain('display: grid')
+    expect(chamferedTitleBlock).toContain('grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)')
+    expect(chamferedBodyBlock).toContain('height: calc(100% - 3.8125rem)')
+    expect(chamferedTitleFrameBlock).toContain('min-height: 2.375rem')
+    expect(chamferedTitleFrameBlock).toContain('grid-column: 2')
+    expect(chamferedTitleTextBlock).toContain('padding-bottom: 0')
+    expect(chamferedUnderlineBlock).toContain('display: none')
   })
 
   it('adds an available business component into an empty layout slot', async () => {

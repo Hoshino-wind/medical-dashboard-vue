@@ -139,10 +139,11 @@ function token(name: keyof Theme['variables']): string {
   return props.theme.variables[name]
 }
 
+// 柱状图 3 系列使用独立的柱色(与语义状态色解耦),每套主题各不相同以增强区分度
 const seriesTonePalette = computed<SeriesTone[]>(() => [
   { base: token('--data-bar'), accent: token('--data-bar-secondary') },
-  { base: token('--data-health-pie-warning'), accent: token('--warn') },
-  { base: token('--data-health-pie-repairing'), accent: token('--danger') },
+  { base: token('--data-bar-2'), accent: token('--data-bar-2') },
+  { base: token('--data-bar-3'), accent: token('--data-bar-3') },
 ])
 
 const legendItems = computed<LegendItem[]>(() => {
@@ -238,18 +239,18 @@ const option = computed(() => {
   function columnFills(tone: SeriesTone) {
     return {
       left: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        { offset: 0, color: colorWithAlpha(tone.accent, isLight ? 0.74 : 0.82) },
-        { offset: 0.55, color: colorWithAlpha(tone.base, isLight ? 0.42 : 0.56) },
-        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.14 : 0.2) },
+        { offset: 0, color: colorWithAlpha(tone.accent, isLight ? 0.9 : 0.98) },
+        { offset: 0.55, color: colorWithAlpha(tone.base, isLight ? 0.72 : 0.82) },
+        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.42 : 0.5) },
       ]),
       right: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        { offset: 0, color: colorWithAlpha(tone.base, isLight ? 0.58 : 0.7) },
-        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.1 : 0.14) },
+        { offset: 0, color: colorWithAlpha(tone.base, isLight ? 0.82 : 0.9) },
+        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.34 : 0.42) },
       ]),
       top: new echarts.graphic.RadialGradient(0.5, 0.55, 0.72, [
-        { offset: 0, color: colorWithAlpha(instrumentBaseRim, isLight ? 0.54 : 0.72) },
-        { offset: 0.58, color: colorWithAlpha(tone.accent, isLight ? 0.46 : 0.58) },
-        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.16 : 0.22) },
+        { offset: 0, color: colorWithAlpha(instrumentBaseRim, isLight ? 0.62 : 0.8) },
+        { offset: 0.58, color: colorWithAlpha(tone.accent, isLight ? 0.66 : 0.78) },
+        { offset: 1, color: colorWithAlpha(tone.base, isLight ? 0.42 : 0.52) },
       ]),
     }
   }

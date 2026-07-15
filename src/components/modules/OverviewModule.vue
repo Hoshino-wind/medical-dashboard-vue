@@ -70,7 +70,7 @@ const overviewRingSize = pxToRem(132)
       <MechanicalFrame variant="compact" />
       <ClipboardList class="overview-stat-icon text-[color:var(--warn)]" />
       <div>
-        <div class="kpi-label">待巡</div>
+        <div class="kpi-label">待巡检</div>
         <div class="overview-value text-[color:var(--warn)]">
           <CountUp :value="data.maintenanceDue" /><span>台</span>
         </div>
@@ -80,7 +80,7 @@ const overviewRingSize = pxToRem(132)
       <MechanicalFrame variant="compact" />
       <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
       <div>
-        <div class="kpi-label">待巡检</div>
+        <div class="kpi-label">待保养</div>
         <div class="overview-value text-[color:var(--data-inspection-line)]">
           <CountUp :value="data.inspectionDue" /><span>台</span>
         </div>

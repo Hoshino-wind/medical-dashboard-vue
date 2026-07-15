@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { AlertCircle, Check, ChevronDown, LayoutGrid, RotateCcw, Save, X } from 'lucide-vue-next'
+import { AlertCircle, Check, ChevronDown, RotateCcw, Save, X } from 'lucide-vue-next'
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
 import BigScreen from './BigScreen.vue'
@@ -12,7 +12,7 @@ import type { Theme, ThemeId } from '@/types/theme'
 type ModuleDisplayType = 'table' | 'chart'
 
 const store = useDashboardStore()
-const { config, availableModules, selectedModules, selectedSlotModules, activeTheme, slotCount } =
+const { config, availableModules, selectedModules, selectedSlotModules, activeTheme } =
   storeToRefs(store)
 
 // 效果预览等比缩小：基于 1920 基准宽度计算 scale
@@ -43,12 +43,11 @@ const tableModuleIds = new Set(['repairOrders', 'inspectionOrders', 'healthTrend
 
 const panelStyleOptions: Array<{ id: PanelStyle; label: string }> = [
   { id: 'glass-flow', label: '流光玻璃' },
-  { id: 'chamfered-instrument', label: '立体切角' },
+  { id: 'borderless', label: '无边框' },
+  { id: 'chamfered-instrument', label: '立体边框' },
 ]
 
 const slotItems = computed(() => selectedSlotModules.value)
-
-const configuredCount = computed(() => selectedModules.value.length)
 
 function moduleDisplayType(module: ModuleCatalogItem): ModuleDisplayType {
   return tableModuleIds.has(module.id) ? 'table' : 'chart'
@@ -321,11 +320,6 @@ onBeforeUnmount(() => {
                 />
               </label>
             </fieldset>
-
-            <div class="property-summary">
-              <LayoutGrid class="h-4 w-4" aria-hidden="true" />
-              <span>{{ configuredCount }}/{{ slotCount }} 已配置</span>
-            </div>
           </div>
         </section>
       </div>
@@ -477,18 +471,27 @@ onBeforeUnmount(() => {
   gap: 0.75rem;
   align-items: center;
   min-height: 3.05rem;
-  border: 0;
+  border: 0.0625rem solid color-mix(in srgb, var(--accent) 42%, var(--border) 58%);
   border-radius: 0.25rem;
-  background: #f2f3f5;
-  color: #dce9f5;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 30%, var(--surface-strong) 70%),
+    color-mix(in srgb, var(--accent) 18%, var(--surface-strong) 82%)
+  );
+  color: var(--text);
   padding: 0 0.75rem;
   text-align: left;
   cursor: grab;
-  transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
 }
 .business-component-card:hover,
 .business-component-card:focus-visible {
-  background: #ffffff;
+  border-color: color-mix(in srgb, var(--accent-2) 72%, var(--border) 28%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 40%, var(--surface-strong) 60%),
+    color-mix(in srgb, var(--accent) 26%, var(--surface-strong) 74%)
+  );
   box-shadow: 0 0 0 0.125rem color-mix(in srgb, var(--accent) 58%, transparent);
   transform: translateY(-0.0625rem);
   outline: none;
@@ -609,22 +612,44 @@ onBeforeUnmount(() => {
 .property-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.25rem;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  min-width: 0;
   border: 0;
-  border-top: 0.0625rem solid color-mix(in srgb, #ffffff 14%, transparent);
   margin: 0;
-  padding: 1.85rem 0 1.6rem;
+  padding: 0 0 1.5rem;
 }
 .property-group + .property-group {
-  margin-top: 0.15rem;
+  margin-top: 0.3rem;
 }
 .property-group legend {
-  margin: 0 auto;
-  background: #111;
-  color: color-mix(in srgb, var(--text) 86%, #ffffff 14%);
-  padding: 0.25rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0 0 1.05rem;
+  border-bottom: 0.0625rem solid color-mix(in srgb, var(--accent) 30%, var(--border) 70%);
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 14%, var(--surface-strong) 86%),
+    transparent 82%
+  );
+  color: color-mix(in srgb, var(--text) 84%, var(--accent-2) 16%);
+  padding: 0.55rem 0.7rem;
   font-size: calc(0.8rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;
+  letter-spacing: 0.03em;
+}
+.property-group legend::before {
+  content: '';
+  flex: 0 0 0.2rem;
+  width: 0.2rem;
+  height: 1rem;
+  border-radius: 62.4375rem;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 0.65rem color-mix(in srgb, var(--accent) 52%, transparent);
 }
 .property-radio {
   display: inline-flex;
@@ -650,19 +675,6 @@ onBeforeUnmount(() => {
 }
 .panel-style-radio {
   min-width: 6.6rem;
-}
-.property-summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 2rem;
-  margin-top: 1rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--border) 46%, transparent);
-  border-radius: 0.25rem;
-  color: color-mix(in srgb, var(--muted) 76%, #ffffff 24%);
-  padding: 0 0.7rem;
-  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 850;
 }
 .config-preview-panel {
   margin-top: 0.85rem;

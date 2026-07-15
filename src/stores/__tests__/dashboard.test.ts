@@ -36,7 +36,7 @@ describe('dashboard store configuration', () => {
     expect(store.config.moduleOrder[8]).toBe('deviceDistribution')
   })
 
-  it('defaults old saved configs to the glass panel style and persists a new selection', async () => {
+  it('defaults old saved configs to the glass panel style and persists borderless selection', async () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -49,12 +49,12 @@ describe('dashboard store configuration', () => {
 
     expect(store.config.panelStyle).toBe('glass-flow')
 
-    store.setPanelStyle('chamfered-instrument')
+    store.setPanelStyle('borderless')
     await nextTick()
 
-    expect(store.config.panelStyle).toBe('chamfered-instrument')
+    expect(store.config.panelStyle).toBe('borderless')
     expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}').panelStyle).toBe(
-      'chamfered-instrument',
+      'borderless',
     )
   })
 
