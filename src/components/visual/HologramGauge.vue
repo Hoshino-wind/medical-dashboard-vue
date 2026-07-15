@@ -18,6 +18,7 @@ const props = withDefaults(
     baseSpeed?: number
     baseDirection?: 'clockwise' | 'counter-clockwise'
     baseIntensity?: number
+    colorMode?: 'solid' | 'gradient'
   }>(),
   {
     unit: '台',
@@ -29,6 +30,7 @@ const props = withDefaults(
     baseSpeed: 6.4,
     baseDirection: 'clockwise',
     baseIntensity: 1,
+    colorMode: 'solid',
   },
 )
 
@@ -163,7 +165,10 @@ onUnmounted(() => {
 <template>
   <div
     class="hologram-gauge"
-    :class="{ 'is-large': large, 'has-inside-label': insideLabel, 'is-complete': isComplete }"
+    :class="[
+      `ring-${colorMode}`,
+      { 'is-large': large, 'has-inside-label': insideLabel, 'is-complete': isComplete },
+    ]"
     :style="rootStyle"
   >
     <div class="hologram-gauge-stage">

@@ -90,8 +90,8 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-rows: minmax(0, 1fr) 2.65rem;
-  gap: 0.375rem;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 0;
 }
 .work-order-table-wrap {
   display: flex;

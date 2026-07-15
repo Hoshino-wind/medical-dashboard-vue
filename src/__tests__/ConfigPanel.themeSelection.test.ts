@@ -187,7 +187,7 @@ describe('ConfigPanel workbench configuration', () => {
     expect(borderlessFlowBlock).toContain('display: none')
   })
 
-  it('keeps chamfered panel titles below the outer mechanical frame', () => {
+  it('centers chamfered panel titles on the outer mechanical frame', () => {
     const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
     const chamferedTitleBlock =
       panelStyles.match(
@@ -210,15 +210,58 @@ describe('ConfigPanel workbench configuration', () => {
         /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-title-text::after\s*\{[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
-    expect(chamferedTitleBlock).toContain('padding-top: 1.375rem')
+    expect(chamferedTitleBlock).toContain('z-index: 5')
+    expect(chamferedTitleBlock).toContain('padding-top: 0')
     expect(chamferedTitleBlock).toContain('padding-bottom: 0.0625rem')
     expect(chamferedTitleBlock).toContain('display: grid')
     expect(chamferedTitleBlock).toContain('grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)')
-    expect(chamferedBodyBlock).toContain('height: calc(100% - 3.8125rem)')
+    expect(chamferedBodyBlock).toContain('height: calc(100% - 2.4375rem)')
     expect(chamferedTitleFrameBlock).toContain('min-height: 2.375rem')
     expect(chamferedTitleFrameBlock).toContain('grid-column: 2')
+    expect(chamferedTitleFrameBlock).toContain('align-items: center')
     expect(chamferedTitleTextBlock).toContain('padding-bottom: 0')
     expect(chamferedUnderlineBlock).toContain('display: none')
+  })
+
+  it('gives chamfered status summary cards enough text height and a shorter width', () => {
+    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const mechanicalFrame = readFileSync(
+      join(testDir, '../components/visual/MechanicalFrame.vue'),
+      'utf8',
+    )
+    const chamferedModuleGridBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?:is\(\.inspection-order-grid,\s*\.health-status-grid\)\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedSummaryBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.module-status-summary\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedSummaryItemBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.module-status-summary\s*>\s*div\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const chamferedCompactFrameBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.module-status-summary\s+\.mechanical-frame--compact\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+    const purpleCompactFrameBlock =
+      mechanicalFrame.match(
+        /:global\(\.is-purple\s*>\s*\.mechanical-frame--compact\)\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
+
+    expect(chamferedModuleGridBlock).toContain('grid-template-rows: minmax(0, 1fr) 3.25rem')
+    expect(chamferedSummaryBlock).toContain('width: calc(100% - 1.25rem)')
+    expect(chamferedSummaryBlock).toContain('height: 3.25rem')
+    expect(chamferedSummaryBlock).toContain('justify-self: center')
+    expect(chamferedSummaryItemBlock).toContain('width: calc(100% - 0.75rem)')
+    expect(chamferedSummaryItemBlock).toContain('min-height: 3.25rem')
+    expect(chamferedSummaryItemBlock).toContain('padding: 0.375rem 0.625rem')
+    expect(chamferedCompactFrameBlock).toContain('display: block')
+    expect(chamferedCompactFrameBlock).toContain('height: auto')
+    expect(chamferedCompactFrameBlock).toContain('border-width: 0.5625rem')
+    expect(chamferedCompactFrameBlock).toContain('border-image-width: 0.5625rem')
+    expect(purpleCompactFrameBlock).toContain('opacity: 0.82')
   })
 
   it('adds an available business component into an empty layout slot', async () => {

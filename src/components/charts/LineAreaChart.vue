@@ -55,7 +55,7 @@ const option = computed(() => {
     color: [lineColor],
     animationDuration: 1000,
     animationEasing: 'cubicOut',
-    grid: { left: 54, right: 24, top: 18, bottom: 28 },
+    grid: { left: 54, right: 24, top: 30, bottom: 28 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
@@ -83,6 +83,15 @@ const option = computed(() => {
           color: lineColor,
           borderColor: pointColor,
           borderWidth: 2,
+        },
+        // 每个点位都标出数值
+        label: {
+          show: true,
+          position: 'top',
+          color: text,
+          fontSize: chartFontSize(9),
+          fontWeight: 800,
+          distance: 6,
         },
         lineStyle: {
           width: isLight ? 3 : 3.6,

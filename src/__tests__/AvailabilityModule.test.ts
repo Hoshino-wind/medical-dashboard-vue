@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { createPinia } from 'pinia'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import AvailabilityModule from '@/components/modules/AvailabilityModule.vue'
@@ -20,6 +21,7 @@ describe('availability module pagination', () => {
         ],
       },
       global: {
+        plugins: [createPinia()],
         stubs: {
           AvailabilityMetricRing: RingStub,
         },
@@ -47,6 +49,7 @@ describe('availability module pagination', () => {
         ],
       },
       global: {
+        plugins: [createPinia()],
         stubs: {
           AvailabilityMetricRing: RingStub,
         },
@@ -69,6 +72,7 @@ describe('availability module pagination', () => {
         ],
       },
       global: {
+        plugins: [createPinia()],
         stubs: {
           AvailabilityMetricRing: RingStub,
         },

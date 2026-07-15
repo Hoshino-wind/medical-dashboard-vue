@@ -87,6 +87,7 @@ withDefaults(
 
 :global(.is-purple > .mechanical-frame--compact) {
   border-image-source: url('../../assets/mechanical-frames/compact-purple.png');
+  opacity: 0.82;
 }
 
 /* 浅色主题走独立玻璃体系，不加载任何机械边框图片。 */

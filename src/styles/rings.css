@@ -144,6 +144,43 @@
   stop-color: var(--gauge-tone-bright);
 }
 
+/* —— 配色模式：环图进度弧可切换纯色 / 多色渐变(类似设备分布进度条) —— */
+/* 纯色：整环统一 tone，去掉由深到浅的同色系渐变 */
+.hologram-gauge.ring-solid .gauge-grad-a,
+.hologram-gauge.ring-solid .gauge-grad-b,
+.hologram-gauge.ring-solid .gauge-grad-c,
+.hologram-gauge.ring-solid .gauge-grad-d {
+  stop-color: var(--gauge-tone);
+}
+
+/* 渐变色：跨色相多色渐变（青→绿→蓝→紫），与设备分布进度条风格一致 */
+.hologram-gauge.ring-gradient .gauge-grad-a {
+  stop-color: hsl(180, 88%, 54%);
+}
+.hologram-gauge.ring-gradient .gauge-grad-b {
+  stop-color: hsl(150, 84%, 52%);
+}
+.hologram-gauge.ring-gradient .gauge-grad-c {
+  stop-color: hsl(210, 88%, 60%);
+}
+.hologram-gauge.ring-gradient .gauge-grad-d {
+  stop-color: hsl(280, 80%, 64%);
+}
+
+/* 浅色主题下渐变色稍微提亮，保证白底可读 */
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge.ring-gradient .gauge-grad-a {
+  stop-color: hsl(186, 90%, 48%);
+}
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge.ring-gradient .gauge-grad-b {
+  stop-color: hsl(155, 82%, 46%);
+}
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge.ring-gradient .gauge-grad-c {
+  stop-color: hsl(215, 88%, 54%);
+}
+.dashboard-shell[data-theme-mode='light'] .hologram-gauge.ring-gradient .gauge-grad-d {
+  stop-color: hsl(278, 70%, 58%);
+}
+
 .hologram-gauge-content {
   position: absolute;
   z-index: 3;

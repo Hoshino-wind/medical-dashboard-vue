@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useDashboardStore } from '@/stores/dashboard'
 import type { DeviceDistributionItem } from '@/types/dashboard'
 
 const PAGE_SIZE = 4
@@ -8,6 +10,10 @@ const PAGE_INTERVAL = 5000
 const props = defineProps<{
   items: DeviceDistributionItem[]
 }>()
+
+const store = useDashboardStore()
+const { config } = storeToRefs(store)
+const barColorMode = computed(() => config.value.barColorMode)
 
 const currentIndex = ref(0)
 let pageTimer: ReturnType<typeof setInterval> | null = null
@@ -60,7 +66,11 @@ onBeforeUnmount(stopTimer)
 </script>
 
 <template>
-  <div class="device-distribution" aria-label="设备分布台数占比">
+  <div
+    class="device-distribution"
+    :class="`bar-${barColorMode}`"
+    aria-label="设备分布台数占比"
+  >
     <Transition name="dist-flip" mode="out-in">
       <div :key="currentIndex" class="device-distribution-page">
         <div
@@ -175,12 +185,12 @@ onBeforeUnmount(stopTimer)
   box-shadow:
     inset 0 0 0 0.0625rem color-mix(in srgb, var(--instrument-rim) 14%, transparent);
 }
+/* 默认（渐变色模式）：0°→ 280° 色相渐变，让进度条色彩更丰富 */
 .device-distribution-bar {
   position: absolute;
   inset: 0 auto 0 0;
   min-width: 0.14rem;
   border-radius: inherit;
-  /* 0°→ 180° 色相渐变：青→紫→粉，让进度条色彩更丰富 */
   background: linear-gradient(
     90deg,
     hsl(180, 90%, 55%),
@@ -190,6 +200,13 @@ onBeforeUnmount(stopTimer)
   );
   box-shadow:
     0 0 0.5rem color-mix(in srgb, hsl(200, 90%, 55%) 40%, transparent),
+    inset 0 0.0625rem 0 color-mix(in srgb, #ffffff 42%, transparent);
+}
+/* 纯色模式：整条统一主题数据色，去掉跨色相渐变 */
+.device-distribution.bar-solid .device-distribution-bar {
+  background: var(--data-bar);
+  box-shadow:
+    0 0 0.5rem color-mix(in srgb, var(--data-bar) 40%, transparent),
     inset 0 0.0625rem 0 color-mix(in srgb, #ffffff 42%, transparent);
 }
 </style>
@@ -217,5 +234,10 @@ onBeforeUnmount(stopTimer)
 .dashboard-shell[data-theme-mode='light'] .device-distribution-bar {
   background: linear-gradient(90deg, hsl(195, 92%, 50%), hsl(165, 85%, 48%), hsl(225, 88%, 55%), hsl(280, 75%, 58%));
   box-shadow: 0 0 0.65rem rgba(8, 184, 255, 0.28);
+}
+/* 浅色主题纯色模式 */
+.dashboard-shell[data-theme-mode='light'] .device-distribution.bar-solid .device-distribution-bar {
+  background: var(--data-bar);
+  box-shadow: 0 0 0.65rem color-mix(in srgb, var(--data-bar) 32%, transparent);
 }
 </style>

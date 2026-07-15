@@ -3,7 +3,14 @@ import { defineStore } from 'pinia'
 import { themes } from '@/data/themes'
 import { defaultConfig, moduleCatalog } from '@/data/modules'
 import { readStorage, writeStorage } from '@/utils/storage'
-import { PANEL_STYLES, type DashboardConfig, type LayoutType, type PanelStyle } from '@/types/config'
+import {
+  COLOR_MODES,
+  PANEL_STYLES,
+  type ColorMode,
+  type DashboardConfig,
+  type LayoutType,
+  type PanelStyle,
+} from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -12,11 +19,14 @@ const STORAGE_KEY = 'medical-dashboard-config'
 /** 合法的布局值,用于校验 localStorage 脏数据 */
 const VALID_LAYOUTS: LayoutType[] = ['2x3', '3x3']
 const VALID_PANEL_STYLES = new Set<PanelStyle>(PANEL_STYLES)
+const VALID_COLOR_MODES = new Set<ColorMode>(COLOR_MODES)
 
 type SavedDashboardConfig = Partial<{
   themeId: ThemeId
   panelStyle: PanelStyle
   layout: LayoutType
+  ringColorMode: ColorMode
+  barColorMode: ColorMode
   selectedModuleIds: Array<string | null>
   moduleOrder: string[]
 }>
@@ -105,6 +115,14 @@ function loadConfig(): DashboardConfig {
       saved?.panelStyle && VALID_PANEL_STYLES.has(saved.panelStyle)
         ? saved.panelStyle
         : defaultConfig.panelStyle,
+    ringColorMode:
+      saved?.ringColorMode && VALID_COLOR_MODES.has(saved.ringColorMode)
+        ? saved.ringColorMode
+        : defaultConfig.ringColorMode,
+    barColorMode:
+      saved?.barColorMode && VALID_COLOR_MODES.has(saved.barColorMode)
+        ? saved.barColorMode
+        : defaultConfig.barColorMode,
     layout,
     selectedModuleIds: normalizeSelectedModuleIds(
       saved?.selectedModuleIds,
@@ -165,6 +183,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   function setPanelStyle(panelStyle: PanelStyle) {
     config.panelStyle = panelStyle
+  }
+
+  function setRingColorMode(mode: ColorMode) {
+    config.ringColorMode = mode
+  }
+
+  function setBarColorMode(mode: ColorMode) {
+    config.barColorMode = mode
   }
 
   function setLayout(layout: LayoutType) {
@@ -269,6 +295,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     config.themeId = defaultConfig.themeId
     config.panelStyle = defaultConfig.panelStyle
     config.layout = defaultConfig.layout
+    config.ringColorMode = defaultConfig.ringColorMode
+    config.barColorMode = defaultConfig.barColorMode
     config.selectedModuleIds = [...defaultConfig.selectedModuleIds]
     config.moduleOrder = [...defaultConfig.moduleOrder]
   }
@@ -281,6 +309,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         themeId: value.themeId,
         panelStyle: value.panelStyle,
         layout: value.layout,
+        ringColorMode: value.ringColorMode,
+        barColorMode: value.barColorMode,
         selectedModuleIds: value.selectedModuleIds,
         moduleOrder: value.moduleOrder,
       })
@@ -298,6 +328,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     availableModules,
     setTheme,
     setPanelStyle,
+    setRingColorMode,
+    setBarColorMode,
     setLayout,
     moveModule,
     addModuleToLayout,

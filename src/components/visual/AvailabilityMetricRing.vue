@@ -9,10 +9,12 @@ withDefaults(
     count?: string | number
     size?: string
     tone?: string
+    colorMode?: 'solid' | 'gradient'
   }>(),
   {
     size: pxToRem(106),
     tone: 'var(--data-ring)',
+    colorMode: 'solid',
   },
 )
 </script>
@@ -25,6 +27,7 @@ withDefaults(
     :count="count"
     :size="size"
     :tone="tone"
+    :color-mode="colorMode"
     :base-density="0.94"
     :show-footer="true"
   />

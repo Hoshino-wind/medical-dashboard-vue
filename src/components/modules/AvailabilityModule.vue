@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
+import { useDashboardStore } from '@/stores/dashboard'
 import type { AvailabilityItem } from '@/types/dashboard'
 import { pxToRem } from '@/utils/rem'
 
@@ -18,20 +20,24 @@ const props = withDefaults(
   },
 )
 
+const store = useDashboardStore()
+const { config } = storeToRefs(store)
+const ringColorMode = computed(() => config.value.ringColorMode)
+
 const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
 
-// 环图多色交叉:每个环按序取不同主题色(6 色循环),基座随 --gauge-tone 自动跟色。
-// 两个可用率模块(life/ultrasound)错开起点,避免整屏配色雷同。
+// 环图多色交叉:仅保留区分度高的色相(蓝/绿/橙/紫),避免玫红、品红等相近色;
+// 亮红色保留给数值低于 50% 的环作警示。两个可用率模块(life/ultrasound)错开起点。
 const RING_PALETTE = [
   'var(--data-bar)',
+  'var(--data-health-pie-good)',
   'var(--data-health-pie-warning)',
   'var(--data-pie-pending)',
-  'var(--data-health-pie-good)',
-  'var(--data-health-pie-repairing)',
-  'var(--data-bar-3)',
 ]
-function ringColorAt(localIndex: number): string {
-  const offset = props.variant === 'ultrasound' ? 3 : 0
+
+function ringColorAt(localIndex: number, value: number): string {
+  if (value < 50) return 'var(--danger)'
+  const offset = props.variant === 'ultrasound' ? 2 : 0
   const globalIndex = currentIndex.value * PAGE_SIZE + localIndex + offset
   return RING_PALETTE[globalIndex % RING_PALETTE.length]
 }
@@ -102,7 +108,8 @@ onUnmounted(stopAutoPaging)
           :label="item.name"
           :count="item.count"
           :size="ringSize"
-          :tone="ringColorAt(localIndex)"
+          :tone="ringColorAt(localIndex, item.value)"
+          :color-mode="ringColorMode"
         />
       </div>
     </Transition>

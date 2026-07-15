@@ -280,7 +280,7 @@ const option = computed(() => {
   return {
     animationDuration: 1000,
     // 上下留白配平:底部比顶部多 ~16px,抵消 3D 底座向下延伸,使视觉留白对称、数据不贴底
-    grid: { left: 44, right: 16, top: 50, bottom: 66 },
+    grid: { left: 34, right: 18, top: 50, bottom: 55 },
     xAxis: {
       type: 'category',
       data: labels,
@@ -292,7 +292,7 @@ const option = computed(() => {
       type: 'value',
       max: axisRange.max,
       interval: axisRange.interval,
-      axisLabel: { color: muted, fontSize: 10, fontWeight: 800 },
+      axisLabel: { color: muted, fontSize: 12, fontWeight: 800 },
       splitLine: { lineStyle: { color: grid, width: 1, type: 'dashed' } },
     },
     series: [

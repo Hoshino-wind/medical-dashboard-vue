@@ -20,6 +20,8 @@ export const defaultConfig: DashboardConfig = {
   themeId: 'deep-sea-instrument',
   panelStyle: 'glass-flow',
   layout: '3x3',
+  ringColorMode: 'solid',
+  barColorMode: 'gradient',
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
   moduleOrder: moduleCatalog.map((item) => item.id),
 }

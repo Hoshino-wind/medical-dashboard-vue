@@ -254,6 +254,24 @@ const fakeTableData = [
         repairDuration: "0天3小时20分",
         responder: "/",
         status: "待响应"
+    },
+    {
+        department: "急诊科",
+        equipName: "除颤仪",
+        repairCode: "00011",
+        repairReportDuration: "0天0小时15分",
+        repairDuration: "0天0小时15分",
+        responder: "/",
+        status: "待接修"
+    },
+    {
+        department: "重症医学科",
+        equipName: "呼吸机",
+        repairCode: "00012",
+        repairReportDuration: "0天0小时8分",
+        repairDuration: "0天0小时8分",
+        responder: "/",
+        status: "待接修"
     }
 ]
 

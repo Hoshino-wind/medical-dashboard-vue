@@ -5,7 +5,7 @@ import { AlertCircle, Check, ChevronDown, RotateCcw, Save, X } from 'lucide-vue-
 import { themes } from '@/data/themes'
 import { useDashboardStore } from '@/stores/dashboard'
 import BigScreen from './BigScreen.vue'
-import type { LayoutType, PanelStyle } from '@/types/config'
+import type { ColorMode, LayoutType, PanelStyle } from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -45,6 +45,11 @@ const panelStyleOptions: Array<{ id: PanelStyle; label: string }> = [
   { id: 'glass-flow', label: '流光玻璃' },
   { id: 'borderless', label: '无边框' },
   { id: 'chamfered-instrument', label: '立体边框' },
+]
+
+const colorModeOptions: Array<{ id: ColorMode; label: string }> = [
+  { id: 'solid', label: '纯色' },
+  { id: 'gradient', label: '渐变色' },
 ]
 
 const slotItems = computed(() => selectedSlotModules.value)
@@ -315,6 +320,56 @@ onBeforeUnmount(() => {
                 <span>{{ style.label }}</span>
                 <Check
                   v-if="style.id === config.panelStyle"
+                  class="h-3.5 w-3.5"
+                  aria-hidden="true"
+                />
+              </label>
+            </fieldset>
+
+            <fieldset class="property-group">
+              <legend>环图配色</legend>
+              <label
+                v-for="mode in colorModeOptions"
+                :key="`ring-${mode.id}`"
+                class="property-radio color-mode-radio"
+                :class="{ active: mode.id === config.ringColorMode }"
+              >
+                <input
+                  :data-testid="`ring-color-mode-${mode.id}`"
+                  type="radio"
+                  name="ring-color-mode"
+                  :value="mode.id"
+                  :checked="mode.id === config.ringColorMode"
+                  @change="store.setRingColorMode(mode.id)"
+                />
+                <span>{{ mode.label }}</span>
+                <Check
+                  v-if="mode.id === config.ringColorMode"
+                  class="h-3.5 w-3.5"
+                  aria-hidden="true"
+                />
+              </label>
+            </fieldset>
+
+            <fieldset class="property-group">
+              <legend>进度条配色</legend>
+              <label
+                v-for="mode in colorModeOptions"
+                :key="`bar-${mode.id}`"
+                class="property-radio color-mode-radio"
+                :class="{ active: mode.id === config.barColorMode }"
+              >
+                <input
+                  :data-testid="`bar-color-mode-${mode.id}`"
+                  type="radio"
+                  name="bar-color-mode"
+                  :value="mode.id"
+                  :checked="mode.id === config.barColorMode"
+                  @change="store.setBarColorMode(mode.id)"
+                />
+                <span>{{ mode.label }}</span>
+                <Check
+                  v-if="mode.id === config.barColorMode"
                   class="h-3.5 w-3.5"
                   aria-hidden="true"
                 />
@@ -607,7 +662,13 @@ onBeforeUnmount(() => {
 }
 .property-panel {
   min-height: 34.75rem;
+  max-height: 34.75rem;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
   padding: 1rem;
+}
+.property-panel::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Edge */
 }
 .property-group {
   display: flex;
@@ -675,6 +736,9 @@ onBeforeUnmount(() => {
 }
 .panel-style-radio {
   min-width: 6.6rem;
+}
+.color-mode-radio {
+  min-width: 5.2rem;
 }
 .config-preview-panel {
   margin-top: 0.85rem;
