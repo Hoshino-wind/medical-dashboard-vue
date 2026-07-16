@@ -64,6 +64,38 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.panel-style-radio.active').text()).toContain('立体边框')
   })
 
+  it('configures the chart type of each statistics card independently', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: {
+          BigScreen: true,
+        },
+      },
+    })
+    const store = useDashboardStore(pinia)
+
+    expect(
+      (wrapper.find('[data-testid="chart-type-repairStats-bar"]').element as HTMLInputElement)
+        .checked,
+    ).toBe(true)
+    expect(
+      (wrapper.find('[data-testid="chart-type-maintenanceStats-line"]').element as HTMLInputElement)
+        .checked,
+    ).toBe(true)
+
+    await wrapper.find('[data-testid="chart-type-repairStats-line"]').setValue()
+    await flushPromises()
+
+    expect(store.config.chartTypes.repairStats).toBe('line')
+    expect(store.config.chartTypes.maintenanceStats).toBe('line')
+    expect(
+      (wrapper.find('[data-testid="chart-type-repairStats-line"]').element as HTMLInputElement)
+        .checked,
+    ).toBe(true)
+  })
+
   it('offers borderless as the middle of three card styles', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
@@ -78,11 +110,7 @@ describe('ConfigPanel workbench configuration', () => {
     const styleOptions = wrapper.findAll('.panel-style-radio')
 
     expect(styleOptions).toHaveLength(3)
-    expect(styleOptions.map((option) => option.text())).toEqual([
-      '流光玻璃',
-      '无边框',
-      '立体边框',
-    ])
+    expect(styleOptions.map((option) => option.text())).toEqual(['流光玻璃', '无边框', '立体边框'])
 
     const borderlessStyle = wrapper.find('[data-testid="panel-style-borderless"]')
     expect(borderlessStyle.exists()).toBe(true)
@@ -131,12 +159,8 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('uses active theme colors for available business component cards', () => {
-    const configPanel = readFileSync(
-      join(testDir, '../components/shared/ConfigPanel.vue'),
-      'utf8',
-    )
-    const cardBlock =
-      configPanel.match(/\.business-component-card\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const configPanel = readFileSync(join(testDir, '../components/shared/ConfigPanel.vue'), 'utf8')
+    const cardBlock = configPanel.match(/\.business-component-card\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const interactiveBlock =
       configPanel.match(
         /\.business-component-card:hover,[\s\S]*?\.business-component-card:focus-visible\s*\{[\s\S]*?\n\}/,
@@ -150,10 +174,7 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('renders property group legends as theme-aware section dividers', () => {
-    const configPanel = readFileSync(
-      join(testDir, '../components/shared/ConfigPanel.vue'),
-      'utf8',
-    )
+    const configPanel = readFileSync(join(testDir, '../components/shared/ConfigPanel.vue'), 'utf8')
     const legendBlock = configPanel.match(/\.property-group legend\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const markerBlock =
       configPanel.match(/\.property-group legend::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
@@ -223,7 +244,9 @@ describe('ConfigPanel workbench configuration', () => {
     expect(chamferedTitleBlock).toContain('padding-top: 0')
     expect(chamferedTitleBlock).toContain('padding-bottom: 0.0625rem')
     expect(chamferedTitleBlock).toContain('display: grid')
-    expect(chamferedTitleBlock).toContain('grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)')
+    expect(chamferedTitleBlock).toContain(
+      'grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)',
+    )
     expect(chamferedBodyBlock).toContain('height: calc(100% - 2.4375rem)')
     expect(chamferedTitleFrameBlock).toContain('min-height: 2.375rem')
     expect(chamferedTitleFrameBlock).toContain('grid-column: 2')

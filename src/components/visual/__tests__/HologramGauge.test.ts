@@ -84,7 +84,9 @@ describe('HologramGauge', () => {
     expect(base.classes()).toContain('is-counter-clockwise')
     expect(wrapper.findAll('.gauge-base-tier')).toHaveLength(3)
     expect(wrapper.findAll('.gauge-base-rotor')).toHaveLength(3)
-    expect(wrapper.findAll('.gauge-base-rotor .gauge-base-deck')).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-deck')).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-rotor .gauge-base-deck')).toHaveLength(0)
+    expect(wrapper.findAll('.gauge-base-rotor [filter]')).toHaveLength(0)
     expect(wrapper.find('.gauge-base-scan').exists()).toBe(false)
     expect(wrapper.find('.gauge-base-beam').exists()).toBe(true)
 

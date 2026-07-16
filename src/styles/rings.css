@@ -27,7 +27,6 @@
   opacity: calc(0.96 * var(--gauge-base-density, 1));
   transform: translateX(-50%);
   pointer-events: none;
-  filter: saturate(1.08) contrast(1.04);
 }
 
 .hologram-gauge-ring {
@@ -304,7 +303,6 @@
   --holo-emitter-min: 0.42;
   --holo-emitter-max: 0.68;
   opacity: calc(0.72 * var(--gauge-base-density, 1));
-  filter: saturate(0.76) brightness(1.08) contrast(0.96);
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-ring {

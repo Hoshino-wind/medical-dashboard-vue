@@ -4,8 +4,10 @@ import { themes } from '@/data/themes'
 import { defaultConfig, moduleCatalog } from '@/data/modules'
 import { readStorage, writeStorage } from '@/utils/storage'
 import {
+  CHART_DISPLAY_TYPES,
   COLOR_MODES,
   PANEL_STYLES,
+  type ChartDisplayType,
   type ColorMode,
   type DashboardConfig,
   type LayoutType,
@@ -20,6 +22,7 @@ const STORAGE_KEY = 'medical-dashboard-config'
 const VALID_LAYOUTS: LayoutType[] = ['2x3', '3x3']
 const VALID_PANEL_STYLES = new Set<PanelStyle>(PANEL_STYLES)
 const VALID_COLOR_MODES = new Set<ColorMode>(COLOR_MODES)
+const VALID_CHART_DISPLAY_TYPES = new Set<ChartDisplayType>(CHART_DISPLAY_TYPES)
 
 type SavedDashboardConfig = Partial<{
   themeId: ThemeId
@@ -27,9 +30,26 @@ type SavedDashboardConfig = Partial<{
   layout: LayoutType
   ringColorMode: ColorMode
   barColorMode: ColorMode
+  chartTypes: Record<string, ChartDisplayType>
   selectedModuleIds: Array<string | null>
   moduleOrder: string[]
 }>
+
+/** 只保留目录中可配置的统计模块，并为旧配置或脏值补上模块默认值。 */
+function normalizeChartTypes(savedTypes?: Record<string, ChartDisplayType>) {
+  return Object.fromEntries(
+    moduleCatalog
+      .filter((module) => module.chart)
+      .map((module) => {
+        const savedType = savedTypes?.[module.id]
+        const type =
+          savedType && VALID_CHART_DISPLAY_TYPES.has(savedType)
+            ? savedType
+            : module.chart!.defaultType
+        return [module.id, type]
+      }),
+  ) as Record<string, ChartDisplayType>
+}
 
 function getLayoutCapacity(layout: LayoutType) {
   return layout === '2x3' ? 6 : 9
@@ -41,10 +61,7 @@ function isTableModule(moduleId: string | null | undefined) {
   return Boolean(moduleId && TABLE_MODULE_IDS.has(moduleId))
 }
 
-function normalizeSlotIds(
-  selectedIds: Array<string | null> | undefined,
-  layout: LayoutType,
-) {
+function normalizeSlotIds(selectedIds: Array<string | null> | undefined, layout: LayoutType) {
   const capacity = getLayoutCapacity(layout)
   const validIds = new Set(moduleCatalog.map((item) => item.id))
   const seen = new Set<string>()
@@ -123,12 +140,9 @@ function loadConfig(): DashboardConfig {
       saved?.barColorMode && VALID_COLOR_MODES.has(saved.barColorMode)
         ? saved.barColorMode
         : defaultConfig.barColorMode,
+    chartTypes: normalizeChartTypes(saved?.chartTypes),
     layout,
-    selectedModuleIds: normalizeSelectedModuleIds(
-      saved?.selectedModuleIds,
-      moduleOrder,
-      layout,
-    ),
+    selectedModuleIds: normalizeSelectedModuleIds(saved?.selectedModuleIds, moduleOrder, layout),
     moduleOrder,
   }
 }
@@ -173,7 +187,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
   function syncModuleOrder(selectedIds = config.selectedModuleIds) {
     const compactSelectedIds = selectedIds.filter((id): id is string => Boolean(id))
     const selectedSet = new Set(compactSelectedIds)
-    const remainingIds = normalizeModuleOrder(config.moduleOrder).filter((id) => !selectedSet.has(id))
+    const remainingIds = normalizeModuleOrder(config.moduleOrder).filter(
+      (id) => !selectedSet.has(id),
+    )
     config.moduleOrder = [...compactSelectedIds, ...remainingIds]
   }
 
@@ -191,6 +207,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   function setBarColorMode(mode: ColorMode) {
     config.barColorMode = mode
+  }
+
+  function setModuleChartType(moduleId: string, type: ChartDisplayType) {
+    const module = moduleCatalog.find((item) => item.id === moduleId)
+    if (!module?.chart || !VALID_CHART_DISPLAY_TYPES.has(type)) return false
+
+    config.chartTypes[moduleId] = type
+    return true
   }
 
   function setLayout(layout: LayoutType) {
@@ -297,6 +321,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     config.layout = defaultConfig.layout
     config.ringColorMode = defaultConfig.ringColorMode
     config.barColorMode = defaultConfig.barColorMode
+    config.chartTypes = { ...defaultConfig.chartTypes }
     config.selectedModuleIds = [...defaultConfig.selectedModuleIds]
     config.moduleOrder = [...defaultConfig.moduleOrder]
   }
@@ -311,6 +336,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         layout: value.layout,
         ringColorMode: value.ringColorMode,
         barColorMode: value.barColorMode,
+        chartTypes: value.chartTypes,
         selectedModuleIds: value.selectedModuleIds,
         moduleOrder: value.moduleOrder,
       })
@@ -330,6 +356,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     setPanelStyle,
     setRingColorMode,
     setBarColorMode,
+    setModuleChartType,
     setLayout,
     moveModule,
     addModuleToLayout,

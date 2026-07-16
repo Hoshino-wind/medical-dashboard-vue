@@ -3,21 +3,24 @@ import { computed } from 'vue'
 import CountUp from '../shared/CountUp.vue'
 import CubeBarChart from '../charts/CubeBarChart.vue'
 import LineAreaChart from '../charts/LineAreaChart.vue'
-import type { BarChartData, LineChartData } from '@/types/dashboard'
+import type { ChartDisplayType } from '@/types/config'
+import type { CartesianChartData, LineChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
 const props = defineProps<{
-  /** 'bar' 渲染柱状图;maintenance/inspection 等渲染折线图(通过 variant 区分配色) */
-  type: string
-  data: BarChartData | LineChartData
+  /** 展示形态与业务变体相互独立，切图表时不改变数据来源。 */
+  chartType: ChartDisplayType
+  variant: 'repair' | 'maintenance' | 'inspection'
+  seriesName: string
+  data: CartesianChartData
   theme: Theme
 }>()
 
 const lineFooter = computed(() => {
-  if (props.type === 'bar') return null
+  if (props.variant === 'repair' || 'series' in props.data) return null
   const values = (props.data as LineChartData).data
   const total = values.reduce((sum, value) => sum + value, 0)
-  if (props.type === 'inspection') {
+  if (props.variant === 'inspection') {
     return {
       label: '本周巡检',
       value: total,
@@ -37,10 +40,25 @@ const lineFooter = computed(() => {
 </script>
 
 <template>
-  <CubeBarChart v-if="type === 'bar'" :data="data as BarChartData" :theme="theme" />
-  <div v-else class="line-chart-module">
-    <div class="line-chart-body">
-      <LineAreaChart :data="data as LineChartData" :theme="theme" :variant="type" />
+  <div
+    class="statistics-chart-module"
+    :class="{ 'has-footer': lineFooter }"
+    :data-chart-type="chartType"
+  >
+    <div class="statistics-chart-body">
+      <CubeBarChart
+        v-if="chartType === 'bar'"
+        :data="data"
+        :theme="theme"
+        :series-name="seriesName"
+      />
+      <LineAreaChart
+        v-else
+        :data="data"
+        :theme="theme"
+        :variant="variant"
+        :series-name="seriesName"
+      />
     </div>
     <div v-if="lineFooter" class="line-chart-footer">
       <div>
@@ -58,14 +76,17 @@ const lineFooter = computed(() => {
 </template>
 
 <style scoped>
-.line-chart-module {
+.statistics-chart-module {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-rows: minmax(0, 1fr) 2.25rem;
+  grid-template-rows: minmax(0, 1fr);
   gap: 0.25rem;
 }
-.line-chart-body {
+.statistics-chart-module.has-footer {
+  grid-template-rows: minmax(0, 1fr) 2.25rem;
+}
+.statistics-chart-body {
   min-height: 0;
 }
 .line-chart-footer {
@@ -73,11 +94,17 @@ const lineFooter = computed(() => {
   grid-template-columns: 1fr 1fr;
   min-height: 0;
   overflow: hidden;
-  border-top: 0.0625rem solid var(--line-footer-border, color-mix(in srgb, var(--border) 34%, transparent));
+  border-top: 0.0625rem solid
+    var(--line-footer-border, color-mix(in srgb, var(--border) 34%, transparent));
   color: var(--muted);
   background: var(
     --line-footer-bg,
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--glass-highlight) 12%, transparent), transparent)
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--glass-highlight) 12%, transparent),
+      transparent
+    )
   );
 }
 .line-chart-footer > div {
@@ -89,7 +116,8 @@ const lineFooter = computed(() => {
   white-space: nowrap;
 }
 .line-chart-footer > div:first-child {
-  border-right: 0.0625rem solid var(--line-footer-divider, color-mix(in srgb, var(--border) 24%, transparent));
+  border-right: 0.0625rem solid
+    var(--line-footer-divider, color-mix(in srgb, var(--border) 24%, transparent));
 }
 .line-chart-footer span {
   font-size: calc(0.64rem * var(--dashboard-font-scale, 1.45));

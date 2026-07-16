@@ -70,6 +70,9 @@ export interface LineChartData {
   data: number[]
 }
 
+/** 可由折线图和柱状图共同消费的笛卡尔坐标图表数据。 */
+export type CartesianChartData = BarChartData | LineChartData
+
 /** 设备健康状态 */
 export interface HealthTrendData {
   online: number

@@ -1,4 +1,5 @@
 import type { Component } from 'vue'
+import type { ChartDisplayType } from './config'
 
 /**
  * 大屏模块相关类型。
@@ -7,14 +8,7 @@ import type { Component } from 'vue'
  * moduleRegistry 中查找对应组件,而非用一长串 `v-if` 判断模块 id。
  */
 export type ModuleKind =
-  | 'overview'
-  | 'table'
-  | 'bar'
-  | 'line'
-  | 'availability'
-  | 'completion'
-  | 'health'
-  | 'distribution'
+  'overview' | 'table' | 'bar' | 'line' | 'availability' | 'completion' | 'health' | 'distribution'
 
 /** 模块占位尺寸:wide 表示跨列布局 */
 export type ModuleSize = 'normal' | 'wide'
@@ -32,6 +26,11 @@ export interface ModuleCatalogItem {
   subtitle?: string
   kind: ModuleKind
   size: ModuleSize
+  /** 仅统计图表模块提供；声明默认展示形态和单系列图例名称。 */
+  chart?: {
+    defaultType: ChartDisplayType
+    seriesName: string
+  }
 }
 
 /**

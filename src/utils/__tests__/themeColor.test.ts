@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { colorWithAlpha } from '../themeColor'
+import { colorWithAlpha, mixColor } from '../themeColor'
 
 describe('theme color helpers', () => {
   it('applies alpha to hex colors', () => {
@@ -10,5 +10,10 @@ describe('theme color helpers', () => {
   it('applies alpha to rgb and rgba colors', () => {
     expect(colorWithAlpha('rgb(10, 20, 30)', 0.5)).toBe('rgba(10, 20, 30, 0.5)')
     expect(colorWithAlpha('rgba(10, 20, 30, 0.9)', 0.2)).toBe('rgba(10, 20, 30, 0.2)')
+  })
+
+  it('mixes parseable colors and clamps the target ratio', () => {
+    expect(mixColor('#000000', '#ffffff', 0.25)).toBe('rgb(64, 64, 64)')
+    expect(mixColor('#1677ff', '#ffffff', 2)).toBe('rgb(255, 255, 255)')
   })
 })

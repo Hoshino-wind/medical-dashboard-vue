@@ -58,6 +58,35 @@ describe('dashboard store configuration', () => {
     )
   })
 
+  it('migrates old configs to per-card chart defaults and persists chart switches', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        themeId: 'deep-sea-instrument',
+        layout: '3x3',
+      }),
+    )
+
+    const store = useDashboardStore()
+
+    expect(store.config.chartTypes).toEqual({
+      repairStats: 'bar',
+      maintenanceStats: 'line',
+      inspectionStats: 'line',
+    })
+
+    expect(store.setModuleChartType('repairStats', 'line')).toBe(true)
+    expect(store.setModuleChartType('overview', 'bar')).toBe(false)
+    await nextTick()
+
+    expect(store.config.chartTypes.repairStats).toBe('line')
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}').chartTypes).toEqual({
+      repairStats: 'line',
+      maintenanceStats: 'line',
+      inspectionStats: 'line',
+    })
+  })
+
   it('replaces an occupied layout slot when placing an available module into it', () => {
     const store = useDashboardStore()
 

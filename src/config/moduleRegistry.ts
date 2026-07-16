@@ -1,6 +1,7 @@
 import { defineAsyncComponent } from 'vue'
 import type { Component } from 'vue'
 import type { ModuleCatalogItem, ModuleKind } from '@/types/module'
+import type { DashboardConfig } from '@/types/config'
 import type { DashboardData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 
@@ -38,14 +39,12 @@ const DeviceDistributionModule = defineAsyncComponent(
 export interface ModuleRenderContext {
   data: DashboardData
   theme: Theme
+  config: DashboardConfig
 }
 
 export interface ModuleRenderEntry {
   component: Component
-  resolveProps: (
-    module: ModuleCatalogItem,
-    ctx: ModuleRenderContext,
-  ) => Record<string, unknown>
+  resolveProps: (module: ModuleCatalogItem, ctx: ModuleRenderContext) => Record<string, unknown>
 }
 
 const REPAIR_HEADERS = ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态']
@@ -60,14 +59,23 @@ function resolveAvailability(
   return { items: ctx.data.lifeSupport, variant: 'life' }
 }
 
-function resolveLine(
-  module: ModuleCatalogItem,
-  ctx: ModuleRenderContext,
-): Record<string, unknown> {
+function resolveLine(module: ModuleCatalogItem, ctx: ModuleRenderContext): Record<string, unknown> {
   if (module.id === 'inspectionStats') {
-    return { type: 'inspection', data: ctx.data.inspectionStats, theme: ctx.theme }
+    return {
+      variant: 'inspection',
+      chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
+      seriesName: module.chart?.seriesName,
+      data: ctx.data.inspectionStats,
+      theme: ctx.theme,
+    }
   }
-  return { type: 'maintenance', data: ctx.data.maintenanceStats, theme: ctx.theme }
+  return {
+    variant: 'maintenance',
+    chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
+    seriesName: module.chart?.seriesName,
+    data: ctx.data.maintenanceStats,
+    theme: ctx.theme,
+  }
 }
 
 export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
@@ -81,8 +89,10 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   bar: {
     component: ChartModule,
-    resolveProps: (_module, ctx) => ({
-      type: 'bar',
+    resolveProps: (module, ctx) => ({
+      variant: 'repair',
+      chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
+      seriesName: module.chart?.seriesName,
       data: ctx.data.repairStats,
       theme: ctx.theme,
     }),

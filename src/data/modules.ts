@@ -5,14 +5,50 @@ import type { DashboardConfig } from '@/types/config'
 export const moduleCatalog: ModuleCatalogItem[] = [
   { id: 'overview', number: '01', title: '设备总览', kind: 'overview', size: 'normal' },
   { id: 'repairOrders', number: '02', title: '维修工单', kind: 'table', size: 'wide' },
-  { id: 'repairStats', number: '03', title: '保修统计', subtitle: '近7天', kind: 'bar', size: 'normal' },
-  { id: 'lifeSupport', number: '04', title: '生命支持设备可用率', kind: 'availability', size: 'normal' },
+  {
+    id: 'repairStats',
+    number: '03',
+    title: '保修统计',
+    subtitle: '近7天',
+    kind: 'bar',
+    size: 'normal',
+    chart: { defaultType: 'bar', seriesName: '报修台次' },
+  },
+  {
+    id: 'lifeSupport',
+    number: '04',
+    title: '生命支持设备可用率',
+    kind: 'availability',
+    size: 'normal',
+  },
   { id: 'inspectionOrders', number: '05', title: '巡检工单', kind: 'completion', size: 'wide' },
-  { id: 'maintenanceStats', number: '06', title: '保养统计', subtitle: '近7天', kind: 'line', size: 'normal' },
+  {
+    id: 'maintenanceStats',
+    number: '06',
+    title: '保养统计',
+    subtitle: '近7天',
+    kind: 'line',
+    size: 'normal',
+    chart: { defaultType: 'line', seriesName: '保养台次' },
+  },
   { id: 'ultrasound', number: '07', title: '超声设备可用率', kind: 'availability', size: 'normal' },
   { id: 'healthTrend', number: '08', title: '保养工单', kind: 'health', size: 'wide' },
-  { id: 'inspectionStats', number: '09', title: '巡检统计', subtitle: '近7天', kind: 'line', size: 'normal' },
-  { id: 'deviceDistribution', number: '10', title: '设备分布台数占比', kind: 'distribution', size: 'normal' },
+  {
+    id: 'inspectionStats',
+    number: '09',
+    title: '巡检统计',
+    subtitle: '近7天',
+    kind: 'line',
+    size: 'normal',
+    chart: { defaultType: 'line', seriesName: '巡检台次' },
+  },
+  {
+    id: 'deviceDistribution',
+    number: '10',
+    title: '设备分布台数占比',
+    kind: 'distribution',
+    size: 'normal',
+  },
 ]
 
 /** 默认配置 */
@@ -22,6 +58,9 @@ export const defaultConfig: DashboardConfig = {
   layout: '3x3',
   ringColorMode: 'solid',
   barColorMode: 'gradient',
+  chartTypes: Object.fromEntries(
+    moduleCatalog.filter((item) => item.chart).map((item) => [item.id, item.chart!.defaultType]),
+  ),
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
   moduleOrder: moduleCatalog.map((item) => item.id),
 }

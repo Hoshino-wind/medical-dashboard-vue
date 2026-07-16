@@ -29,22 +29,20 @@ function isLightTheme(theme: Theme | undefined): boolean {
   return theme?.id.startsWith('light-') ?? false
 }
 
+// 完成率进度环:亮弧 = 本月保养完成率(data.rate = 已完成÷总数),其余为暗色空轨道。
+// 与中心百分比同源(data.rate),保证「环的填充比例」与「中心数字」严格一致。
 const inspectionPieItems = computed(() => {
+  const rate = Math.min(100, Math.max(0, props.data.rate))
   return [
     {
       name: '已完成',
-      value: props.data.finished,
+      value: rate,
       color: themeColor('--data-inspection-pie-finished', '#20e8ff'),
     },
     {
-      name: '待保养',
-      value: props.data.waiting,
-      color: themeColor('--data-inspection-pie-waiting', '#7efcff'),
-    },
-    {
-      name: '逾期未检',
-      value: props.data.overdue,
-      color: themeColor('--data-inspection-pie-overdue', '#ff5a92'),
+      name: '未完成',
+      value: 100 - rate,
+      color: themeColor('--instrument-base', '#33566c'),
     },
   ]
 })

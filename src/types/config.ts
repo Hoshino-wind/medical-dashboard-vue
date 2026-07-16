@@ -11,6 +11,10 @@ export type PanelStyle = (typeof PANEL_STYLES)[number]
 export const COLOR_MODES = ['solid', 'gradient'] as const
 export type ColorMode = (typeof COLOR_MODES)[number]
 
+/** 统计卡片的图表展示形态；只控制怎么画，不改变模块的数据来源。 */
+export const CHART_DISPLAY_TYPES = ['line', 'bar'] as const
+export type ChartDisplayType = (typeof CHART_DISPLAY_TYPES)[number]
+
 /** 大屏配置(可序列化、可持久化到 localStorage) */
 export interface DashboardConfig {
   themeId: ThemeId
@@ -20,6 +24,8 @@ export interface DashboardConfig {
   ringColorMode: ColorMode
   /** 进度条配色模式(设备分布台数) */
   barColorMode: ColorMode
+  /** 按模块 id 保存统计卡片的展示形态 */
+  chartTypes: Record<string, ChartDisplayType>
   selectedModuleIds: Array<string | null>
   moduleOrder: string[]
 }

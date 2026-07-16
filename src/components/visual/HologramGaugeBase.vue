@@ -187,8 +187,8 @@ const baseStyle = computed(() => {
           :fill="`url(#${uid}-wall)`"
         />
         <g class="gauge-base-rotor-plane" transform="translate(110 42) scale(1 0.1442)">
+          <circle class="gauge-base-deck" cx="0" cy="0" r="104" :fill="`url(#${uid}-deck)`" />
           <g class="gauge-base-rotor gauge-base-rotor--bottom">
-            <circle class="gauge-base-deck" cx="0" cy="0" r="104" :fill="`url(#${uid}-deck)`" />
             <circle
               class="gauge-base-rotor-rail gauge-base-rotor-rail--outer"
               cx="0"
@@ -221,9 +221,9 @@ const baseStyle = computed(() => {
           :fill="`url(#${uid}-wall)`"
         />
         <g class="gauge-base-rotor-plane" transform="translate(110 36) scale(1 0.1395)">
+          <circle class="gauge-base-deck" cx="0" cy="0" r="86" :fill="`url(#${uid}-deck)`" />
+          <circle class="gauge-base-rim" cx="0" cy="0" r="82" :stroke="`url(#${uid}-rim)`" />
           <g class="gauge-base-rotor gauge-base-rotor--middle">
-            <circle class="gauge-base-deck" cx="0" cy="0" r="86" :fill="`url(#${uid}-deck)`" />
-            <circle class="gauge-base-rim" cx="0" cy="0" r="82" :stroke="`url(#${uid}-rim)`" />
             <circle
               class="gauge-base-rotor-rail"
               cx="0"
@@ -252,21 +252,21 @@ const baseStyle = computed(() => {
           :fill="`url(#${uid}-wall)`"
         />
         <g class="gauge-base-rotor-plane" transform="translate(110 29) scale(1 0.1364)">
+          <circle
+            class="gauge-base-deck gauge-base-deck--top"
+            cx="0"
+            cy="0"
+            r="66"
+            :fill="`url(#${uid}-top-deck)`"
+          />
+          <circle
+            class="gauge-base-aperture"
+            cx="0"
+            cy="0"
+            r="43"
+            :fill="`url(#${uid}-aperture)`"
+          />
           <g class="gauge-base-rotor gauge-base-rotor--top">
-            <circle
-              class="gauge-base-deck gauge-base-deck--top"
-              cx="0"
-              cy="0"
-              r="66"
-              :fill="`url(#${uid}-top-deck)`"
-            />
-            <circle
-              class="gauge-base-aperture"
-              cx="0"
-              cy="0"
-              r="43"
-              :fill="`url(#${uid}-aperture)`"
-            />
             <circle
               class="gauge-base-aperture-ring"
               cx="0"
@@ -429,6 +429,8 @@ const baseStyle = computed(() => {
 .gauge-base-rotor {
   transform-box: fill-box;
   transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
   animation: gauge-base-layer-rotate var(--holo-speed, 6.4s) linear infinite;
 }
 
@@ -582,6 +584,10 @@ const baseStyle = computed(() => {
 }
 
 @keyframes gauge-base-layer-rotate {
+  from {
+    transform: rotate(0turn);
+  }
+
   to {
     transform: rotate(1turn);
   }
@@ -632,6 +638,10 @@ const baseStyle = computed(() => {
   .hologram-gauge-volume,
   .gauge-base-projector {
     animation: none;
+  }
+
+  .gauge-base-rotor {
+    will-change: auto;
   }
 }
 

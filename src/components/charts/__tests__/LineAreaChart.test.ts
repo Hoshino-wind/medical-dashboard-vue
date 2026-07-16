@@ -2,13 +2,19 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import LineAreaChart from '@/components/charts/LineAreaChart.vue'
 import { themes } from '@/data/themes'
-import type { LineChartData } from '@/types/dashboard'
+import type { BarChartData, LineChartData } from '@/types/dashboard'
 
 interface LineChartOption {
   yAxis: {
     max: number
     interval: number
   }
+  series: Array<{
+    name: string
+    type: string
+    data: number[]
+    label: { show: boolean }
+  }>
 }
 
 const EChartStub = {
@@ -47,4 +53,40 @@ describe('LineAreaChart', () => {
       wrapper.unmount()
     },
   )
+
+  it('renders multi-series repair data as separate lines with a matching legend', () => {
+    const repairData: BarChartData = {
+      labels: ['07-01', '07-02'],
+      series: [
+        { name: '全保', data: [12, 8] },
+        { name: '技保', data: [4, 2] },
+        { name: '厂保', data: [1, 0] },
+      ],
+    }
+    const wrapper = mount(LineAreaChart, {
+      props: {
+        data: repairData,
+        theme: themes[1],
+        variant: 'repair',
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    const option = wrapper.findComponent(EChartStub).props('option') as LineChartOption
+
+    expect(option.series.map((series) => series.name)).toEqual(['全保', '技保', '厂保'])
+    expect(option.series.every((series) => series.type === 'line')).toBe(true)
+    expect(option.series.every((series) => series.label.show === false)).toBe(true)
+    expect(wrapper.findAll('.line-area-legend span').map((item) => item.text())).toEqual([
+      '全保',
+      '技保',
+      '厂保',
+    ])
+
+    wrapper.unmount()
+  })
 })

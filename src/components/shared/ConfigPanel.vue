@@ -3,9 +3,10 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { AlertCircle, Check, ChevronDown, RotateCcw, Save, X } from 'lucide-vue-next'
 import { themes } from '@/data/themes'
+import { moduleCatalog } from '@/data/modules'
 import { useDashboardStore } from '@/stores/dashboard'
 import BigScreen from './BigScreen.vue'
-import type { ColorMode, LayoutType, PanelStyle } from '@/types/config'
+import type { ChartDisplayType, ColorMode, LayoutType, PanelStyle } from '@/types/config'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
 
@@ -52,6 +53,13 @@ const colorModeOptions: Array<{ id: ColorMode; label: string }> = [
   { id: 'gradient', label: '渐变色' },
 ]
 
+const chartTypeOptions: Array<{ id: ChartDisplayType; label: string }> = [
+  { id: 'line', label: '折线图' },
+  { id: 'bar', label: '柱状图' },
+]
+
+const configurableChartModules = moduleCatalog.filter((module) => module.chart)
+
 const slotItems = computed(() => selectedSlotModules.value)
 
 function moduleDisplayType(module: ModuleCatalogItem): ModuleDisplayType {
@@ -63,7 +71,9 @@ function moduleTypeLabel(module: ModuleCatalogItem) {
 }
 
 function moduleById(moduleId: string | null) {
-  return [...availableModules.value, ...selectedModules.value].find((module) => module.id === moduleId)
+  return [...availableModules.value, ...selectedModules.value].find(
+    (module) => module.id === moduleId,
+  )
 }
 
 function themeLabel(theme: Theme) {
@@ -115,10 +125,7 @@ function handleSlotDrop(index: number) {
   let placed = true
   if (draggedModuleId.value) {
     if (draggedSlotIndex.value !== null) {
-      placed = store.moveSelectedModule(
-        draggedSlotIndex.value,
-        index,
-      )
+      placed = store.moveSelectedModule(draggedSlotIndex.value, index)
     } else {
       placed = store.placeModuleInSlot(draggedModuleId.value, index)
     }
@@ -326,6 +333,35 @@ onBeforeUnmount(() => {
               </label>
             </fieldset>
 
+            <fieldset class="property-group chart-type-group">
+              <legend>统计图表设置</legend>
+              <div
+                v-for="module in configurableChartModules"
+                :key="module.id"
+                class="chart-type-row"
+              >
+                <span class="chart-type-title">{{ module.title }}</span>
+                <div class="chart-type-options">
+                  <label
+                    v-for="option in chartTypeOptions"
+                    :key="option.id"
+                    class="property-radio chart-type-radio"
+                    :class="{ active: config.chartTypes[module.id] === option.id }"
+                  >
+                    <input
+                      :data-testid="`chart-type-${module.id}-${option.id}`"
+                      type="radio"
+                      :name="`chart-type-${module.id}`"
+                      :value="option.id"
+                      :checked="config.chartTypes[module.id] === option.id"
+                      @change="store.setModuleChartType(module.id, option.id)"
+                    />
+                    <span>{{ option.label }}</span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
             <fieldset class="property-group">
               <legend>环图配色</legend>
               <label
@@ -386,7 +422,10 @@ onBeforeUnmount(() => {
         <span>{{ activeTheme.name }} · {{ config.layout }}</span>
       </div>
       <div ref="previewRef" class="config-live-preview">
-        <div class="config-live-scaler" :style="{ transform: `translate(-50%, -50%) scale(${previewScale})` }">
+        <div
+          class="config-live-scaler"
+          :style="{ transform: `translate(-50%, -50%) scale(${previewScale})` }"
+        >
           <BigScreen />
         </div>
       </div>
@@ -412,7 +451,11 @@ onBeforeUnmount(() => {
   border-color: color-mix(in srgb, var(--glass-edge) 64%, transparent);
   border-radius: 0.5rem;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--glass-highlight) 10%, transparent), transparent),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--glass-highlight) 10%, transparent),
+      transparent
+    ),
     color-mix(in srgb, var(--surface) 82%, var(--bg) 18%);
   box-shadow: var(--panel-shadow);
 }
@@ -449,7 +492,9 @@ onBeforeUnmount(() => {
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -0.35rem);
-  transition: opacity 160ms ease, transform 160ms ease;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 .config-rule-toast.visible {
   opacity: 1;
@@ -537,7 +582,10 @@ onBeforeUnmount(() => {
   padding: 0 0.75rem;
   text-align: left;
   cursor: grab;
-  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
 }
 .business-component-card:hover,
 .business-component-card:focus-visible {
@@ -610,7 +658,10 @@ onBeforeUnmount(() => {
   color: #f4fbff;
   padding: 0.75rem;
   text-align: center;
-  transition: border-color 140ms ease, filter 140ms ease, transform 140ms ease;
+  transition:
+    border-color 140ms ease,
+    filter 140ms ease,
+    transform 140ms ease;
 }
 .layout-slot.is-chart {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-3) 22%, #429bf0), #429bf0);
@@ -739,6 +790,35 @@ onBeforeUnmount(() => {
 }
 .color-mode-radio {
   min-width: 5.2rem;
+}
+.chart-type-group {
+  display: grid;
+  gap: 0.75rem;
+}
+.chart-type-row {
+  display: grid;
+  grid-template-columns: minmax(5.25rem, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+.chart-type-title {
+  min-width: 0;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--text) 78%, #ffffff 22%);
+  font-size: calc(0.8rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chart-type-options {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.chart-type-radio {
+  gap: 0.35rem;
+  white-space: nowrap;
 }
 .config-preview-panel {
   margin-top: 0.85rem;

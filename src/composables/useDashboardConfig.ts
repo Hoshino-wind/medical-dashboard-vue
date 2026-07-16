@@ -16,14 +16,21 @@ import { useDashboardStore } from '@/stores/dashboard'
  */
 export function useDashboardConfig() {
   const store = useDashboardStore()
-  const { config, activeTheme, orderedModules, selectedModules, selectedSlotModules, availableModules } =
-    storeToRefs(store)
+  const {
+    config,
+    activeTheme,
+    orderedModules,
+    selectedModules,
+    selectedSlotModules,
+    availableModules,
+  } = storeToRefs(store)
 
   return {
     // 响应式状态(来自 store)
     config,
     themeId: config.value.themeId,
     panelStyle: config.value.panelStyle,
+    chartTypes: config.value.chartTypes,
     layout: config.value.layout,
     selectedModuleIds: config.value.selectedModuleIds,
     moduleOrder: config.value.moduleOrder,
@@ -35,6 +42,7 @@ export function useDashboardConfig() {
     // actions(直接透传 store 方法)
     setTheme: store.setTheme,
     setPanelStyle: store.setPanelStyle,
+    setModuleChartType: store.setModuleChartType,
     setLayout: store.setLayout,
     moveModule: store.moveModule,
     addModuleToLayout: store.addModuleToLayout,
