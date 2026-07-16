@@ -17,10 +17,11 @@ describe('HologramGaugeBase', () => {
     expect(wrapper.attributes('style')).toContain('--gauge-tone-soft: color-mix')
     expect(wrapper.attributes('style')).toContain('--gauge-tone-bright: color-mix')
     expect(wrapper.attributes('style')).toContain('--holo-speed: 7.2s')
+    expect(wrapper.attributes('style')).toContain('--holo-speed-middle: 6.19s')
     expect(wrapper.classes()).toContain('is-counter-clockwise')
   })
 
-  it('projects a layered point-source beam from a bright top deck', () => {
+  it('projects a layered wide inverted-trapezoid beam from a bright top deck', () => {
     const wrapper = mount(HologramGaugeBase)
 
     const beams = wrapper.findAll('.gauge-base-beam')
@@ -31,12 +32,39 @@ describe('HologramGaugeBase', () => {
     expect(beams).toHaveLength(3)
     expect(wrapper.find('.gauge-base-ray').exists()).toBe(false)
     expect(wrapper.find('.gauge-base-core').exists()).toBe(false)
-    expect(outerBeam.attributes('d')).toContain('-58')
-    expect(outerBeam.attributes('d')).toContain('L38 -58')
-    expect(outerBeam.attributes('d')).toContain('182 -58')
-    expect(innerBeam.attributes('d')).toContain('-48')
+    // 倒梯形:底部平口发射(96/124 @29)向上张开到宽顶边(-40/260 @-21),约 140~150°
+    expect(outerBeam.attributes('d')).toContain('M96 29')
+    expect(outerBeam.attributes('d')).toContain('124 29')
+    expect(outerBeam.attributes('d')).toContain('L-40 -21')
+    expect(outerBeam.attributes('d')).toContain('260 -21')
+    expect(innerBeam.attributes('d')).toContain('L18 -21')
     expect(wrapper.find('.gauge-base-beam--core').attributes('fill')).toMatch(/-beam-core\)$/)
     expect(topDeck.attributes('fill')).toMatch(/-top-deck\)$/)
     expect(wrapper.find('.gauge-base-dot').attributes('r')).toBe('1.8')
+  })
+
+  it('renders a maintainable projector housing around the emission aperture', () => {
+    const wrapper = mount(HologramGaugeBase)
+
+    expect(wrapper.find('.hologram-gauge-volume').exists()).toBe(true)
+    expect(wrapper.findAll('.gauge-base-tier')).toHaveLength(3)
+    expect(wrapper.find('.gauge-base-aperture').exists()).toBe(true)
+    expect(wrapper.find('.gauge-base-aperture-ring').exists()).toBe(true)
+    expect(wrapper.find('.gauge-base-status-window').exists()).toBe(true)
+    expect(wrapper.findAll('.gauge-base-strut')).toHaveLength(2)
+    expect(wrapper.findAll('.gauge-base-fastener')).toHaveLength(2)
+  })
+
+  it('rotates each complete deck instead of sweeping a single arc segment', () => {
+    const wrapper = mount(HologramGaugeBase)
+
+    const rotors = wrapper.findAll('.gauge-base-rotor')
+
+    expect(rotors).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-rotor .gauge-base-deck')).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-rotor .gauge-base-rotor-spokes')).toHaveLength(3)
+    expect(wrapper.findAll('.gauge-base-rotor .gauge-base-rotor-nodes')).toHaveLength(3)
+    expect(wrapper.find('.gauge-base-scan').exists()).toBe(false)
+    expect(wrapper.find('.gauge-base-orbit--rotating').exists()).toBe(false)
   })
 })

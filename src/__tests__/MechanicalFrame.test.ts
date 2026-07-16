@@ -94,7 +94,7 @@ describe('MechanicalFrame', () => {
     expect(frameSource).toContain("data-theme-id='light-medical'] .mechanical-frame")
     expect(frameSource).toContain('display: none')
     expect(layoutStyles).toContain(".dashboard-shell[data-theme-id='light-medical']")
-    expect(layoutStyles).toContain('rgba(78, 211, 187, 0.15)')
+    expect(layoutStyles).toContain('rgba(52, 211, 187, 0.22)')
     expect(panelStyles).toContain('backdrop-filter: blur(1.125rem) saturate(1.28)')
     expect(panelStyles).toContain('border-radius: 0.875rem')
     expect(moduleStyles).toContain('--glass-stat-tint')

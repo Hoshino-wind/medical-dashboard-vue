@@ -81,6 +81,7 @@
   font-weight: 950;
 }
 .pie-summary-panel {
+  position: relative;
   display: grid;
   min-width: 0;
   min-height: 0;
@@ -88,9 +89,31 @@
   align-items: center;
   overflow: hidden;
   padding-top: 0.5rem;
-  border-left: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 86%, transparent);
   background: transparent;
   text-align: center;
+}
+
+/* 巡检/保养工单:列表与饼图之间的发光分割线(颜色随主题) */
+.pie-summary-panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8%;
+  bottom: 8%;
+  z-index: 2;
+  width: 0.09375rem;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--glass-edge) 58%, transparent) 16%,
+    color-mix(in srgb, var(--accent-2) 92%, var(--glass-edge) 8%) 50%,
+    color-mix(in srgb, var(--glass-edge) 58%, transparent) 84%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 0.3rem color-mix(in srgb, var(--accent-2) 62%, transparent),
+    0 0 0.7rem color-mix(in srgb, var(--accent) 42%, transparent);
 }
 .inspection-pie-panel,
 .health-pie-panel {
@@ -115,7 +138,7 @@
 .inspection-pie-base {
   position: absolute;
   left: 50%;
-  top: 3rem;
+  top: 4.75rem;
   bottom: auto;
   z-index: 0;
   width: min(16.25rem, 124%);
@@ -124,13 +147,21 @@
   transform: translateX(-50%);
   pointer-events: none;
 }
+.inspection-pie-base .hologram-gauge-volume,
+.health-pie-base .hologram-gauge-volume {
+  top: -48%;
+  width: 58%;
+  height: 96%;
+  --holo-volume-min: 0.18;
+  --holo-volume-max: 0.28;
+}
 .inspection-pie-shell .pie3d-three-shell {
   position: relative;
   z-index: 2;
   width: 12.85rem;
   height: 8.5rem;
   max-width: 100%;
-  transform: translateY(0);
+  transform: translateY(-0.25rem);
   filter: saturate(1.06);
 }
 .pie-center-value {
@@ -143,7 +174,7 @@
   font-size: 1rem;
   font-weight: 950;
   line-height: 1;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 0.25rem));
   text-shadow:
     0 0 0.35rem color-mix(in srgb, var(--data-inspection-pie-finished) 48%, transparent),
     0 0.0625rem 0.125rem color-mix(in srgb, #020814 70%, transparent);
@@ -304,7 +335,7 @@
   transform: translateY(-1.1rem);
 }
 .health-pie-panel .health-pie-base {
-  top: 3rem;
+  top: 4.75rem;
   bottom: auto;
   display: block;
   width: min(16.25rem, 124%);
@@ -315,7 +346,7 @@
   width: 12.85rem;
   height: 8.5rem;
   max-width: 100%;
-  transform: translateY(0);
+  transform: translateY(-0.25rem);
   filter: saturate(1.06);
 }
 .health-pie-chart {
@@ -389,10 +420,24 @@
   box-shadow: none;
 }
 .dashboard-shell[data-theme-mode='light'] .pie-summary-panel {
-  border-left-color: color-mix(in srgb, var(--border) 92%, transparent);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--data-pie-primary) 2.5%, transparent), transparent 54%),
     #ffffff;
+}
+.dashboard-shell[data-theme-mode='light'] .pie-summary-panel::before {
+  width: 0.125rem;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 45%, transparent) 16%,
+    var(--accent) 50%,
+    color-mix(in srgb, var(--accent) 45%, transparent) 84%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 0.3rem color-mix(in srgb, var(--accent) 68%, transparent),
+    0 0 0.85rem color-mix(in srgb, var(--accent) 42%, transparent),
+    0 0 1.5rem color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .dashboard-shell[data-theme-mode='light'] .module-status-summary {
   border-color: color-mix(in srgb, var(--border) 86%, transparent);
@@ -419,7 +464,7 @@
 .dashboard-shell[data-theme-mode='light'] .inspection-pie-base,
 .dashboard-shell[data-theme-mode='light'] .health-pie-panel .health-pie-base,
 .dashboard-shell[data-theme-mode='light'] .health-pie-base {
-  opacity: 0.66;
+  opacity: 0.68;
 }
 .dashboard-shell[data-theme-mode='light'] .pie-center-value {
   color: color-mix(in srgb, var(--text) 92%, var(--data-inspection-pie-finished) 8%);

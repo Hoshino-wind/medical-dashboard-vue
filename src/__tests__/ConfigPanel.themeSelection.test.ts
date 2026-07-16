@@ -166,7 +166,7 @@ describe('ConfigPanel workbench configuration', () => {
     expect(markerBlock).toContain('var(--accent)')
   })
 
-  it('removes all panel border layers in borderless mode', () => {
+  it('keeps borderless panels frame-free while preserving raised card depth', () => {
     const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
     const borderlessPanelBlock =
       panelStyles.match(
@@ -180,11 +180,20 @@ describe('ConfigPanel workbench configuration', () => {
       panelStyles.match(
         /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.panel-border-flow\s*\{[\s\S]*?\n\}/,
       )?.[0] ?? ''
-
+    const borderlessTitleBlock =
+      panelStyles.match(
+        /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.panel-title-frame\s*\{[\s\S]*?\n\}/,
+      )?.[0] ?? ''
     expect(borderlessPanelBlock).toContain('border: 0')
-    expect(borderlessPanelBlock).toContain('box-shadow: none')
+    expect(borderlessPanelBlock).not.toContain('box-shadow: none')
+    expect(borderlessPanelBlock).toContain('box-shadow:')
     expect(borderlessBeforeBlock).toContain('display: none')
     expect(borderlessFlowBlock).toContain('display: none')
+    expect(borderlessTitleBlock).toContain('border: 0')
+    expect(borderlessTitleBlock).toContain('background: linear-gradient')
+    expect(borderlessTitleBlock).toContain('box-shadow:')
+    expect(borderlessTitleBlock).toContain('var(--panel-title-primary)')
+    expect(borderlessTitleBlock).toContain('no-repeat')
   })
 
   it('centers chamfered panel titles on the outer mechanical frame', () => {

@@ -1,10 +1,55 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import hospitalBadge from '../../assets/hospital-badge.png'
 import type { HeaderData } from '@/types/dashboard'
 
 defineProps<{
   data: HeaderData
 }>()
+
+const beijingClock = defineBeijingClock()
+
+function defineBeijingClock() {
+  const text = ref('')
+  let timer: ReturnType<typeof setInterval> | null = null
+
+  const formatter = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    weekday: 'long',
+  })
+
+  const pad = (value: string): string => (value.length < 2 ? `0${value}` : value)
+
+  const tick = (): void => {
+    const map: Record<string, string> = {}
+    for (const part of formatter.formatToParts(new Date())) {
+      map[part.type] = part.value
+    }
+    let hour = pad(map.hour ?? '0')
+    if (hour === '24') hour = '00'
+    text.value = `${map.year}-${pad(map.month)}-${pad(map.day)} ${hour}:${pad(map.minute)} ${map.weekday}`
+  }
+
+  onMounted(() => {
+    tick()
+    timer = setInterval(tick, 1000)
+  })
+
+  onUnmounted(() => {
+    if (timer !== null) {
+      clearInterval(timer)
+      timer = null
+    }
+  })
+
+  return { text }
+}
 </script>
 
 <template>
@@ -111,7 +156,7 @@ defineProps<{
         <span class="brand-cn">上云赋</span>
       </div>
       <div class="brand-clock">
-        <div>{{ data.updatedAt }} 星期三</div>
+        <div>{{ beijingClock.text.value }}</div>
       </div>
     </div>
 
@@ -587,13 +632,11 @@ defineProps<{
 }
 .dashboard-shell[data-theme-mode='light'] .brand-lockup,
 .dashboard-shell[data-theme-mode='light'] .hospital-copy {
-  border-color: color-mix(in srgb, var(--border-strong) 34%, var(--border) 66%);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 2.5%, transparent), transparent 44%),
-    linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--bg-soft) 42%, #ffffff));
-  box-shadow:
-    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.94),
-    0 0.25rem 0.75rem rgba(31, 58, 68, 0.045);
+  border-color: var(--lm-glass-border);
+  background: var(--lm-glass-fill);
+  -webkit-backdrop-filter: var(--lm-glass-blur);
+  backdrop-filter: var(--lm-glass-blur);
+  box-shadow: var(--lm-glass-shadow);
 }
 .dashboard-shell[data-theme-mode='light'] .brand-lockup::before,
 .dashboard-shell[data-theme-mode='light'] .hospital-copy::before {
@@ -611,13 +654,13 @@ defineProps<{
   animation: none;
 }
 .dashboard-shell[data-theme-mode='light'] .title-frame::before {
-  background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 3%, transparent) 18%, rgba(255, 255, 255, 0.9) 50%, color-mix(in srgb, var(--chart-secondary) 2.5%, transparent) 82%, transparent),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), color-mix(in srgb, var(--bg-soft) 36%, #ffffff));
+  background: var(--lm-glass-fill);
+  -webkit-backdrop-filter: var(--lm-glass-blur);
+  backdrop-filter: var(--lm-glass-blur);
   box-shadow:
     inset 0 0.0625rem 0 rgba(255, 255, 255, 0.9),
     inset 0 -0.0625rem 0 color-mix(in srgb, var(--border) 72%, transparent),
-    0 0.25rem 0.75rem rgba(31, 58, 68, 0.035);
+    0 0.5rem 1.5rem rgba(41, 71, 115, 0.08);
 }
 .dashboard-shell[data-theme-mode='light'] .brand-main {
   color: color-mix(in srgb, var(--text) 86%, var(--accent) 14%);
