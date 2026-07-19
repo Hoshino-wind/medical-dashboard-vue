@@ -38,7 +38,7 @@ const overviewRingSize = pxToRem(132)
       <div>
         <div class="kpi-label">设备总数</div>
         <div class="overview-value text-[color:var(--data-pie-primary)]">
-          <CountUp :value="data.total" /><span>台</span>
+          <CountUp :value="data.total" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@ const overviewRingSize = pxToRem(132)
       <div>
         <div class="kpi-label">可用设备</div>
         <div class="overview-value text-[color:var(--good)]">
-          <CountUp :value="data.available" /><span>台</span>
+          <CountUp :value="data.available" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@ const overviewRingSize = pxToRem(132)
       <div>
         <div class="kpi-label">维修中</div>
         <div class="overview-value text-[color:var(--danger)]">
-          <CountUp :value="data.repairing" /><span>台</span>
+          <CountUp :value="data.repairing" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -72,7 +72,7 @@ const overviewRingSize = pxToRem(132)
       <div>
         <div class="kpi-label">待巡检</div>
         <div class="overview-value text-[color:var(--warn)]">
-          <CountUp :value="data.maintenanceDue" /><span>台</span>
+          <CountUp :value="data.maintenanceDue" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@ const overviewRingSize = pxToRem(132)
       <div>
         <div class="kpi-label">待保养</div>
         <div class="overview-value text-[color:var(--data-inspection-line)]">
-          <CountUp :value="data.inspectionDue" /><span>台</span>
+          <CountUp :value="data.inspectionDue" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -142,19 +142,27 @@ const overviewRingSize = pxToRem(132)
   min-width: 0;
   width: 100%;
   max-width: 9rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 48%, transparent);
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--status-tone, var(--glass-edge)) 46%, transparent);
   border-radius: 0.375rem;
   background:
-    linear-gradient(90deg, color-mix(in srgb, currentColor 12%, transparent), transparent 68%),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--status-tone, var(--chart-primary)) 14%, transparent),
+      transparent 76%
+    ),
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--surface-strong) 22%, transparent),
-      color-mix(in srgb, var(--surface) 12%, transparent)
+      color-mix(in srgb, var(--surface-strong) 52%, transparent),
+      color-mix(in srgb, var(--surface-muted) 30%, transparent)
     );
   padding: 0.3rem 0.5rem;
   box-shadow:
-    inset 0.1875rem 0 0 color-mix(in srgb, currentColor 58%, transparent),
-    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 18%, transparent);
+    inset 0.1875rem 0 0
+      color-mix(in srgb, var(--status-tone, var(--chart-primary)) 72%, transparent),
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 24%, transparent),
+    0 0 0.65rem
+      color-mix(in srgb, var(--status-tone, var(--chart-primary)) 6%, transparent);
 }
 .overview-stat.with-icon {
   display: flex;
@@ -188,7 +196,7 @@ const overviewRingSize = pxToRem(132)
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.overview-value span {
+.overview-unit {
   margin-left: 0.125rem;
   color: var(--muted);
   font-size: calc(0.69rem * var(--dashboard-font-scale, 1.45));
@@ -200,15 +208,24 @@ const overviewRingSize = pxToRem(132)
   line-height: 1.1;
 }
 .kpi-label {
-  color: var(--muted);
+  color: color-mix(in srgb, var(--muted) 78%, var(--text) 22%);
   font-size: calc(0.875rem * var(--dashboard-font-scale, 1.45));
   line-height: 1;
   white-space: nowrap;
 }
-.overview-stat.is-warn {
+.overview-stat--total {
+  --status-tone: var(--data-pie-primary);
+}
+.overview-stat--available {
+  --status-tone: var(--good);
+}
+.overview-stat--repair {
+  --status-tone: var(--danger);
+}
+.overview-stat--maintenance {
   --status-tone: var(--warn);
 }
-.overview-stat.is-danger {
-  --status-tone: var(--danger);
+.overview-stat--inspection {
+  --status-tone: var(--data-inspection-line);
 }
 </style>

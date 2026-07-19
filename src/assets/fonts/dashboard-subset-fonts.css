@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'MedDash Rounded Heavy Subset';
+  src:
+    url('./meddash-rounded-heavy-subset.woff2') format('woff2'),
+    url('./meddash-rounded-heavy-subset.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MedDash Rounded Orbit Subset';
+  src:
+    url('./meddash-rounded-orbit-subset.woff2') format('woff2'),
+    url('./meddash-rounded-orbit-subset.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  --font-dashboard-rounded-heavy: 'MedDash Rounded Heavy Subset', 'Microsoft YaHei', sans-serif;
+  --font-dashboard-rounded-orbit: 'MedDash Rounded Orbit Subset', 'Microsoft YaHei', sans-serif;
+}

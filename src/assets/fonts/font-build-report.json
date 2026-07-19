@@ -1,0 +1,28 @@
+{
+  "extra_glyphs_file": "scripts/fonts/dashboard-extra-glyphs.txt",
+  "families": {
+    "heavy": {
+      "family": "MedDash Rounded Heavy Subset",
+      "new_sources": {},
+      "preserved_characters": "%+-./0123456789:·保修全养分医单占可台命场声备天巡工布总慧持支数景智检比率理生用疗管系统维览计设超近（）",
+      "source_counts": {
+        "seed-locked": 61
+      },
+      "ttf_sha256": "43627ead37d30d1f00a12d4d4f0574ff3ed2808e6f705630b7b52555e73a3881",
+      "unlocked_characters": "",
+      "woff2_sha256": "2944d1dcd9b29e8083e369dbbf87c1fc8dc98eb3eadae7058ef03f8e961e15df"
+    },
+    "orbit": {
+      "family": "MedDash Rounded Orbit Subset",
+      "new_sources": {},
+      "preserved_characters": "%+-./0123456789:·保修全养分医单占可台命场声备天巡工布总慧持支数景智检比率理生用疗管系统维览计设超近（）",
+      "source_counts": {
+        "seed-locked": 61
+      },
+      "ttf_sha256": "c9b06a8c7182fd1e4d951304a77cdef735cb3b95b70baa486fccaf30251ed768",
+      "unlocked_characters": "",
+      "woff2_sha256": "7cf5e8bfafafa1d58436fd322f3284f95dd415dd9f6d59d59a6dc18c5f453ba8"
+    }
+  },
+  "pipeline_version": 4
+}

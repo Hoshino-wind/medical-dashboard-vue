@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import hospitalBadge from '../../assets/hospital-badge.png'
+import sunnicareLogo from '../../assets/sunnicare-logo.png'
+import hospitalLogo from '../../assets/jiangmen-central-hospital-logo.png'
 import type { HeaderData } from '@/types/dashboard'
 
 defineProps<{
@@ -107,10 +108,28 @@ function defineBeijingClock() {
 
       <!-- 静态装饰线:按用户标注的红线路径绘制,左右先走上沿再折入标题 -->
       <g class="header-static-lines" filter="url(#headerPathGlow)">
-        <path class="header-line is-main" d="M6 8 H160 L178 30 H404 L432 46 H482" />
-        <path class="header-line is-main" d="M918 42 H930 L958 30 H1168 L1188 12 H1394" />
-        <path class="header-line is-step" d="M306 50 H390 L418 62 H470" />
-        <path class="header-line is-step" d="M1030 50 H1168" />
+        <path
+          class="header-line is-main"
+          data-header-connector="left"
+          d="M6 8 H160 L178 30 H404 L432 42 H482"
+        />
+        <path
+          class="header-line is-main"
+          data-header-connector="right"
+          d="M6 8 H160 L178 30 H404 L432 42 H482"
+          transform="translate(1400 0) scale(-1 1)"
+        />
+        <path
+          class="header-line is-step"
+          data-header-step="left"
+          d="M306 50 H390 L418 62 H470"
+        />
+        <path
+          class="header-line is-step"
+          data-header-step="right"
+          d="M306 50 H390 L418 62 H470"
+          transform="translate(1400 0) scale(-1 1)"
+        />
         <!-- 标题外/内六边形 -->
         <path class="header-line is-title" d="M502 12 L898 12 L918 42 L898 72 L502 72 L482 42 Z" />
         <path class="header-line is-inner" d="M516 24 H884 L896 42 L884 60 H516 L504 42 Z" />
@@ -139,11 +158,19 @@ function defineBeijingClock() {
 
       <!-- 流光:辉光底层 + 亮芯双层 -->
       <g class="header-flow-group">
-        <path class="header-flow-glow is-left" d="M6 8 H160 L178 30 H404 L432 46 H482" />
-        <path class="header-flow-glow is-right" d="M918 42 H930 L958 30 H1168 L1188 12 H1394" />
+        <path class="header-flow-glow is-left" d="M6 8 H160 L178 30 H404 L432 42 H482" />
+        <path
+          class="header-flow-glow is-right"
+          d="M6 8 H160 L178 30 H404 L432 42 H482"
+          transform="translate(1400 0) scale(-1 1)"
+        />
         <path class="header-flow-glow is-title" d="M502 12 L898 12 L918 42 L898 72 L502 72 L482 42 Z" />
-        <path class="header-flow is-left" d="M6 8 H160 L178 30 H404 L432 46 H482" />
-        <path class="header-flow is-right" d="M918 42 H930 L958 30 H1168 L1188 12 H1394" />
+        <path class="header-flow is-left" d="M6 8 H160 L178 30 H404 L432 42 H482" />
+        <path
+          class="header-flow is-right"
+          d="M6 8 H160 L178 30 H404 L432 42 H482"
+          transform="translate(1400 0) scale(-1 1)"
+        />
         <path class="header-flow is-title" d="M502 12 L898 12 L918 42 L898 72 L502 72 L482 42 Z" />
       </g>
 
@@ -151,9 +178,8 @@ function defineBeijingClock() {
     </svg>
 
     <div class="brand-chip">
-      <div class="brand-lockup" aria-label="Sunnicare 上云赋">
-        <span class="brand-main">Sunnicare</span>
-        <span class="brand-cn">上云赋</span>
+      <div class="brand-lockup">
+        <img class="brand-logo" :src="sunnicareLogo" alt="Sunnicare 上云赋" />
       </div>
       <div class="brand-clock">
         <div>{{ beijingClock.text.value }}</div>
@@ -169,7 +195,7 @@ function defineBeijingClock() {
         <div class="hospital-name">{{ data.hospital }}</div>
         <div class="hospital-subtitle">{{ data.subtitle }}</div>
       </div>
-      <img class="hospital-badge" :src="hospitalBadge" :alt="data.hospital" />
+      <img class="hospital-badge" :src="hospitalLogo" :alt="`${data.hospital}院徽`" />
     </div>
   </header>
 </template>
@@ -178,7 +204,7 @@ function defineBeijingClock() {
 .dashboard-header {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(28rem, 0.9fr) minmax(42rem, 1.4fr) minmax(24rem, 0.8fr);
+  grid-template-columns: minmax(28rem, 0.9fr) minmax(42rem, 1.4fr) minmax(28rem, 0.9fr);
   align-items: center;
   gap: 0.75rem;
   isolation: isolate;
@@ -359,8 +385,11 @@ function defineBeijingClock() {
 }
 .hospital-chip {
   justify-content: flex-end;
+  height: 4.125rem;
+  gap: 0.9rem;
+  overflow: visible;
   padding: 0;
-  clip-path: polygon(8% 0, 100% 0, 100% 100%, 8% 100%, 0 50%);
+  clip-path: none;
   transform: translate(0.125rem, -0.0625rem);
 }
 .brand-chip::after,
@@ -387,9 +416,8 @@ function defineBeijingClock() {
   height: 3.1875rem;
   flex: none;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: nowrap;
-  gap: 0.55rem;
   padding: 0 2.25rem 0 1.1rem;
   border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 92%, transparent);
   border-radius: 0;
@@ -418,26 +446,15 @@ function defineBeijingClock() {
   opacity: 0.8;
   animation: header-chip-breathe 3.6s ease-in-out infinite;
 }
-.brand-main {
+.brand-logo {
   position: relative;
   z-index: 1;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 3.25rem;
   flex: none;
-  color: color-mix(in srgb, var(--text) 88%, var(--chart-primary) 12%);
-  font-size: 1.68rem;
-  font-weight: 950;
-  line-height: 1;
-  white-space: nowrap;
-}
-.brand-cn {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  color: color-mix(in srgb, var(--text) 84%, transparent);
-  font-size: 1.05rem;
-  font-weight: 900;
-  line-height: 1;
-  white-space: nowrap;
-  transform: translateY(0.04rem);
+  object-fit: contain;
 }
 .brand-clock {
   position: relative;
@@ -454,7 +471,6 @@ function defineBeijingClock() {
 }
 .brand-clock div {
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 .brand-clock::before {
@@ -469,27 +485,29 @@ function defineBeijingClock() {
 .hospital-name {
   position: relative;
   z-index: 1;
-  overflow: hidden;
+  overflow: visible;
   color: var(--text);
   font-size: 1.25rem;
   font-weight: 950;
-  line-height: 1.05;
-  text-overflow: ellipsis;
+  line-height: 1.25;
   white-space: nowrap;
 }
 .hospital-subtitle {
   position: relative;
   z-index: 1;
   margin-top: 0.3125rem;
+  overflow: visible;
   color: var(--muted);
   font-size: 1rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 .hospital-copy {
   position: relative;
-  min-width: 13.75rem;
-  padding: 0.5rem 4.25rem 0.5rem 1.75rem;
+  min-width: 0;
+  flex: 1 1 0;
+  padding: 0.35rem 1.1rem 0.35rem 1.75rem;
   clip-path: polygon(10% 0, 100% 0, 92% 100%, 0 100%);
   background:
     linear-gradient(90deg, transparent, color-mix(in srgb, var(--chart-primary) 16%, transparent) 22%, color-mix(in srgb, var(--surface-strong) 18%, transparent) 100%),
@@ -498,7 +516,7 @@ function defineBeijingClock() {
   box-shadow:
     inset 0 -0.0625rem 0 color-mix(in srgb, var(--chart-primary) 62%, transparent),
     0 0 1rem color-mix(in srgb, var(--chart-primary) 22%, transparent);
-  transform: translateY(0.72rem);
+  transform: none;
 }
 .hospital-copy::before {
   content: "";
@@ -550,8 +568,9 @@ function defineBeijingClock() {
   background-size: 260% 100%;
   background-clip: text;
   color: transparent;
+  font-family: var(--font-dashboard-rounded-heavy);
   font-size: 2.55rem;
-  font-weight: 950;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
   -webkit-background-clip: text;
@@ -589,16 +608,11 @@ function defineBeijingClock() {
   }
 }
 .hospital-badge {
-  width: 3.875rem;
-  height: 3.875rem;
+  width: 4.75rem;
+  height: 3.5rem;
   flex: none;
-  padding: 0.125rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 86%, transparent);
-  border-radius: 62.4375rem;
-  background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--surface-strong) 34%, transparent), color-mix(in srgb, var(--surface) 24%, transparent) 66%, transparent 68%);
   object-fit: contain;
-  filter: saturate(1.12) contrast(1.06);
+  filter: saturate(1.08) contrast(1.04) drop-shadow(0 0 0.5rem color-mix(in srgb, var(--chart-primary) 30%, transparent));
 }
 </style>
 
@@ -662,16 +676,11 @@ function defineBeijingClock() {
     inset 0 -0.0625rem 0 color-mix(in srgb, var(--border) 72%, transparent),
     0 0.5rem 1.5rem rgba(41, 71, 115, 0.08);
 }
-.dashboard-shell[data-theme-mode='light'] .brand-main {
-  color: color-mix(in srgb, var(--text) 86%, var(--accent) 14%);
-}
-.dashboard-shell[data-theme-mode='light'] .brand-cn,
 .dashboard-shell[data-theme-mode='light'] .hospital-subtitle,
 .dashboard-shell[data-theme-mode='light'] .brand-clock {
   color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
 }
 .dashboard-shell[data-theme-mode='light'] .hospital-badge {
-  background: #ffffff;
-  filter: saturate(1) contrast(1.02);
+  filter: saturate(1) contrast(1.02) drop-shadow(0 0.25rem 0.5rem rgba(41, 71, 115, 0.12));
 }
 </style>

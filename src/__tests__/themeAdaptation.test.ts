@@ -43,8 +43,6 @@ describe('global theme adaptation', () => {
     const cubeBar = readSource('components/charts/CubeBarChart.vue')
     const lineArea = readSource('components/charts/LineAreaChart.vue')
     const restoredHeaderTextBlocks = [
-      '.brand-main',
-      '.brand-cn',
       '.brand-clock',
       '.hospital-name',
       '.hospital-subtitle',

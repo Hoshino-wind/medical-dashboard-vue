@@ -1,0 +1,3 @@
+# Add future dashboard-only characters below. Comments and line breaks are ignored.
+# Do not remove previously accepted characters; the TTF seed also preserves them.
+

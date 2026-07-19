@@ -265,8 +265,8 @@
   padding: 0 0.125rem 0.3125rem;
   overflow: hidden;
   color: inherit;
-  font-family: 'STHeiti', 'Microsoft YaHei', 'PingFang SC', sans-serif;
-  font-weight: 900;
+  font-family: var(--font-dashboard-rounded-orbit);
+  font-weight: 500;
   letter-spacing: 0.06em;
   text-align: center;
   text-overflow: ellipsis;
