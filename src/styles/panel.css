@@ -256,6 +256,18 @@
   overflow: hidden;
 }
 
+.panel-title-ornament {
+  position: absolute;
+  top: 50%;
+  z-index: 0;
+  display: none;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transform: translateY(-50%);
+}
+
 .panel-title-text {
   position: relative;
   z-index: 1;
@@ -671,6 +683,7 @@
   gap: 0;
   padding-top: 0;
   padding-bottom: 0.0625rem;
+  transform: translateY(-0.1875rem);
 }
 
 .dashboard-shell[data-panel-style='chamfered-instrument']
@@ -685,19 +698,85 @@
   align-items: center;
   justify-self: center;
   min-height: 2.375rem;
-  padding: 0.25rem 0.875rem;
+  padding: 0.25rem 0;
+  overflow: visible;
   border: 0;
   border-radius: 0;
-  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  background: transparent;
   box-shadow: none;
+  isolation: isolate;
+}
+
+/* 用与卡片内层接近的实色遮住机械外框中段，让标题真正嵌在上边框中。 */
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame::before {
+  content: '';
+  position: absolute;
+  inset: -0.125rem -8rem -0.125rem -2.25rem;
+  z-index: 0;
+  background: color-mix(in srgb, var(--bg) 76%, var(--bg-soft) 24%);
+  pointer-events: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame
+  > .mechanical-frame,
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-mini-bars {
+  display: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament {
+  z-index: 1;
+  display: block;
+  filter:
+    brightness(1.18)
+    saturate(1.28)
+    drop-shadow(0 0 0.2rem color-mix(in srgb, var(--chart-primary) 72%, transparent));
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament--left {
+  right: calc(100% + 0.75rem);
+  width: 7.2rem;
+  transform: translateY(-50%) scaleY(1.05);
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament--right {
+  top: calc(50% + 0.2rem);
+  left: calc(100% - 7.25rem);
+  width: 15.25rem;
+  height: 2.1rem;
 }
 
 .dashboard-shell[data-panel-style='chamfered-instrument']
   .screen-grid
   > .panel
   .panel-title-text {
+  z-index: 2;
   padding-bottom: 0;
+  font-size: 1.375rem;
+  font-weight: 550;
   line-height: 1.1;
+  letter-spacing: 0.075em;
+  transform: translateY(-0.1875rem);
+  text-shadow:
+    0 0 0.35rem color-mix(in srgb, var(--panel-title-primary) 42%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 18%, transparent);
 }
 
 .dashboard-shell[data-panel-style='chamfered-instrument']
@@ -807,6 +886,13 @@
 }
 
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame::before {
+  display: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
   .panel-title-mini-bars
   i {
   display: none;
@@ -824,6 +910,11 @@
 
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
   .panel-title-mini-bars--right {
+  display: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .panel-title-ornament {
   display: none;
 }
 

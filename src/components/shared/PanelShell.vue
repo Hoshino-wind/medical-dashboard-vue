@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import MechanicalFrame from '../visual/MechanicalFrame.vue'
+import panelTitleOrnamentLeftUrl from '@/assets/panel-titles/medical-pulse-title-left-v3.png'
+import panelTitleOrnamentRightUrl from '@/assets/panel-titles/medical-pulse-title-right-v6.png'
 import type { ModuleKind } from '@/types/module'
 
 const props = withDefaults(
@@ -25,12 +27,24 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
     <div class="panel-header panel-header--main">
       <h2 class="panel-title-frame mechanical-frame-host">
         <MechanicalFrame variant="compact" />
+        <img
+          class="panel-title-ornament panel-title-ornament--left"
+          :src="panelTitleOrnamentLeftUrl"
+          alt=""
+          aria-hidden="true"
+        />
         <span class="panel-title-mini-bars panel-title-mini-bars--left" aria-hidden="true">
           <i></i><i></i><i></i>
         </span>
         <span class="panel-title-text">
           {{ title }}
         </span>
+        <img
+          class="panel-title-ornament panel-title-ornament--right"
+          :src="panelTitleOrnamentRightUrl"
+          alt=""
+          aria-hidden="true"
+        />
         <span class="panel-title-mini-bars panel-title-mini-bars--right" aria-hidden="true">
           <i></i><i></i><i></i>
         </span>
