@@ -1,11 +1,10 @@
 # Dashboard subset fonts
 
-This directory contains the two selected dashboard-only font directions:
+This directory contains one dashboard-only font direction:
 
 - `MedDash Rounded Heavy Subset`: the heavier rounded mechanical direction.
-- `MedDash Rounded Orbit Subset`: the lighter rounded orbital direction.
 
-Each family is exported as installable TTF and browser-ready WOFF2. The subsets cover
+The family is exported as installable TTF and browser-ready WOFF2. The subset covers
 the current dashboard title, module titles, title suffixes, digits, and the punctuation
 used by dashboard metrics. Unsupported body-copy characters intentionally fall back to
 the next font in the CSS stack.
@@ -15,20 +14,17 @@ The approved concept boards are retained in `references/`. Rendered proofs in
 
 ## CSS
 
-Import `dashboard-subset-fonts.css`, then choose one of the variables:
+Import `dashboard-subset-fonts.css`, then use the single Heavy variable:
 
 ```css
 .dashboard-title {
   font-family: var(--font-dashboard-rounded-heavy);
 }
 
-.panel-title-text {
-  font-family: var(--font-dashboard-rounded-orbit);
-}
 ```
 
 The application imports this stylesheet from `src/main.ts`. The main dashboard title
-uses the heavy family, while panel titles use the orbit family.
+and panel titles both use the Heavy family.
 
 ## Rebuild
 

@@ -1,6 +1,6 @@
 # Deterministic dashboard font extension
 
-The two dashboard fonts are extended from their current TTF files instead of being
+The Heavy dashboard font is extended from its current TTF file instead of being
 redrawn from image prompts. Existing glyphs are copied byte-for-shape from the seed
 font and checked against `font-glyph-lock.json` after every build.
 

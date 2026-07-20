@@ -14,8 +14,8 @@ describe('panel title styles', () => {
 
     expect(headingBlock).toContain('font-size: 1.25rem')
     expect(titleBlock).toContain('color: inherit')
-    expect(titleBlock).toContain('font-family: var(--font-dashboard-rounded-orbit)')
-    expect(titleBlock).toContain('font-weight: 500')
+    expect(titleBlock).toContain('font-family: var(--font-dashboard-rounded-heavy)')
+    expect(titleBlock).toContain('font-weight: 700')
     expect(titleBlock).toContain('letter-spacing: 0.06em')
     expect(titleBlock).not.toContain('background-clip: text')
     expect(titleBlock).not.toContain('color: transparent')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the two dashboard-only font subsets selected from the concept boards.
+"""Build the dashboard-only Heavy font subset selected from the concept board.
 
 The reference-board glyphs are traced directly from the approved images. Characters
 that are used by the dashboard but absent from the boards are derived from the
@@ -94,7 +94,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         '--extra-glyphs-file',
         type=Path,
-        help='UTF-8 file containing additional characters to include in both font families.',
+        help='UTF-8 file containing additional characters to include in the Heavy family.',
     )
     parser.add_argument(
         '--output-dir',
@@ -124,7 +124,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def style_configs(root: Path) -> tuple[StyleConfig, StyleConfig]:
+def style_configs(root: Path) -> tuple[StyleConfig]:
     reference_dir = root / 'src/assets/fonts/references'
     return (
         StyleConfig(
@@ -150,30 +150,6 @@ def style_configs(root: Path) -> tuple[StyleConfig, StyleConfig]:
             source_blur=7,
             weight_class=700,
             preview_color=(242, 249, 255),
-        ),
-        StyleConfig(
-            key='orbit',
-            family='MedDash Rounded Orbit Subset',
-            file_stem='meddash-rounded-orbit-subset',
-            reference_path=reference_dir / 'rounded-orbit-reference.png',
-            title_box=(69, 236, 1659, 374),
-            card_boxes=(
-                (193, 472, 466, 535),
-                (560, 472, 835, 535),
-                (930, 472, 1199, 535),
-                (1286, 472, 1555, 535),
-            ),
-            digit_box=(105, 639, 809, 724),
-            punctuation_boxes={
-                '.': (1034, 639, 1052, 724),
-                '%': (1140, 639, 1200, 724),
-                '+': (1261, 639, 1306, 724),
-            },
-            threshold=132,
-            source_dilate=3,
-            source_blur=5,
-            weight_class=500,
-            preview_color=(215, 252, 255),
         ),
     )
 

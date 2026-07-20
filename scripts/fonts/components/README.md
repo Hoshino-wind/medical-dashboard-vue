@@ -1,8 +1,8 @@
 # Reusable glyph components
 
 This directory is the deterministic component library for future glyph expansion.
-Store white-on-black monochrome PNG components under `heavy/` or `orbit/`, then compose
-them in `../component-recipes.json`.
+Store white-on-black monochrome PNG components under `heavy/`, then compose them in
+`../component-recipes.json`.
 
 Example recipe:
 

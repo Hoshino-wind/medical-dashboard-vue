@@ -1,9 +1,8 @@
 # Approved whole-glyph overrides
 
-Place visually reviewed monochrome PNG glyph masks in one of these directories:
+Place visually reviewed monochrome PNG glyph masks in the Heavy directory:
 
 - `heavy/U+8D44.png`
-- `orbit/U+8D44.png`
 
 The filename is the Unicode code point. White pixels are ink and black pixels are
 empty space. The builder tight-crops and normalizes the mask to the existing font
