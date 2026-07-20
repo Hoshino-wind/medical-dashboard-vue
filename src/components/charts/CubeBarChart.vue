@@ -5,6 +5,7 @@ import EChart from './EChart.vue'
 import type { CartesianChartData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
 import { normalizeCartesianChartData } from '@/utils/chartData'
+import { useChartTheme } from '@/composables/useChartTheme'
 import { pxToRem } from '@/utils/rem'
 import { resolveChartAxisRange } from '@/utils/chartAxis'
 import { colorWithAlpha, mixColor } from '@/utils/themeColor'
@@ -149,9 +150,7 @@ const normalizedData = computed(() => normalizeCartesianChartData(props.data, pr
 const animationProgress = ref(0)
 let animationFrame = 0
 
-function token(name: keyof Theme['variables']): string {
-  return props.theme.variables[name]
-}
+const { token, isLight: isLightTheme } = useChartTheme(() => props.theme)
 
 // 柱状图 3 系列使用独立的柱色(与语义状态色解耦),每套主题各不相同以增强区分度
 const seriesTonePalette = computed<SeriesTone[]>(() => [
@@ -249,7 +248,7 @@ const option = computed(() => {
   const fallbackTones = seriesTonePalette.value
   const seriesTones = legendItems.value.map((item) => item.tone)
   const themed = colorWithAlpha
-  const isLight = props.theme.id.startsWith('light-')
+  const isLight = isLightTheme()
   const tooltipExtraCssText = `border-radius: ${pxToRem(8)}; box-shadow: 0 ${pxToRem(6)} ${pxToRem(18)} ${themed(dataBar, isLight ? 0.08 : 0.24)};`
 
   function resolveTone(index: number): SeriesTone {

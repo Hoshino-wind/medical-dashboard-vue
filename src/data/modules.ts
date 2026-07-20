@@ -12,6 +12,8 @@ export const moduleCatalog: ModuleCatalogItem[] = [
     subtitle: '近7天',
     kind: 'bar',
     size: 'normal',
+    dataKey: 'repairStats',
+    variant: 'repair',
     chart: { defaultType: 'bar', seriesName: '报修台次' },
   },
   {
@@ -20,6 +22,8 @@ export const moduleCatalog: ModuleCatalogItem[] = [
     title: '生命支持设备可用率',
     kind: 'availability',
     size: 'normal',
+    dataKey: 'lifeSupport',
+    variant: 'life',
   },
   { id: 'inspectionOrders', number: '05', title: '巡检工单', kind: 'completion', size: 'wide' },
   {
@@ -29,9 +33,19 @@ export const moduleCatalog: ModuleCatalogItem[] = [
     subtitle: '近7天',
     kind: 'line',
     size: 'normal',
+    dataKey: 'maintenanceStats',
+    variant: 'maintenance',
     chart: { defaultType: 'line', seriesName: '保养台次' },
   },
-  { id: 'ultrasound', number: '07', title: '超声设备可用率', kind: 'availability', size: 'normal' },
+  {
+    id: 'ultrasound',
+    number: '07',
+    title: '超声设备可用率',
+    kind: 'availability',
+    size: 'normal',
+    dataKey: 'ultrasound',
+    variant: 'ultrasound',
+  },
   { id: 'healthTrend', number: '08', title: '保养工单', kind: 'health', size: 'wide' },
   {
     id: 'inspectionStats',
@@ -40,6 +54,8 @@ export const moduleCatalog: ModuleCatalogItem[] = [
     subtitle: '近7天',
     kind: 'line',
     size: 'normal',
+    dataKey: 'inspectionStats',
+    variant: 'inspection',
     chart: { defaultType: 'line', seriesName: '巡检台次' },
   },
   {

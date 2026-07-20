@@ -1,5 +1,6 @@
 import type { Component } from 'vue'
 import type { ChartDisplayType } from './config'
+import type { DashboardData } from './dashboard'
 
 /**
  * 大屏模块相关类型。
@@ -26,6 +27,15 @@ export interface ModuleCatalogItem {
   subtitle?: string
   kind: ModuleKind
   size: ModuleSize
+  /**
+   * 该模块消费的 DashboardData 数据切片键。
+   * 供 moduleRegistry 数据驱动取数(`ctx.data[dataKey]`),
+   * 替代早先按 `module.id === '...'` 的硬编码分支。
+   * 单一数据源、由 kind 直接决定取数的模块可省略。
+   */
+  dataKey?: keyof DashboardData
+  /** 业务变体(如 life / ultrasound / repair / maintenance / inspection),透传给展示组件区分呈现。 */
+  variant?: string
   /** 仅统计图表模块提供；声明默认展示形态和单系列图例名称。 */
   chart?: {
     defaultType: ChartDisplayType

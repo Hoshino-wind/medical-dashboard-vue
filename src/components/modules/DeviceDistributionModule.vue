@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useDashboardStore } from '@/stores/dashboard'
+import { computed } from 'vue'
+import { usePagedCarousel } from '@/composables/usePagedCarousel'
 import type { DeviceDistributionItem } from '@/types/dashboard'
+import type { ColorMode } from '@/types/config'
 
 const PAGE_SIZE = 4
 const PAGE_INTERVAL = 5000
 
-const props = defineProps<{
-  items: DeviceDistributionItem[]
-}>()
-
-const store = useDashboardStore()
-const { config } = storeToRefs(store)
-const barColorMode = computed(() => config.value.barColorMode)
-
-const currentIndex = ref(0)
-let pageTimer: ReturnType<typeof setInterval> | null = null
+const props = withDefaults(
+  defineProps<{
+    items: DeviceDistributionItem[]
+    /** 进度条配色模式,由上层配置(moduleRegistry)注入,不再直接读 store */
+    barColorMode?: ColorMode
+  }>(),
+  {
+    barColorMode: 'gradient',
+  },
+)
 
 const rows = computed(() =>
   props.items.map((item) => ({
@@ -37,32 +37,10 @@ const pages = computed(() => {
   return result
 })
 
-const shouldPaginate = computed(() => pages.value.length > 1)
-
-function nextPage() {
-  if (!shouldPaginate.value) return
-  currentIndex.value = (currentIndex.value + 1) % pages.value.length
-}
-
-function startTimer() {
-  stopTimer()
-  if (!shouldPaginate.value) return
-  pageTimer = setInterval(nextPage, PAGE_INTERVAL)
-}
-
-function stopTimer() {
-  if (pageTimer) {
-    clearInterval(pageTimer)
-    pageTimer = null
-  }
-}
-
-watch(() => props.items, () => {
-  currentIndex.value = 0
+const { currentIndex } = usePagedCarousel({
+  pageCount: () => pages.value.length,
+  interval: PAGE_INTERVAL,
 })
-
-onMounted(startTimer)
-onBeforeUnmount(stopTimer)
 </script>
 
 <template>

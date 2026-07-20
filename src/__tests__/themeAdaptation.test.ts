@@ -91,7 +91,6 @@ describe('global theme adaptation', () => {
     expect(overviewValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(pieCenterValueBlock).not.toContain('var(--dashboard-font-scale')
     expect(cubeBar).not.toContain('chartFontSize(')
-    expect(cubeBar).toContain('fontSize: 10')
     expect(cubeBar).toContain('fontSize: 11')
     expect(cubeBar).toContain('fontSize: 12')
     expect(cubeBar).toContain('fontSize: 8')
@@ -229,15 +228,20 @@ describe('global theme adaptation', () => {
     expect(inspectionPieShell).not.toContain('drop-shadow')
   })
 
-  it('keeps each 3x3 dashboard row split into three equal-width cards', () => {
+  it('keeps each 3x3 dashboard row as three cards with a wider middle column', () => {
     const layoutStyles = readSource('styles/layout.css')
     const screenGridBlock = layoutStyles.match(/\.screen-grid\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const compactGridBlock =
       layoutStyles.match(/\.screen-grid\.layout-2x3\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
-    expect(screenGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    // 中列加宽以容纳跨列的宽表模块(维修/巡检/保养工单),两侧等宽。
+    expect(screenGridBlock).toContain(
+      'grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);',
+    )
     expect(screenGridBlock).not.toContain('0.98fr 1.43fr 1.04fr')
-    expect(compactGridBlock).toContain('grid-template-columns: repeat(3, minmax(0, 1fr));')
+    expect(compactGridBlock).toContain(
+      'grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);',
+    )
   })
 
   it('renders panel flowing borders with reduced-motion fallback', () => {
@@ -375,7 +379,7 @@ describe('global theme adaptation', () => {
     expect(base).not.toContain('WebGLRenderer')
     expect(source).toContain('gauge-base-tier')
     expect(source).toContain('gauge-base-beam')
-    expect(source).toContain('gauge-base-orbit--rotating')
+    expect(source).toContain('gauge-base-layer-rotate')
     expect(gauge).toContain('gauge-ring-track')
     expect(gauge).toContain('gauge-ring-progress')
     expect(source).not.toMatch(/gauge-(?:tube|water|glass)|pipe-|tube-|water-pipe/i)

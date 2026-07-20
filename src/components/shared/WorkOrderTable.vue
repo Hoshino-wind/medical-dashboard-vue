@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import CountUp from './CountUp.vue'
 import { usePagedList } from '@/composables/usePagedList'
 
 const props = defineProps<{
@@ -81,6 +82,12 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
         </div>
       </div>
     </div>
+    <div class="work-order-summary">
+      <div><span>维修中</span><b><CountUp :value="44" /></b><em>单</em></div>
+      <div><span>配件运输中</span><b><CountUp :value="18" /></b><em>单</em></div>
+      <div><span>待接修</span><b><CountUp :value="1" /></b><em>单</em></div>
+      <div><span>已维修</span><b><CountUp :value="1326" /></b><em>单</em></div>
+    </div>
   </div>
 </template>
 
@@ -90,8 +97,39 @@ const { viewportRef, trackRef, renderPages, trackStyle, onFlipEnd } = usePagedLi
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 0;
+}
+/* 底部静态工单汇总条:数值为固定示意数据,用 CountUp 做入场动画 */
+.work-order-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: baseline;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.2rem 0;
+  color: var(--muted);
+}
+.work-order-summary > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+.work-order-summary span {
+  font-size: calc(0.62rem * var(--dashboard-list-font-scale, 1.18));
+  font-weight: 850;
+}
+.work-order-summary b {
+  color: var(--text);
+  font-size: calc(0.8rem * var(--dashboard-list-font-scale, 1.18));
+  font-weight: 950;
+}
+.work-order-summary em {
+  font-size: calc(0.56rem * var(--dashboard-list-font-scale, 1.18));
+  font-style: normal;
+  font-weight: 850;
 }
 .work-order-table-wrap {
   display: flex;

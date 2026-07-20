@@ -217,7 +217,7 @@
 
 .hologram-gauge.has-inside-label .hologram-gauge-label {
   position: static;
-  font-size: calc(0.69rem * var(--dashboard-font-scale, 1.45));
+  font-size: calc(0.625rem * var(--dashboard-font-scale, 1.45));
 }
 
 .hologram-gauge-value {

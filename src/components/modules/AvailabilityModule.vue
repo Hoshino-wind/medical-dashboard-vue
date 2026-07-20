@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
-import { useDashboardStore } from '@/stores/dashboard'
+import { usePagedCarousel } from '@/composables/usePagedCarousel'
 import type { AvailabilityItem } from '@/types/dashboard'
+import type { ColorMode } from '@/types/config'
 import { pxToRem } from '@/utils/rem'
 
 const PAGE_SIZE = 3
@@ -14,15 +14,14 @@ const props = withDefaults(
   defineProps<{
     items: AvailabilityItem[]
     variant?: string
+    /** 环图配色模式,由上层配置(moduleRegistry)注入,不再直接读 store */
+    ringColorMode?: ColorMode
   }>(),
   {
     variant: 'life',
+    ringColorMode: 'solid',
   },
 )
-
-const store = useDashboardStore()
-const { config } = storeToRefs(store)
-const ringColorMode = computed(() => config.value.ringColorMode)
 
 const ringSize = computed(() => pxToRem(props.variant === 'ultrasound' ? 98 : 104))
 
@@ -35,13 +34,6 @@ const RING_PALETTE = [
   'var(--data-pie-pending)',
 ]
 
-function ringColorAt(localIndex: number, value: number): string {
-  if (value < 50) return 'var(--danger)'
-  const offset = props.variant === 'ultrasound' ? 2 : 0
-  const globalIndex = currentIndex.value * PAGE_SIZE + localIndex + offset
-  return RING_PALETTE[globalIndex % RING_PALETTE.length]
-}
-
 const pages = computed(() => {
   const result: AvailabilityItem[][] = []
   for (let index = 0; index < props.items.length; index += PAGE_SIZE) {
@@ -50,43 +42,19 @@ const pages = computed(() => {
   return result.length > 0 ? result : [[]]
 })
 
-const shouldPaginate = computed(() => pages.value.length > 1)
-
-const currentIndex = ref(0)
-let pageTimer: ReturnType<typeof setInterval> | null = null
+const { currentIndex, shouldPaginate } = usePagedCarousel({
+  pageCount: () => pages.value.length,
+  interval: PAGE_INTERVAL,
+})
 
 const currentPage = computed(() => pages.value[currentIndex.value] ?? [])
 
-function nextPage() {
-  if (!shouldPaginate.value) return
-  currentIndex.value = (currentIndex.value + 1) % pages.value.length
+function ringColorAt(localIndex: number, value: number): string {
+  if (value < 50) return 'var(--danger)'
+  const offset = props.variant === 'ultrasound' ? 2 : 0
+  const globalIndex = currentIndex.value * PAGE_SIZE + localIndex + offset
+  return RING_PALETTE[globalIndex % RING_PALETTE.length]
 }
-
-function startAutoPaging() {
-  stopAutoPaging()
-  if (shouldPaginate.value) {
-    pageTimer = setInterval(nextPage, PAGE_INTERVAL)
-  }
-}
-
-function stopAutoPaging() {
-  if (pageTimer) {
-    clearInterval(pageTimer)
-    pageTimer = null
-  }
-}
-
-// 数据页数变化后回到第一页并重启计时
-watch(
-  () => pages.value.length,
-  () => {
-    currentIndex.value = 0
-    startAutoPaging()
-  },
-)
-
-onMounted(startAutoPaging)
-onUnmounted(stopAutoPaging)
 </script>
 
 <template>

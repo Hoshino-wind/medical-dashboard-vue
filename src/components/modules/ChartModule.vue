@@ -20,21 +20,19 @@ const lineFooter = computed(() => {
   if (props.variant === 'repair' || 'series' in props.data) return null
   const values = (props.data as LineChartData).data
   const total = values.reduce((sum, value) => sum + value, 0)
-  if (props.variant === 'inspection') {
-    return {
-      label: '本周巡检',
-      value: total,
-      unit: '台次',
-      trend: '5.8%',
-      direction: 'up',
-    }
-  }
+
+  // 环比:用最新一期与上一期的真实数据算涨跌方向与幅度,替代早先写死的假百分比
+  const latest = values.length ? values[values.length - 1] : 0
+  const previous = values.length > 1 ? values[values.length - 2] : latest
+  const delta = latest - previous
+  const changeRatio = previous === 0 ? 0 : (delta / previous) * 100
+
   return {
-    label: '本周保养',
+    label: props.variant === 'inspection' ? '本周巡检' : '本周保养',
     value: total,
     unit: '台次',
-    trend: '8.6%',
-    direction: 'down',
+    trend: `${Math.abs(changeRatio).toFixed(1)}%`,
+    direction: delta >= 0 ? 'up' : 'down',
   }
 })
 </script>
@@ -144,6 +142,6 @@ const lineFooter = computed(() => {
 }
 .line-chart-trend.is-down b,
 .line-chart-trend.is-down strong {
-  color: var(--good);
+  color: var(--danger);
 }
 </style>

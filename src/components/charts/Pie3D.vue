@@ -233,7 +233,7 @@ function frontWallForSegment(segment: RenderedSegment): WallSegment[] {
       path: sideWallPath(start, end, OUTER_RX, OUTER_RY, totalDepth.value),
       fill: colorMix(segment.topColor, isLightTheme() ? 72 : 78, isLightTheme() ? '#b9d6df' : '#020814'),
       stroke: segment.strokeColor,
-      opacity: isLightTheme() ? 0.86 : 1,
+      opacity: isLightTheme() ? 0.76 : 0.94,
     },
   ]
 }

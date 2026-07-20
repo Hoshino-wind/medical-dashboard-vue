@@ -53,27 +53,26 @@ function resolveAvailability(
   module: ModuleCatalogItem,
   ctx: ModuleRenderContext,
 ): Record<string, unknown> {
-  if (module.id === 'ultrasound') {
-    return { items: ctx.data.ultrasound, variant: 'ultrasound' }
+  return {
+    items: ctx.data[module.dataKey!],
+    variant: module.variant,
+    ringColorMode: ctx.config.ringColorMode,
   }
-  return { items: ctx.data.lifeSupport, variant: 'life' }
 }
 
-function resolveLine(module: ModuleCatalogItem, ctx: ModuleRenderContext): Record<string, unknown> {
-  if (module.id === 'inspectionStats') {
-    return {
-      variant: 'inspection',
-      chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
-      seriesName: module.chart?.seriesName,
-      data: ctx.data.inspectionStats,
-      theme: ctx.theme,
-    }
-  }
+/**
+ * 折线/柱状统计卡片共用解析:数据源(dataKey)与业务变体(variant)均由模块目录声明,
+ * ChartModule 内部再按 chartType 决定画折线还是柱状。新增同类统计模块只改 moduleCatalog。
+ */
+function resolveCartesian(
+  module: ModuleCatalogItem,
+  ctx: ModuleRenderContext,
+): Record<string, unknown> {
   return {
-    variant: 'maintenance',
+    variant: module.variant,
     chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
     seriesName: module.chart?.seriesName,
-    data: ctx.data.maintenanceStats,
+    data: ctx.data[module.dataKey!],
     theme: ctx.theme,
   }
 }
@@ -89,13 +88,7 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   bar: {
     component: ChartModule,
-    resolveProps: (module, ctx) => ({
-      variant: 'repair',
-      chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
-      seriesName: module.chart?.seriesName,
-      data: ctx.data.repairStats,
-      theme: ctx.theme,
-    }),
+    resolveProps: resolveCartesian,
   },
   availability: {
     component: AvailabilityModule,
@@ -107,7 +100,7 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   line: {
     component: ChartModule,
-    resolveProps: resolveLine,
+    resolveProps: resolveCartesian,
   },
   health: {
     component: HealthTrendModule,
@@ -115,6 +108,9 @@ export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
   },
   distribution: {
     component: DeviceDistributionModule,
-    resolveProps: (_module, ctx) => ({ items: ctx.data.deviceDistribution }),
+    resolveProps: (_module, ctx) => ({
+      items: ctx.data.deviceDistribution,
+      barColorMode: ctx.config.barColorMode,
+    }),
   },
 }

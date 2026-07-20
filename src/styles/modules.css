@@ -8,7 +8,7 @@
   font-size: 1.7rem;
 }
 .overview-feature-ring .hologram-gauge-label {
-  font-size: 1rem;
+  font-size: 0.56rem;
 }
 .inspection-order-grid,
 .health-status-grid {
@@ -171,7 +171,7 @@
   top: 32.4%;
   z-index: 3;
   color: color-mix(in srgb, var(--text) 92%, var(--data-inspection-pie-finished) 8%);
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 950;
   line-height: 1;
   transform: translate(-50%, calc(-50% - 0.25rem));

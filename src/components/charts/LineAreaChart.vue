@@ -2,12 +2,13 @@
 import { computed } from 'vue'
 import EChart from './EChart.vue'
 import type { CartesianChartData } from '@/types/dashboard'
-import type { Theme, ThemeVariables } from '@/types/theme'
+import type { Theme } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
 import { resolveChartAxisRange } from '@/utils/chartAxis'
 import { chartFontSize } from '@/utils/fontScale'
 import { colorWithAlpha } from '@/utils/themeColor'
 import { normalizeCartesianChartData } from '@/utils/chartData'
+import { useChartTheme } from '@/composables/useChartTheme'
 
 const props = withDefaults(
   defineProps<{
@@ -24,9 +25,7 @@ const props = withDefaults(
 
 const normalizedData = computed(() => normalizeCartesianChartData(props.data, props.seriesName))
 
-function token(name: keyof ThemeVariables): string {
-  return props.theme.variables[name]
-}
+const { token, isLight: isLightTheme } = useChartTheme(() => props.theme)
 
 const tooltipExtraCssText = 'border-radius: 0.5rem;'
 
@@ -58,7 +57,7 @@ const option = computed(() => {
   const lineColor = colors[0]
   const pointColor =
     props.variant === 'inspection' ? token('--data-ring-secondary') : token('--data-pie-pending')
-  const isLight = props.theme.id.startsWith('light-')
+  const isLight = isLightTheme()
   const hasMultipleSeries = data.series.length > 1
   const maxValue = Math.max(0, ...data.series.flatMap((series) => series.data))
   const yAxisRange = resolveChartAxisRange(maxValue)
