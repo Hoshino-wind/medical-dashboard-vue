@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import LineAreaChart from '@/components/charts/LineAreaChart.vue'
 import { themes } from '@/data/themes'
 import type { BarChartData, LineChartData } from '@/types/dashboard'
+import type { CartesianChartVariant } from '@/types/module'
 
 interface LineChartOption {
   yAxis: {
@@ -29,7 +30,7 @@ const chartData: LineChartData = {
 }
 
 describe('LineAreaChart', () => {
-  it.each(['maintenance', 'inspection'])(
+  it.each<CartesianChartVariant>(['maintenance', 'inspection'])(
     'scales the %s y axis from the actual line data maximum',
     (variant) => {
       const wrapper = mount(LineAreaChart, {

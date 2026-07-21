@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import PanelShell from './PanelShell.vue'
 import { moduleRegistry, type ModuleRenderContext } from '@/config/moduleRegistry'
-import { useDashboardData } from '@/composables/useDashboardData'
+import { useInjectedDashboardData } from '@/composables/useInjectedDashboardData'
 import { useDashboardStore } from '@/stores/dashboard'
 import type { ModuleCatalogItem } from '@/types/module'
 import type { Theme } from '@/types/theme'
@@ -12,13 +12,17 @@ const props = defineProps<{
   theme: Theme
 }>()
 
-const { data } = useDashboardData()
+/**
+ * 从 BigScreen 注入的数据上下文取数(ComputedRef),不再自己调 useDashboardData(),
+ * 避免每个模块重复触发请求与重复 loading 状态。
+ */
+const data = useInjectedDashboardData()
 const store = useDashboardStore()
 
 const entry = computed(() => moduleRegistry[props.module.kind])
 
 const ctx = computed<ModuleRenderContext>(() => ({
-  data: data,
+  data: data.value,
   theme: props.theme,
   config: store.config,
 }))

@@ -1,6 +1,11 @@
 import { defineAsyncComponent } from 'vue'
 import type { Component } from 'vue'
-import type { ModuleCatalogItem, ModuleKind } from '@/types/module'
+import type {
+  AvailabilityVariant,
+  CartesianChartVariant,
+  ModuleCatalogItem,
+  ModuleKind,
+} from '@/types/module'
 import type { DashboardConfig } from '@/types/config'
 import type { DashboardData } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
@@ -55,7 +60,7 @@ function resolveAvailability(
 ): Record<string, unknown> {
   return {
     items: ctx.data[module.dataKey!],
-    variant: module.variant,
+    variant: module.variant as AvailabilityVariant,
     ringColorMode: ctx.config.ringColorMode,
   }
 }
@@ -69,7 +74,7 @@ function resolveCartesian(
   ctx: ModuleRenderContext,
 ): Record<string, unknown> {
   return {
-    variant: module.variant,
+    variant: module.variant as CartesianChartVariant,
     chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
     seriesName: module.chart?.seriesName,
     data: ctx.data[module.dataKey!],

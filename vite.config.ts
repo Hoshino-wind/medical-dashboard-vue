@@ -23,5 +23,7 @@ export default defineConfig({
     },
     globals: true,
     setupFiles: ['./src/__tests__/setup.ts'],
+    // 排除 Playwright e2e 目录,避免 vitest 误拆解 *.spec.ts 调用 Playwright test()
+    exclude: ['**/node_modules/**', '**/dist/**', '**/dist-ssr/**', 'e2e/**', 'playwright/**'],
   },
 })

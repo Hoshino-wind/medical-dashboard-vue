@@ -15,6 +15,27 @@ export type ModuleKind =
 export type ModuleSize = 'normal' | 'wide'
 
 /**
+ * 业务变体联合类型。
+ *
+ * 用于区分模块消费的数据切片与展示形态(如生命支持/超声、报修/保养/巡检),
+ * 替代原先散落在各组件 props 中的裸 `string` 声明——
+ * 后者无法在编译期拦截拼写错误,且与 catalog 中的 variant 字段失去契约。
+ *
+ * 命名规则:沿用各模块在 `moduleCatalog` 中已使用的字符串字面量,
+ * 新增业务场景时请同步扩展本联合与对应组件的运行时分支。
+ */
+export type ModuleVariant = 'repair' | 'maintenance' | 'inspection' | 'life' | 'ultrasound'
+
+/** 笛卡尔坐标图表(报修/保养/巡检统计)允许的业务变体 */
+export type CartesianChartVariant = Extract<
+  ModuleVariant,
+  'repair' | 'maintenance' | 'inspection'
+>
+
+/** 可用率模块(生命支持/超声)允许的业务变体 */
+export type AvailabilityVariant = Extract<ModuleVariant, 'life' | 'ultrasound'>
+
+/**
  * 模块目录项。
  * `title` 为主标题,`subtitle` 为可选副标题(如"近7天"),
  * 替代原先用正则解析 `（xxx）` 的脆弱实现。
@@ -34,8 +55,11 @@ export interface ModuleCatalogItem {
    * 单一数据源、由 kind 直接决定取数的模块可省略。
    */
   dataKey?: keyof DashboardData
-  /** 业务变体(如 life / ultrasound / repair / maintenance / inspection),透传给展示组件区分呈现。 */
-  variant?: string
+  /**
+   * 业务变体,透传给展示组件区分呈现(如 life / ultrasound / repair / maintenance / inspection)。
+   * 类型收紧为 `ModuleVariant` 联合,新增业务场景需同步扩展该联合。
+   */
+  variant?: ModuleVariant
   /** 仅统计图表模块提供；声明默认展示形态和单系列图例名称。 */
   chart?: {
     defaultType: ChartDisplayType

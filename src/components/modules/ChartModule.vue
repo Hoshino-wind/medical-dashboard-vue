@@ -5,12 +5,14 @@ import CubeBarChart from '../charts/CubeBarChart.vue'
 import LineAreaChart from '../charts/LineAreaChart.vue'
 import type { ChartDisplayType } from '@/types/config'
 import type { CartesianChartData, LineChartData } from '@/types/dashboard'
+import type { CartesianChartVariant } from '@/types/module'
 import type { Theme } from '@/types/theme'
 
 const props = defineProps<{
   /** 展示形态与业务变体相互独立，切图表时不改变数据来源。 */
   chartType: ChartDisplayType
-  variant: 'repair' | 'maintenance' | 'inspection'
+  /** 业务变体,仅限报修/保养/巡检三种统计场景 */
+  variant: CartesianChartVariant
   seriesName: string
   data: CartesianChartData
   theme: Theme

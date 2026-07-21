@@ -4,6 +4,7 @@ import AvailabilityMetricRing from '../visual/AvailabilityMetricRing.vue'
 import { usePagedCarousel } from '@/composables/usePagedCarousel'
 import type { AvailabilityItem } from '@/types/dashboard'
 import type { ColorMode } from '@/types/config'
+import type { AvailabilityVariant } from '@/types/module'
 import { pxToRem } from '@/utils/rem'
 
 const PAGE_SIZE = 3
@@ -13,7 +14,8 @@ const PAGE_INTERVAL = 5500
 const props = withDefaults(
   defineProps<{
     items: AvailabilityItem[]
-    variant?: string
+    /** 业务变体,限定为 life/ultrasound(其余取值对该模块无意义) */
+    variant?: AvailabilityVariant
     /** 环图配色模式,由上层配置(moduleRegistry)注入,不再直接读 store */
     ringColorMode?: ColorMode
   }>(),

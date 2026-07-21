@@ -43,6 +43,8 @@ describe('BigScreen reference layout', () => {
         },
       },
     })
+    // BigScreen 现在 onMounted 异步拉取数据,需 flush 让 v-if="data" 生效
+    await flushPromises()
 
     expect(wrapper.find('.screen-frame').attributes('data-reference-design')).toBe(
       'medical-equipment-1920x1080',
@@ -73,6 +75,8 @@ describe('BigScreen reference layout', () => {
         },
       },
     })
+    // 等待异步数据拉取完成后才进入 grid 分支
+    await flushPromises()
 
     expect(wrapper.findAll('.module-stub')).toHaveLength(9)
     expect(wrapper.text()).toContain('设备分布台数占比')

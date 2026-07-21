@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import EChart from './EChart.vue'
 import type { CartesianChartData } from '@/types/dashboard'
+import type { CartesianChartVariant } from '@/types/module'
 import type { Theme } from '@/types/theme'
 import { type EChartsOption } from '@/utils/echarts'
 import { resolveChartAxisRange } from '@/utils/chartAxis'
@@ -14,7 +15,8 @@ const props = withDefaults(
   defineProps<{
     data: CartesianChartData
     theme: Theme
-    variant?: string
+    /** 业务变体,仅允许影响配色的三种统计场景 */
+    variant?: CartesianChartVariant
     seriesName?: string
   }>(),
   {
