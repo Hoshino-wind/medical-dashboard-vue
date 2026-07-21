@@ -175,10 +175,13 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('renders property group legends as theme-aware section dividers', () => {
-    const configPanel = readFileSync(join(testDir, '../components/shared/ConfigPanel.vue'), 'utf8')
-    const legendBlock = configPanel.match(/\.property-group legend\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+    const propertyPanel = readFileSync(
+      join(testDir, '../components/shared/ConfigPropertyPanel.vue'),
+      'utf8',
+    )
+    const legendBlock = propertyPanel.match(/\.property-group legend\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const markerBlock =
-      configPanel.match(/\.property-group legend::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
+      propertyPanel.match(/\.property-group legend::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(legendBlock).toContain('width: 100%')
     expect(legendBlock).toContain('var(--accent)')
