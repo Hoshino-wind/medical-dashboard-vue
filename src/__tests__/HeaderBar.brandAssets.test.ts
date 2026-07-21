@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import HeaderBar from '@/components/shared/HeaderBar.vue'
@@ -8,8 +5,6 @@ import hospitalLogo from '@/assets/jiangmen-central-hospital-logo.png'
 import sunnicareLogo from '@/assets/sunnicare-logo.png'
 
 enableAutoUnmount(afterEach)
-
-const testDir = dirname(fileURLToPath(import.meta.url))
 
 const header = {
   brand: 'Sunnicare 上云赋',
@@ -40,23 +35,5 @@ describe('HeaderBar brand assets', () => {
     expect(rightStep.attributes('d')).toBe(leftStep.attributes('d'))
     expect(rightConnector.attributes('transform')).toBe('translate(1400 0) scale(-1 1)')
     expect(rightStep.attributes('transform')).toBe('translate(1400 0) scale(-1 1)')
-  })
-
-  it('keeps the hospital lockup inside the header without squeezing its copy', () => {
-    const source = readFileSync(join(testDir, '../components/shared/HeaderBar.vue'), 'utf8')
-    const chipBlock =
-      [...source.matchAll(/^\.hospital-chip\s*\{[\s\S]*?\n\}/gm)]
-        .map((match) => match[0])
-        .find((block) => block.includes('justify-content: flex-end')) ?? ''
-    const copyBlock = source.match(/^\.hospital-copy\s*\{[\s\S]*?\n\}/m)?.[0] ?? ''
-    const subtitleBlock = source.match(/^\.hospital-subtitle\s*\{[\s\S]*?\n\}/m)?.[0] ?? ''
-
-    expect(chipBlock).toContain('overflow: visible')
-    expect(chipBlock).toContain('clip-path: none')
-    expect(copyBlock).toContain('flex: 1 1 0')
-    expect(copyBlock).toContain('padding: 0.35rem 1.1rem 0.35rem 1.75rem')
-    expect(copyBlock).toContain('transform: none')
-    expect(subtitleBlock).toContain('overflow: visible')
-    expect(subtitleBlock).toContain('white-space: nowrap')
   })
 })

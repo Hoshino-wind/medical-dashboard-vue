@@ -25,7 +25,7 @@ function themeColor(theme: Theme | undefined, token: `--${string}`, fallback: st
 }
 
 function isLightTheme(theme: Theme | undefined): boolean {
-  return theme?.id.startsWith('light-') ?? false
+  return theme?.mode === 'light'
 }
 </script>
 

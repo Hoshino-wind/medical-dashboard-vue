@@ -4,6 +4,7 @@ import { pxToRem } from '@/utils/rem'
 export const themes: Theme[] = [
   {
     id: 'light-medical',
+    mode: 'light',
     name: '01 日间医疗白',
     description: '冷白天空蓝·白底运维',
     preview: ['#f7fbff', '#1677ff', '#2fbf8f'],
@@ -64,6 +65,7 @@ export const themes: Theme[] = [
   },
   {
     id: 'deep-sea-instrument',
+    mode: 'dark',
     name: '03 深海指挥蓝',
     description: '深海蓝黑·低噪青蓝·夜间中控',
     preview: ['#020814', '#16b8d9', '#4f8cff'],
@@ -124,6 +126,7 @@ export const themes: Theme[] = [
   },
   {
     id: 'ink-blue-medical',
+    mode: 'dark',
     name: '04 电光青绿',
     description: '墨绿高对比·电光青绿·演示大屏',
     preview: ['#030812', '#0fd6a0', '#6ee7c8'],
@@ -184,6 +187,7 @@ export const themes: Theme[] = [
   },
   {
     id: 'midnight-violet',
+    mode: 'dark',
     name: '05 午夜蓝紫',
     description: '深靛紫底·青紫分层·科技大屏',
     preview: ['#080719', '#7c6dff', '#3bd7ff'],
@@ -244,6 +248,7 @@ export const themes: Theme[] = [
   },
   {
     id: 'black-gold-blue',
+    mode: 'dark',
     name: '06 黑金蓝',
     description: '炭黑蓝底·金色重点·设备中控',
     preview: ['#05080d', '#1fb6ff', '#e7b94d'],

@@ -40,14 +40,14 @@ function toDashboardData(source: ParsedBigScreenFakeData): DashboardData {
 }
 
 function toRepairOrderRow(order: ParsedRepairOrderItem): RepairOrder {
-  return [
-    order.department,
-    order.equipName,
-    order.repairCode,
-    order.repairReportDuration,
-    order.responder,
-    order.status,
-  ]
+  return {
+    department: order.department,
+    equipName: order.equipName,
+    repairCode: order.repairCode,
+    reportDuration: order.repairReportDuration,
+    responder: order.responder,
+    status: order.status,
+  }
 }
 
 function toInspectionOrders(orders: ServiceOrderItem[]): InspectionOrders {

@@ -13,6 +13,16 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('/node_modules/zrender/')) return 'zrender'
+          if (id.includes('/node_modules/echarts/')) return 'echarts'
+        },
+      },
+    },
+  },
   test: {
     // 组件测试基于 jsdom,挂载 Vue 组件需要 DOM 环境
     environment: 'jsdom',

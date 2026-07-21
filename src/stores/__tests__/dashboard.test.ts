@@ -12,7 +12,7 @@ describe('dashboard store configuration', () => {
     setActivePinia(createPinia())
   })
 
-  it('normalizes old saved module order so newly added modules stay configurable', () => {
+  it('migrates legacy moduleOrder into versioned slot configuration', async () => {
     const oldModuleOrder = moduleCatalog
       .filter((item) => item.id !== 'deviceDistribution')
       .map((item) => item.id)
@@ -28,12 +28,15 @@ describe('dashboard store configuration', () => {
 
     const store = useDashboardStore()
 
-    expect(store.config.moduleOrder).toHaveLength(moduleCatalog.length)
-    expect(store.config.moduleOrder.at(-1)).toBe('deviceDistribution')
+    expect(store.config.schemaVersion).toBe(2)
+    expect(store.config.selectedModuleIds).toEqual(oldModuleOrder.slice(0, 9))
+    expect(store.availableModules.map((module) => module.id)).toContain('deviceDistribution')
 
-    store.moveModule(9, 8)
-
-    expect(store.config.moduleOrder[8]).toBe('deviceDistribution')
+    store.persistConfig()
+    await nextTick()
+    const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
+    expect(persisted.schemaVersion).toBe(2)
+    expect(persisted).not.toHaveProperty('moduleOrder')
   })
 
   it('defaults old saved configs to the glass panel style and persists borderless selection', async () => {

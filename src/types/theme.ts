@@ -6,6 +6,8 @@ export type ThemeId =
   | 'midnight-violet'
   | 'black-gold-blue'
 
+export type ThemeMode = 'light' | 'dark'
+
 /** 全部主题 ID 常量,可用于遍历或校验 */
 export const THEME_IDS: ThemeId[] = [
   'light-medical',
@@ -79,6 +81,7 @@ export interface ThemeVariables {
 /** 主题定义 */
 export interface Theme {
   id: ThemeId
+  mode: ThemeMode
   name: string
   description: string
   /** 主题预览配色,用于配置页色块展示 */

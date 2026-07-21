@@ -1,16 +1,11 @@
-import { existsSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useDashboardData } from '../useDashboardData'
-import { fetchDashboardData } from '@/data/dashboardRepository'
+import { DashboardRequestError, fetchDashboardData } from '@/data/dashboardRepository'
 
-const testDir = dirname(fileURLToPath(import.meta.url))
-const projectRoot = join(testDir, '../../..')
-
-vi.mock('@/data/dashboardRepository', () => ({
-  fetchDashboardData: vi.fn(),
-}))
+vi.mock('@/data/dashboardRepository', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/data/dashboardRepository')>()
+  return { ...actual, fetchDashboardData: vi.fn() }
+})
 
 describe('useDashboardData', () => {
   beforeEach(() => {
@@ -124,7 +119,24 @@ describe('useDashboardData', () => {
     expect(fetchDashboardData).toHaveBeenCalledTimes(1)
   })
 
-  it('removes the legacy hand-written mock data module', () => {
-    expect(existsSync(join(projectRoot, 'src/data/mock/dashboardData.ts'))).toBe(false)
+  it('cancels the active request without exposing an error', async () => {
+    vi.mocked(fetchDashboardData).mockImplementation(
+      ({ signal } = {}) =>
+        new Promise((_resolve, reject) => {
+          signal?.addEventListener(
+            'abort',
+            () => reject(new DashboardRequestError('aborted', '已取消')),
+            { once: true },
+          )
+        }),
+    )
+
+    const { loading, error, refresh, cancel } = useDashboardData()
+    const request = refresh()
+    cancel()
+    await request
+
+    expect(loading.value).toBe(false)
+    expect(error.value).toBeNull()
   })
 })

@@ -1,4 +1,7 @@
 import type { ThemeId } from './theme'
+import type { ChartModuleId, ModuleId } from './module'
+
+export const CURRENT_DASHBOARD_CONFIG_VERSION = 2 as const
 
 /** 布局类型:2行3列 / 3行3列 */
 export type LayoutType = '2x3' | '3x3'
@@ -17,6 +20,7 @@ export type ChartDisplayType = (typeof CHART_DISPLAY_TYPES)[number]
 
 /** 大屏配置(可序列化、可持久化到 localStorage) */
 export interface DashboardConfig {
+  schemaVersion: typeof CURRENT_DASHBOARD_CONFIG_VERSION
   themeId: ThemeId
   panelStyle: PanelStyle
   layout: LayoutType
@@ -25,7 +29,7 @@ export interface DashboardConfig {
   /** 进度条配色模式(设备分布台数) */
   barColorMode: ColorMode
   /** 按模块 id 保存统计卡片的展示形态 */
-  chartTypes: Record<string, ChartDisplayType>
-  selectedModuleIds: Array<string | null>
-  moduleOrder: string[]
+  chartTypes: Record<ChartModuleId, ChartDisplayType>
+  /** 唯一布局事实来源：数组下标就是大屏槽位。 */
+  selectedModuleIds: Array<ModuleId | null>
 }

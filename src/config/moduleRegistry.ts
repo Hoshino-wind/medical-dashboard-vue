@@ -1,22 +1,12 @@
 import { defineAsyncComponent } from 'vue'
 import type { Component } from 'vue'
-import type {
-  AvailabilityVariant,
-  CartesianChartVariant,
-  ModuleCatalogItem,
-  ModuleKind,
-} from '@/types/module'
 import type { DashboardConfig } from '@/types/config'
 import type { DashboardData } from '@/types/dashboard'
+import type { ModuleByKind, ModuleCatalogItem, ModuleKind } from '@/types/module'
 import type { Theme } from '@/types/theme'
 
-/**
- * 大屏模块组件采用 defineAsyncComponent 懒加载,
- * 使每个业务模块(含其依赖的图表/可视化库)拆分为独立 chunk,
- * 减小首屏 JS 体积,模块按需加载。
- */
 const OverviewModule = defineAsyncComponent(() => import('@/components/modules/OverviewModule.vue'))
-const WorkOrderTable = defineAsyncComponent(() => import('@/components/shared/WorkOrderTable.vue'))
+const WorkOrderTable = defineAsyncComponent(() => import('@/components/modules/WorkOrderTable.vue'))
 const ChartModule = defineAsyncComponent(() => import('@/components/modules/ChartModule.vue'))
 const AvailabilityModule = defineAsyncComponent(
   () => import('@/components/modules/AvailabilityModule.vue'),
@@ -31,91 +21,108 @@ const DeviceDistributionModule = defineAsyncComponent(
   () => import('@/components/modules/DeviceDistributionModule.vue'),
 )
 
-/**
- * 模块渲染注册表 —— 配置驱动的核心。
- *
- * ModuleRenderer 不再用一长串 `v-if (module.id === '...')` 判断,
- * 而是根据 `module.kind` 在此注册表查找对应组件与 props 解析逻辑。
- *
- * 新增模块只需:
- *   1. 在 moduleCatalog 增加一项(含 kind);
- *   2. 若引入新组件,在此注册表对应 kind 增加/调整映射。
- */
 export interface ModuleRenderContext {
   data: DashboardData
   theme: Theme
   config: DashboardConfig
 }
 
-export interface ModuleRenderEntry {
+interface ModuleRenderEntry<Kind extends ModuleKind> {
   component: Component
-  resolveProps: (module: ModuleCatalogItem, ctx: ModuleRenderContext) => Record<string, unknown>
+  resolveProps: (module: ModuleByKind<Kind>, ctx: ModuleRenderContext) => Record<string, unknown>
 }
 
-const REPAIR_HEADERS = ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态']
+type ModuleRegistry = {
+  [Kind in ModuleKind]: ModuleRenderEntry<Kind>
+}
 
 function resolveAvailability(
-  module: ModuleCatalogItem,
+  module: ModuleByKind<'availability'>,
   ctx: ModuleRenderContext,
 ): Record<string, unknown> {
   return {
-    items: ctx.data[module.dataKey!],
-    variant: module.variant as AvailabilityVariant,
+    items: ctx.data[module.dataKey],
+    variant: module.variant,
     ringColorMode: ctx.config.ringColorMode,
   }
 }
 
-/**
- * 折线/柱状统计卡片共用解析:数据源(dataKey)与业务变体(variant)均由模块目录声明,
- * ChartModule 内部再按 chartType 决定画折线还是柱状。新增同类统计模块只改 moduleCatalog。
- */
 function resolveCartesian(
-  module: ModuleCatalogItem,
+  module: ModuleByKind<'bar' | 'line'>,
   ctx: ModuleRenderContext,
 ): Record<string, unknown> {
   return {
-    variant: module.variant as CartesianChartVariant,
-    chartType: ctx.config.chartTypes[module.id] ?? module.chart?.defaultType,
-    seriesName: module.chart?.seriesName,
-    data: ctx.data[module.dataKey!],
+    variant: module.variant,
+    chartType: ctx.config.chartTypes[module.id] ?? module.chart.defaultType,
+    seriesName: module.chart.seriesName,
+    data: ctx.data[module.dataKey],
     theme: ctx.theme,
   }
 }
 
-export const moduleRegistry: Record<ModuleKind, ModuleRenderEntry> = {
+export const moduleRegistry: ModuleRegistry = {
   overview: {
     component: OverviewModule,
-    resolveProps: (_module, ctx) => ({ data: ctx.data.overview }),
+    resolveProps: (module, ctx) => ({ data: ctx.data[module.dataKey] }),
   },
   table: {
     component: WorkOrderTable,
-    resolveProps: (_module, ctx) => ({ headers: REPAIR_HEADERS, rows: ctx.data.repairOrders }),
+    resolveProps: (module, ctx) => ({ rows: ctx.data[module.dataKey] }),
   },
-  bar: {
-    component: ChartModule,
-    resolveProps: resolveCartesian,
-  },
-  availability: {
-    component: AvailabilityModule,
-    resolveProps: resolveAvailability,
-  },
+  bar: { component: ChartModule, resolveProps: resolveCartesian },
+  availability: { component: AvailabilityModule, resolveProps: resolveAvailability },
   completion: {
     component: CompletionModule,
-    resolveProps: (_module, ctx) => ({ data: ctx.data.inspectionOrders, theme: ctx.theme }),
+    resolveProps: (module, ctx) => ({ data: ctx.data[module.dataKey], theme: ctx.theme }),
   },
-  line: {
-    component: ChartModule,
-    resolveProps: resolveCartesian,
-  },
+  line: { component: ChartModule, resolveProps: resolveCartesian },
   health: {
     component: HealthTrendModule,
-    resolveProps: (_module, ctx) => ({ data: ctx.data.healthTrend, theme: ctx.theme }),
+    resolveProps: (module, ctx) => ({ data: ctx.data[module.dataKey], theme: ctx.theme }),
   },
   distribution: {
     component: DeviceDistributionModule,
-    resolveProps: (_module, ctx) => ({
-      items: ctx.data.deviceDistribution,
+    resolveProps: (module, ctx) => ({
+      items: ctx.data[module.dataKey],
       barColorMode: ctx.config.barColorMode,
     }),
   },
+}
+
+export interface ResolvedModuleRender {
+  component: Component
+  props: Record<string, unknown>
+}
+
+function resolveEntry<Kind extends ModuleKind>(
+  entry: ModuleRenderEntry<Kind>,
+  module: ModuleByKind<Kind>,
+  ctx: ModuleRenderContext,
+): ResolvedModuleRender {
+  return { component: entry.component, props: entry.resolveProps(module, ctx) }
+}
+
+/** switch 负责收窄判别联合，避免动态注册表在调用端退化为类型断言。 */
+export function resolveModuleRender(
+  module: ModuleCatalogItem,
+  ctx: ModuleRenderContext,
+): ResolvedModuleRender {
+  switch (module.kind) {
+    case 'overview':
+      return resolveEntry(moduleRegistry.overview, module, ctx)
+    case 'table':
+      return resolveEntry(moduleRegistry.table, module, ctx)
+    case 'bar':
+      return resolveEntry(moduleRegistry.bar, module, ctx)
+    case 'availability':
+      return resolveEntry(moduleRegistry.availability, module, ctx)
+    case 'completion':
+      return resolveEntry(moduleRegistry.completion, module, ctx)
+    case 'line':
+      return resolveEntry(moduleRegistry.line, module, ctx)
+    case 'health':
+      return resolveEntry(moduleRegistry.health, module, ctx)
+    case 'distribution':
+      return resolveEntry(moduleRegistry.distribution, module, ctx)
+  }
 }

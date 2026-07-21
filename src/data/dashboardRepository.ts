@@ -1,58 +1,92 @@
-import { dashboardData } from './document/dashboardData'
+import { dashboardData as prototypeDashboardData } from './document/dashboardData'
+import { DashboardDataValidationError, parseDashboardData } from './dashboardDataContract'
 import type { DashboardData } from '@/types/dashboard'
 
-/**
- * 大屏数据仓库(Data Repository)。
- *
- * 当前实现从打包进 bundle 的 mock 文档解析数据;接入真实后端时,
- * 只需把 `fetchDashboardData` 替换为实际 API 请求,组件层无需任何改动。
- *
- * 设计要点:
- *   - 暴露统一异步接口 `fetchDashboardData(): Promise<DashboardData>`,
- *     即使现在是同步 mock,也保留 Promise 形态,避免日后切换 API 时调用方签名变更;
- *   - 通过 `latencyMs` 模拟网络延迟,使 UI 层的 loading / skeleton 分支可被验证;
- *   - 错误路径同样被模拟,方便测试与降级 UI 调试。
- */
-export interface FetchOptions {
-  /** 模拟网络延迟毫秒数;0 表示立即 resolve(默认) */
-  latencyMs?: number
-  /** 调试用:强制抛错以验证错误处理路径 */
-  shouldFail?: boolean
-}
+export type DashboardDataSource = 'http' | 'prototype-mock'
+export type DashboardRequestErrorCode = 'aborted' | 'http' | 'invalid-data' | 'network' | 'timeout'
 
-const DEFAULT_LATENCY_MS = 0
-
-function delay(ms: number): Promise<void> {
-  if (ms <= 0) return Promise.resolve()
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-/**
- * 异步获取大屏数据。
- *
- * @example
- * const data = await fetchDashboardData()
- *
- * // 模拟慢网络
- * const slow = await fetchDashboardData({ latencyMs: 800 })
- */
-export async function fetchDashboardData(options: FetchOptions = {}): Promise<DashboardData> {
-  const { latencyMs = DEFAULT_LATENCY_MS, shouldFail = false } = options
-
-  await delay(latencyMs)
-
-  if (shouldFail) {
-    throw new Error('[dashboardRepository] 模拟数据请求失败(调试用)')
+export class DashboardRequestError extends Error {
+  constructor(
+    public readonly code: DashboardRequestErrorCode,
+    message: string,
+    public readonly cause?: unknown,
+  ) {
+    super(message)
+    this.name = 'DashboardRequestError'
   }
-
-  // 返回深拷贝,避免消费方意外修改污染下一次请求结果
-  return structuredClone(dashboardData)
 }
 
-/**
- * 同步访问打包后的数据,保留给单元测试与极端场景使用。
- * 业务代码应优先使用 useDashboardData() composable。
- */
-export function getDashboardDataSnapshot(): DashboardData {
-  return dashboardData
+export interface FetchDashboardOptions {
+  signal?: AbortSignal
+  timeoutMs?: number
+}
+
+const DEFAULT_TIMEOUT_MS = 8_000
+
+export function getDashboardDataSource(): DashboardDataSource {
+  return import.meta.env.VITE_DASHBOARD_API_URL?.trim() ? 'http' : 'prototype-mock'
+}
+
+function requestContext(externalSignal: AbortSignal | undefined, timeoutMs: number) {
+  const controller = new AbortController()
+  let timedOut = false
+  const abortFromCaller = () => controller.abort(externalSignal?.reason)
+  externalSignal?.addEventListener('abort', abortFromCaller, { once: true })
+  const timeoutId = window.setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, timeoutMs)
+
+  return {
+    signal: controller.signal,
+    didTimeOut: () => timedOut,
+    cleanup: () => {
+      window.clearTimeout(timeoutId)
+      externalSignal?.removeEventListener('abort', abortFromCaller)
+    },
+  }
+}
+
+async function fetchRemoteDashboardData(
+  endpoint: string,
+  options: FetchDashboardOptions,
+): Promise<DashboardData> {
+  const context = requestContext(options.signal, options.timeoutMs ?? DEFAULT_TIMEOUT_MS)
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      signal: context.signal,
+    })
+    if (!response.ok) {
+      throw new DashboardRequestError('http', `大屏数据请求失败：HTTP ${response.status}`)
+    }
+    return parseDashboardData(await response.json())
+  } catch (error) {
+    if (error instanceof DashboardRequestError) throw error
+    if (error instanceof DashboardDataValidationError) {
+      throw new DashboardRequestError('invalid-data', error.message, error)
+    }
+    if (context.didTimeOut()) {
+      throw new DashboardRequestError('timeout', '大屏数据请求超时', error)
+    }
+    if (options.signal?.aborted || context.signal.aborted) {
+      throw new DashboardRequestError('aborted', '大屏数据请求已取消', error)
+    }
+    throw new DashboardRequestError('network', '大屏数据网络请求失败', error)
+  } finally {
+    context.cleanup()
+  }
+}
+
+/** 未配置 API 时明确使用内置原型数据；配置后统一走 HTTP 和运行时校验。 */
+export async function fetchDashboardData(
+  options: FetchDashboardOptions = {},
+): Promise<DashboardData> {
+  const endpoint = import.meta.env.VITE_DASHBOARD_API_URL?.trim()
+  if (endpoint) return fetchRemoteDashboardData(endpoint, options)
+  if (options.signal?.aborted) {
+    throw new DashboardRequestError('aborted', '大屏数据请求已取消')
+  }
+  return parseDashboardData(structuredClone(prototypeDashboardData))
 }

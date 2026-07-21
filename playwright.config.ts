@@ -11,6 +11,8 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: './e2e',
+  // 基线文件名跨操作系统保持一致，CI 与本地共同维护同一份视觉契约。
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -26,17 +28,23 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     locale: 'zh-CN',
+    reducedMotion: 'reduce',
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // 项目级设备参数会覆盖顶层 use，必须在展开设备后重申大屏视口。
+        viewport: { width: 1920, height: 1080 },
+        reducedMotion: 'reduce',
+      },
     },
   ],
   webServer: {
     // 使用专属端口 + strictPort 避免与本地其他 vite 项目(常驻 5173)冲突。
     // 直接调用 vite 而不走 pnpm dev,确保参数可控。
-    command: 'npx vite --port 5180 --strictPort --host 127.0.0.1',
+    command: 'pnpm exec vite --port 5180 --strictPort --host 127.0.0.1',
     url: 'http://localhost:5180',
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

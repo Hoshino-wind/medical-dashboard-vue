@@ -61,7 +61,7 @@ describe('BigScreen reference layout', () => {
     await router.isReady()
     const pinia = createPinia()
     const store = useDashboardStore(pinia)
-    store.moveModule(9, 8)
+    store.placeModuleInSlot('deviceDistribution', 8)
 
     const wrapper = mount(BigScreen, {
       global: {

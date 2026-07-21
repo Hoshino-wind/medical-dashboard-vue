@@ -1,35 +1,20 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { AlertCircle, ChevronDown, RotateCcw, Save, X } from 'lucide-vue-next'
 import { useDashboardStore } from '@/stores/dashboard'
+import { useScaledPreview } from '@/composables/useScaledPreview'
 import BigScreen from './BigScreen.vue'
 import ConfigPropertyPanel from './ConfigPropertyPanel.vue'
-import type { ModuleCatalogItem } from '@/types/module'
-
-type ModuleDisplayType = 'table' | 'chart'
+import type { ModuleCatalogItem, ModuleId } from '@/types/module'
 
 const store = useDashboardStore()
 const { config, availableModules, selectedModules, selectedSlotModules, activeTheme } =
   storeToRefs(store)
 
-// 效果预览等比缩小：基于 1920 基准宽度计算 scale
-const PREVIEW_BASE_WIDTH = 1920
-const PREVIEW_BASE_HEIGHT = 1080
-const previewRef = ref<HTMLElement | null>(null)
-const previewScale = ref(1)
-let previewObserver: ResizeObserver | undefined
+const { previewRef, previewScale } = useScaledPreview(1920, 1080)
 
-function measurePreview() {
-  const el = previewRef.value
-  if (!el) return
-  // 同时考虑宽高约束，确保完整显示（等比缩小）
-  const widthScale = el.clientWidth / PREVIEW_BASE_WIDTH
-  const heightScale = el.clientHeight / PREVIEW_BASE_HEIGHT
-  previewScale.value = Math.min(widthScale, heightScale)
-}
-
-const draggedModuleId = ref<string | null>(null)
+const draggedModuleId = ref<ModuleId | null>(null)
 const draggedSlotIndex = ref<number | null>(null)
 const dragOverSlot = ref<number | null>(null)
 const isComponentPoolActive = ref(false)
@@ -37,26 +22,28 @@ const savedAt = ref('')
 const layoutWarning = ref('')
 let warningTimer: number | undefined
 
-const tableModuleIds = new Set(['repairOrders', 'inspectionOrders', 'healthTrend'])
-
 const slotItems = computed(() => selectedSlotModules.value)
 
-function moduleDisplayType(module: ModuleCatalogItem): ModuleDisplayType {
-  return tableModuleIds.has(module.id) ? 'table' : 'chart'
+function moduleDisplayType(module: ModuleCatalogItem) {
+  return module.displayType
 }
 
 function moduleTypeLabel(module: ModuleCatalogItem) {
   return moduleDisplayType(module) === 'table' ? '表格' : '图形'
 }
 
-function moduleById(moduleId: string | null) {
+function moduleById(moduleId: ModuleId | null) {
   return [...availableModules.value, ...selectedModules.value].find(
     (module) => module.id === moduleId,
   )
 }
 
-function publishConfig() {
-  savedAt.value = new Date().toLocaleTimeString('zh-CN', { hour12: false })
+function saveConfig() {
+  if (store.persistConfig()) {
+    savedAt.value = new Date().toLocaleTimeString('zh-CN', { hour12: false })
+  } else {
+    showLayoutWarning('浏览器存储不可用，配置未保存')
+  }
 }
 
 function showLayoutWarning(message = '每一行只允许存在一个【表格】类型组件') {
@@ -78,7 +65,7 @@ function addModule(module: ModuleCatalogItem) {
   }
 }
 
-function handleAvailableDragStart(moduleId: string) {
+function handleAvailableDragStart(moduleId: ModuleId) {
   draggedModuleId.value = moduleId
   draggedSlotIndex.value = null
 }
@@ -124,19 +111,6 @@ function handleComponentPoolDrop() {
   }
   clearDragState()
 }
-
-onMounted(() => {
-  if (typeof ResizeObserver === 'undefined') return
-  previewObserver = new ResizeObserver(measurePreview)
-  if (previewRef.value) {
-    previewObserver.observe(previewRef.value)
-    measurePreview()
-  }
-})
-
-onBeforeUnmount(() => {
-  previewObserver?.disconnect()
-})
 </script>
 
 <template>
@@ -152,7 +126,7 @@ onBeforeUnmount(() => {
           <span>{{ layoutWarning || '每一行只允许存在一个【表格】类型组件' }}</span>
         </div>
         <div class="config-shell-actions">
-          <span class="config-save-state">{{ savedAt ? `已发布 ${savedAt}` : '自动保存' }}</span>
+          <span class="config-save-state">{{ savedAt ? `已保存 ${savedAt}` : '自动保存' }}</span>
           <button class="app-button" type="button" @click="store.clearSelectedModules()">
             <X class="h-4 w-4" />
             清空布局
@@ -212,6 +186,9 @@ onBeforeUnmount(() => {
               type="button"
               :draggable="Boolean(module)"
               :data-testid="`layout-slot-${index}`"
+              :aria-label="
+                module ? `移除布局位置 ${index + 1} 的${module.title}` : `空布局位置 ${index + 1}`
+              "
               @click="module ? store.removeModuleFromLayout(index) : undefined"
               @dragstart="handleSlotDragStart(index, module)"
               @dragenter.prevent="dragOverSlot = index"
@@ -223,9 +200,9 @@ onBeforeUnmount(() => {
               <span v-else class="layout-slot-empty">将业务组件拖动至此处</span>
             </button>
           </div>
-          <button class="config-publish-button" type="button" @click="publishConfig">
+          <button class="config-publish-button" type="button" @click="saveConfig">
             <Save class="h-4 w-4" />
-            保存并发布
+            保存本地配置
           </button>
         </section>
 
@@ -253,355 +230,7 @@ onBeforeUnmount(() => {
   </main>
 </template>
 
-<style scoped>
-.config-workbench {
-  display: block;
-  width: min(100vw, 106rem);
-  height: auto;
-  min-height: 100vh;
-  padding: 1rem;
-  overflow: visible;
-}
-.config-workbench::before {
-  display: none;
-}
-.config-shell,
-.config-preview-panel {
-  overflow: hidden;
-  border-color: color-mix(in srgb, var(--glass-edge) 64%, transparent);
-  border-radius: 0.5rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--glass-highlight) 10%, transparent),
-      transparent
-    ),
-    color-mix(in srgb, var(--surface) 82%, var(--bg) 18%);
-  box-shadow: var(--panel-shadow);
-}
-.config-shell {
-  position: relative;
-  min-height: 43rem;
-}
-.config-shell-header,
-.config-preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 4.25rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, #ffffff 14%, transparent);
-  padding: 0 1.55rem;
-}
-.config-rule-toast {
-  position: absolute;
-  left: 50%;
-  top: 0.95rem;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-height: 2.35rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--warn) 42%, transparent);
-  border-radius: 0.25rem;
-  background: color-mix(in srgb, var(--warn) 14%, var(--surface-strong) 86%);
-  color: color-mix(in srgb, var(--warn) 88%, var(--text) 12%);
-  padding: 0 1.05rem;
-  font-size: calc(0.82rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 950;
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -0.35rem);
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
-}
-.config-rule-toast.visible {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-.config-shell-title,
-.config-shell-actions,
-.config-preview-header {
-  color: color-mix(in srgb, var(--text) 84%, #d7dbe0 16%);
-}
-.config-shell-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: calc(1rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 850;
-}
-.config-shell-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-.config-save-state {
-  color: color-mix(in srgb, var(--muted) 78%, #d7dbe0 22%);
-  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 800;
-}
-.config-workbench-grid {
-  display: grid;
-  grid-template-columns: minmax(18rem, 22rem) minmax(34rem, 1fr) minmax(18rem, 22rem);
-  gap: 1.35rem;
-  align-items: start;
-  padding: 2.35rem 1.65rem 1.65rem;
-}
-.config-column {
-  min-width: 0;
-}
-.config-column h2,
-.config-preview-header h2 {
-  margin: 0;
-  color: color-mix(in srgb, var(--text) 82%, #ffffff 18%);
-  font-size: calc(1rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 950;
-  line-height: 1;
-  text-align: center;
-}
-.config-column h2 {
-  min-height: 2.75rem;
-}
-.config-column-box,
-.layout-slot-board {
-  border: 0.0625rem solid color-mix(in srgb, var(--border-strong) 64%, transparent);
-  background: color-mix(in srgb, var(--surface-muted) 82%, transparent);
-}
-.component-picker {
-  display: grid;
-  align-content: start;
-  gap: 0.5rem;
-  min-height: 34.75rem;
-  max-height: 34.75rem;
-  overflow: auto;
-  padding: 0.75rem;
-}
-.component-picker.is-drop-target {
-  border-color: color-mix(in srgb, var(--accent-2) 86%, transparent);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent 52%),
-    color-mix(in srgb, var(--surface-muted) 88%, transparent);
-  box-shadow: inset 0 0 1.2rem color-mix(in srgb, var(--accent) 18%, transparent);
-}
-.business-component-card {
-  display: grid;
-  grid-template-columns: 3.35rem minmax(0, 1fr);
-  gap: 0.75rem;
-  align-items: center;
-  min-height: 3.05rem;
-  border: 0.0625rem solid color-mix(in srgb, var(--accent) 42%, var(--border) 58%);
-  border-radius: 0.25rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 30%, var(--surface-strong) 70%),
-    color-mix(in srgb, var(--accent) 18%, var(--surface-strong) 82%)
-  );
-  color: var(--text);
-  padding: 0 0.75rem;
-  text-align: left;
-  cursor: grab;
-  transition:
-    transform 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease;
-}
-.business-component-card:hover,
-.business-component-card:focus-visible {
-  border-color: color-mix(in srgb, var(--accent-2) 72%, var(--border) 28%);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 40%, var(--surface-strong) 60%),
-    color-mix(in srgb, var(--accent) 26%, var(--surface-strong) 74%)
-  );
-  box-shadow: 0 0 0 0.125rem color-mix(in srgb, var(--accent) 58%, transparent);
-  transform: translateY(-0.0625rem);
-  outline: none;
-}
-.business-component-card:active {
-  cursor: grabbing;
-}
-.component-type-badge {
-  display: inline-grid;
-  min-height: 1.45rem;
-  place-items: center;
-  border-radius: 0.25rem;
-  background: color-mix(in srgb, #081018 78%, transparent);
-  font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 950;
-}
-.business-component-card.is-table .component-type-badge {
-  border: 0.0625rem solid color-mix(in srgb, #8ef66d 58%, transparent);
-  color: #84e56d;
-}
-.business-component-card.is-chart .component-type-badge {
-  border: 0.0625rem solid color-mix(in srgb, #54b7ff 62%, transparent);
-  color: #54b7ff;
-}
-.component-card-title {
-  min-width: 0;
-  overflow: hidden;
-  font-size: calc(0.86rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 850;
-  letter-spacing: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.component-empty-state {
-  display: grid;
-  min-height: 8rem;
-  place-items: center;
-  color: color-mix(in srgb, var(--muted) 78%, #ffffff 22%);
-  font-size: calc(0.82rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 800;
-}
-.layout-slot-board {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(6.2rem, 1fr));
-  gap: 0.7rem;
-  min-height: 34.75rem;
-  padding: 0.75rem;
-}
-.layout-slot-board-2x3 {
-  grid-template-rows: repeat(2, minmax(8rem, 1fr));
-  min-height: 24.5rem;
-}
-.layout-slot {
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  min-height: 0;
-  border: 0.0625rem dashed color-mix(in srgb, #ffffff 62%, transparent);
-  border-radius: 0.25rem;
-  color: #f4fbff;
-  padding: 0.75rem;
-  text-align: center;
-  transition:
-    border-color 140ms ease,
-    filter 140ms ease,
-    transform 140ms ease;
-}
-.layout-slot.is-chart {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-3) 22%, #429bf0), #429bf0);
-}
-.layout-slot.is-table {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--good) 24%, #61c635), #61c635);
-}
-.layout-slot.is-empty {
-  background: transparent;
-  color: color-mix(in srgb, #ffffff 42%, transparent);
-}
-.layout-slot:hover,
-.layout-slot:focus-visible,
-.layout-slot.is-drag-over {
-  border-color: #ffffff;
-  filter: brightness(1.07);
-  outline: none;
-  transform: translateY(-0.0625rem);
-}
-.layout-slot-title {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-size: calc(0.95rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 900;
-  line-height: 1.25;
-}
-.layout-slot-empty {
-  color: color-mix(in srgb, #ffffff 48%, transparent);
-  font-size: calc(0.78rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 800;
-}
-.config-publish-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  min-height: 2.6rem;
-  margin: 1.45rem auto 0;
-  border: 0.0625rem solid color-mix(in srgb, #7fc6ff 86%, transparent);
-  border-radius: 0.375rem;
-  background: color-mix(in srgb, #0e2439 86%, transparent);
-  color: #45aafc;
-  padding: 0 1.1rem;
-  font-size: calc(0.9rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 950;
-}
-.config-column-layout {
-  display: grid;
-}
-.config-preview-panel {
-  margin-top: 0.85rem;
-}
-.config-preview-header h2 {
-  text-align: left;
-}
-.config-preview-header span {
-  color: color-mix(in srgb, var(--muted) 80%, #ffffff 20%);
-  font-size: calc(0.76rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 800;
-}
-.config-live-preview {
-  position: relative;
-  overflow: hidden;
-  margin: 1.35rem;
-  aspect-ratio: 16 / 9;
-  border: 0.0625rem solid color-mix(in srgb, var(--border) 58%, transparent);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 30%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg-soft) 46%, transparent), var(--bg));
-}
-.config-live-scaler {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1920px;
-  height: 1080px;
-  transform-origin: center center;
-  will-change: transform;
-}
-@media (max-width: 73.75rem) {
-  .config-workbench {
-    width: 100%;
-    padding: 0.75rem;
-  }
-  .config-workbench-grid {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-  }
-  .component-picker,
-  .property-panel,
-  .layout-slot-board {
-    min-height: auto;
-    max-height: none;
-  }
-  .layout-slot-board,
-  .layout-slot-board-2x3 {
-    grid-template-rows: none;
-    grid-auto-rows: minmax(5.5rem, auto);
-  }
-  .config-live-preview {
-    aspect-ratio: auto;
-    min-height: 22rem;
-  }
-}
-</style>
+<style scoped src="./ConfigPanel.css"></style>
 
 <!-- 引用祖先壳 .config-mode + 穿透进 BigScreen 预览,必须全局(scoped 会给祖先/子元素也加 data-v 而失配) -->
-<style>
-.dashboard-shell.config-mode .config-live-preview .screen-frame {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 0.6rem 0.65rem 0.45rem;
-}
-.dashboard-shell.config-mode .config-live-preview .screen-frame::before {
-  display: block;
-}
-.dashboard-shell.config-mode .config-live-preview .screen-grid {
-  height: auto;
-}
-</style>
+<style src="./ConfigPanel.global.css"></style>

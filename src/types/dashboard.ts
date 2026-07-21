@@ -25,8 +25,15 @@ export interface OverviewData {
   inspectionDue: number
 }
 
-/** 维修工单:一行数据为字符串数组,顺序对应表头 */
-export type RepairOrder = string[]
+/** 维修工单使用命名字段，避免列顺序变化造成静默错位。 */
+export interface RepairOrder {
+  department: string
+  equipName: string
+  repairCode: string
+  reportDuration: string
+  responder: string
+  status: string
+}
 
 /**
  * 服务工单行(巡检 / 保养通用)。

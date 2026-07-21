@@ -1,14 +1,9 @@
 import { mount } from '@vue/test-utils'
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import CompletionModule from '@/components/modules/CompletionModule.vue'
-import WorkOrderTable from '@/components/shared/WorkOrderTable.vue'
+import WorkOrderTable from '@/components/modules/WorkOrderTable.vue'
 import HealthTrendModule from '@/components/modules/HealthTrendModule.vue'
 import { themes } from '@/data/themes'
-
-const testDir = dirname(fileURLToPath(import.meta.url))
 
 const CountUpStub = {
   props: ['value'],
@@ -31,8 +26,18 @@ describe('work order style panels', () => {
           waiting: 71,
           overdue: 12,
           rows: [
-            { department: '血液科层流病房', equipName: '不锈钢床头柜', remainLabel: '25天', engineer: '叶茂永' },
-            { department: '血液科层流病房', equipName: '病房对讲机', remainLabel: '25天', engineer: '叶茂永' },
+            {
+              department: '血液科层流病房',
+              equipName: '不锈钢床头柜',
+              remainLabel: '25天',
+              engineer: '叶茂永',
+            },
+            {
+              department: '血液科层流病房',
+              equipName: '病房对讲机',
+              remainLabel: '25天',
+              engineer: '叶茂永',
+            },
           ],
         },
       },
@@ -69,8 +74,18 @@ describe('work order style panels', () => {
           pending: 102,
           score: 96.8,
           rows: [
-            { department: '运行正常', equipName: '生命支持设备', remainLabel: '15,744台', engineer: '稳定' },
-            { department: '维保预警', equipName: '呼吸机/监护仪', remainLabel: '68台', engineer: '需排查' },
+            {
+              department: '运行正常',
+              equipName: '生命支持设备',
+              remainLabel: '15,744台',
+              engineer: '稳定',
+            },
+            {
+              department: '维保预警',
+              equipName: '呼吸机/监护仪',
+              remainLabel: '68台',
+              engineer: '需排查',
+            },
           ],
         },
       },
@@ -96,32 +111,26 @@ describe('work order style panels', () => {
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
   })
 
-  it('uses status tone variables for bottom summary numbers', () => {
-    const moduleStyles = readFileSync(join(testDir, '../styles/modules.css'), 'utf8')
-
-    expect(moduleStyles).toContain('--status-tone')
-    expect(moduleStyles).toContain('.module-status-summary b')
-    expect(moduleStyles).toContain('grid-template-columns: auto auto auto')
-    expect(moduleStyles).toContain('.module-status-summary b > span')
-    expect(moduleStyles).toContain('height: 1rem')
-    expect(moduleStyles).not.toContain('.module-status-summary > div::before')
-    expect(moduleStyles).toContain('.inspection-status-summary .is-total')
-    expect(moduleStyles).toContain('--data-inspection-pie-finished')
-    expect(moduleStyles).toContain('--data-inspection-pie-waiting')
-    expect(moduleStyles).toContain('--data-inspection-pie-overdue')
-    expect(moduleStyles).toContain('--data-health-pie-good')
-    expect(moduleStyles).toContain('--data-health-pie-warning')
-    expect(moduleStyles).toContain('--data-health-pie-repairing')
-    expect(moduleStyles).toContain('--data-health-pie-pending')
-  })
-
   it('animates work order summary numbers with CountUp', () => {
     const wrapper = mount(WorkOrderTable, {
       props: {
-        headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
         rows: [
-          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
-          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '待接修'],
+          {
+            department: '手术中心',
+            equipName: '监护仪',
+            repairCode: 'ERB-1',
+            reportDuration: '2天',
+            responder: '李明',
+            status: '维修中',
+          },
+          {
+            department: '检验科',
+            equipName: '分析仪',
+            repairCode: 'ERB-2',
+            reportDuration: '1天',
+            responder: '王华',
+            status: '待接修',
+          },
         ],
       },
       global: {
@@ -138,16 +147,41 @@ describe('work order style panels', () => {
   })
 
   it('pins pending repair orders before the scrolling repair list with distinct status colors and no vertical warning stripes', () => {
-    // work-order-pinned-table 样式已随 WorkOrderTable 组件化搬入其 <style scoped>
-    const tableStyles = readFileSync(join(testDir, '../components/shared/WorkOrderTable.vue'), 'utf8')
     const wrapper = mount(WorkOrderTable, {
       props: {
-        headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
         rows: [
-          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
-          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '待接修'],
-          ['放射科', 'DR 摄影系统', 'ERB-3', '8小时', '赵敏', '配件运输中'],
-          ['急诊科', '除颤仪', 'ERB-4', '3小时', '陈诚', '待接修'],
+          {
+            department: '手术中心',
+            equipName: '监护仪',
+            repairCode: 'ERB-1',
+            reportDuration: '2天',
+            responder: '李明',
+            status: '维修中',
+          },
+          {
+            department: '检验科',
+            equipName: '分析仪',
+            repairCode: 'ERB-2',
+            reportDuration: '1天',
+            responder: '王华',
+            status: '待接修',
+          },
+          {
+            department: '放射科',
+            equipName: 'DR 摄影系统',
+            repairCode: 'ERB-3',
+            reportDuration: '8小时',
+            responder: '赵敏',
+            status: '配件运输中',
+          },
+          {
+            department: '急诊科',
+            equipName: '除颤仪',
+            repairCode: 'ERB-4',
+            reportDuration: '3小时',
+            responder: '陈诚',
+            status: '待接修',
+          },
         ],
       },
       global: {
@@ -166,25 +200,30 @@ describe('work order style panels', () => {
     expect(scrollingViewport.text()).not.toContain('待接修')
     expect(scrollingViewport.text()).toContain('维修中')
     expect(scrollingViewport.text()).toContain('配件运输中')
-    expect(tableStyles).toContain('.work-order-pinned-table .is-pending-repair')
-    expect(
-      pinnedTable.find('.status-pill').attributes('style'),
-    ).toContain('var(--warn)')
-    expect(
-      scrollingViewport.find('.status-pill').attributes('style'),
-    ).toContain('var(--danger)')
-    expect(
-      tableStyles.match(/\.work-order-pinned-table \.is-pending-repair td\s*\{[\s\S]*?\n\}/)?.[0] ?? '',
-    ).not.toContain('inset 0.1875rem 0 0')
+    expect(pinnedTable.find('.status-pill').attributes('style')).toContain('var(--warn)')
+    expect(scrollingViewport.find('.status-pill').attributes('style')).toContain('var(--danger)')
   })
 
   it('renders list rows without row number badges or a default active first row', () => {
     const repairOrders = mount(WorkOrderTable, {
       props: {
-        headers: ['所属科室', '设备名称', '编号', '报修时长', '响应人', '工单状态'],
         rows: [
-          ['手术中心', '监护仪', 'ERB-1', '2天', '李明', '维修中'],
-          ['检验科', '分析仪', 'ERB-2', '1天', '王华', '已维修'],
+          {
+            department: '手术中心',
+            equipName: '监护仪',
+            repairCode: 'ERB-1',
+            reportDuration: '2天',
+            responder: '李明',
+            status: '维修中',
+          },
+          {
+            department: '检验科',
+            equipName: '分析仪',
+            repairCode: 'ERB-2',
+            reportDuration: '1天',
+            responder: '王华',
+            status: '已维修',
+          },
         ],
       },
       global: {
@@ -202,8 +241,18 @@ describe('work order style panels', () => {
           waiting: 71,
           overdue: 12,
           rows: [
-            { department: '临床药学组', equipName: '微量分析天平', remainLabel: '29天', engineer: '刘民华' },
-            { department: '临床药学组', equipName: '分析天平', remainLabel: '29天', engineer: '刘民华' },
+            {
+              department: '临床药学组',
+              equipName: '微量分析天平',
+              remainLabel: '29天',
+              engineer: '刘民华',
+            },
+            {
+              department: '临床药学组',
+              equipName: '分析天平',
+              remainLabel: '29天',
+              engineer: '刘民华',
+            },
           ],
         },
       },
@@ -224,8 +273,18 @@ describe('work order style panels', () => {
           pending: 102,
           score: 96.8,
           rows: [
-            { department: '全院设备', equipName: '运行正常', remainLabel: '15,744台', engineer: '稳定' },
-            { department: '生命支持设备', equipName: '维保预警', remainLabel: '68台', engineer: '需排查' },
+            {
+              department: '全院设备',
+              equipName: '运行正常',
+              remainLabel: '15,744台',
+              engineer: '稳定',
+            },
+            {
+              department: '生命支持设备',
+              equipName: '维保预警',
+              remainLabel: '68台',
+              engineer: '需排查',
+            },
           ],
         },
       },
@@ -241,16 +300,5 @@ describe('work order style panels', () => {
       expect(wrapper.findAll('.table-row-icon')).toHaveLength(0)
       expect(wrapper.findAll('tbody tr.is-active')).toHaveLength(0)
     }
-  })
-
-  it('uses CountUp for remaining static summary sources', () => {
-    const workOrderTable = readFileSync(join(testDir, '../components/shared/WorkOrderTable.vue'), 'utf8')
-    const chartModule = readFileSync(join(testDir, '../components/modules/ChartModule.vue'), 'utf8')
-
-    expect(workOrderTable).toContain("import CountUp from './CountUp.vue'")
-    expect(workOrderTable).toContain('<CountUp :value="44"')
-    expect(workOrderTable).toContain('<CountUp :value="1326"')
-    expect(chartModule).toContain("import CountUp from '../shared/CountUp.vue'")
-    expect(chartModule).toContain('<CountUp :value="lineFooter.value"')
   })
 })

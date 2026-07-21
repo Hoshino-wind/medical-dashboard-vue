@@ -1,75 +1,12 @@
-# 数据大屏接口接入说明
+# 大屏数据接口接入说明
 
-## 目标
+## 接入方式
 
-前端当前使用 mock 数据，后端只需要按本文结构提供数据接口，即可替换 mock 数据源。
+设置 `VITE_DASHBOARD_API_URL` 后，前端以 `GET` 请求该完整地址，请求头为 `Accept: application/json`。默认超时 8 秒，组件卸载时取消请求。
 
-## 配置接口
+接口返回非 2xx、网络失败、超时或响应结构不合法时，页面显示错误状态。所有响应都会经过 `src/data/dashboardDataContract.ts` 的运行时校验。
 
-### 获取大屏配置
-
-`GET /api/dashboard/config`
-
-响应：
-
-```json
-{
-  "themeId": "clinical-command",
-  "layout": "3x3",
-  "moduleOrder": [
-    "overview",
-    "repairOrders",
-    "repairStats",
-    "lifeSupport",
-    "inspectionOrders",
-    "maintenanceStats",
-    "ultrasound",
-    "healthTrend",
-    "inspectionStats"
-  ],
-  "moduleSettings": {
-    "overview": {
-      "title": "设备总览",
-      "fields": [{ "key": "total", "label": "设备总数", "visible": true, "unit": "台" }]
-    }
-  }
-}
-```
-
-### 保存大屏配置
-
-`POST /api/dashboard/config`
-
-请求体同上。
-
-字段说明：
-
-| 字段           | 类型     | 说明                             |
-| -------------- | -------- | -------------------------------- |
-| themeId        | string   | 主题 ID                          |
-| layout         | string   | 固定为 `3x3`                     |
-| moduleOrder    | string[] | 9 个模块 ID 的排序               |
-| moduleSettings | object   | 每个模块的标题、副标题和字段配置 |
-
-`moduleSettings` 说明：
-
-| 字段             | 类型    | 说明                             |
-| ---------------- | ------- | -------------------------------- |
-| title            | string  | 模块标题                         |
-| subtitle         | string  | 模块副标题，可为空               |
-| fields           | array   | 字段配置列表                     |
-| fields[].key     | string  | 字段稳定标识，由前端模块映射使用 |
-| fields[].label   | string  | 展示名称，可配置                 |
-| fields[].visible | boolean | 是否展示该字段                   |
-| fields[].unit    | string  | 展示单位，可为空                 |
-
-## 展示数据接口
-
-### 获取全部大屏数据
-
-`GET /api/dashboard/data`
-
-响应：
+## 响应结构
 
 ```json
 {
@@ -89,7 +26,14 @@
     "inspectionDue": 15354
   },
   "repairOrders": [
-    ["消毒供应中心", "蒸汽清洗机", "ERB-202605040", "57天3小时12分", "陈嘉诚", "维修中"]
+    {
+      "department": "消毒供应中心",
+      "equipName": "蒸汽清洗机",
+      "repairCode": "ERB-202605040",
+      "reportDuration": "57天3小时12分",
+      "responder": "陈嘉诚",
+      "status": "维修中"
+    }
   ],
   "inspectionOrders": {
     "rate": 95.2,
@@ -97,10 +41,18 @@
     "finished": 1411,
     "waiting": 71,
     "overdue": 12,
-    "rows": [["临床药学组", "微量分析天平", "29天", "刘民华"]]
+    "rows": [
+      {
+        "department": "临床药学组",
+        "equipName": "微量分析天平",
+        "remainLabel": "29天",
+        "engineer": "刘民华"
+      }
+    ]
   },
   "lifeSupport": [{ "name": "心电图机", "value": 92.6, "count": 68 }],
   "ultrasound": [{ "name": "感染科重症监护", "value": 100, "count": 1 }],
+  "deviceDistribution": [{ "name": "麻醉科", "count": 125, "rate": 50.5 }],
   "repairStats": {
     "labels": ["06-26", "06-27"],
     "series": [{ "name": "全保", "data": [0, 187] }]
@@ -118,28 +70,56 @@
     "warning": 68,
     "repairing": 44,
     "pending": 102,
-    "score": 96.8
+    "score": 96.8,
+    "rows": [
+      {
+        "department": "全院设备",
+        "equipName": "运行正常",
+        "remainLabel": "15744台",
+        "engineer": "稳定"
+      }
+    ]
   }
 }
 ```
 
-## 前端替换位置
+## 约束
 
-- mock 数据：`src/data/mock/dashboardData.ts`
-- 配置保存：`src/stores/dashboard.ts`
-- 图表组件：`src/components/modules/ChartModule.vue`
-- 模块渲染入口：`src/components/shared/ModuleRenderer.vue`
+- 所有数量、比例和图表数据必须是有限数字，不能传数字字符串。
+- 折线图 `data` 长度必须与 `labels` 相同。
+- 柱状图每个 `series.data` 长度必须与 `labels` 相同。
+- 工单必须使用命名字段对象，不接受依赖列顺序的字符串数组。
+- `updatedAt` 当前作为展示文本使用，建议后端统一输出明确时区的 ISO 8601 时间。
 
-## 状态约定
+## 配置状态
 
-工单状态建议使用以下枚举：
+当前配置 Schema 版本为 2，保存在 localStorage 的 `medical-dashboard-config` 中：
 
-```text
-维修中
-配件运输中
-已接修
-待上门
-已完成
+```json
+{
+  "schemaVersion": 2,
+  "themeId": "deep-sea-instrument",
+  "panelStyle": "glass-flow",
+  "layout": "3x3",
+  "ringColorMode": "solid",
+  "barColorMode": "gradient",
+  "chartTypes": {
+    "repairStats": "bar",
+    "maintenanceStats": "line",
+    "inspectionStats": "line"
+  },
+  "selectedModuleIds": [
+    "overview",
+    "repairOrders",
+    "repairStats",
+    "lifeSupport",
+    "inspectionOrders",
+    "maintenanceStats",
+    "ultrasound",
+    "healthTrend",
+    "inspectionStats"
+  ]
+}
 ```
 
-状态颜色由前端主题变量控制，后端只传状态文本即可。
+配置尚未接服务端保存/发布。接入时应新增独立配置 Repository，不应在组件或 Pinia action 中直接调用 `fetch`。

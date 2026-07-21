@@ -1,0 +1,39 @@
+.dashboard-shell[data-theme-mode='light'] .brand-lockup,
+.dashboard-shell[data-theme-mode='light'] .hospital-copy {
+  border-color: var(--lm-glass-border);
+  background: var(--lm-glass-fill);
+  -webkit-backdrop-filter: var(--lm-glass-blur);
+  backdrop-filter: var(--lm-glass-blur);
+  box-shadow: var(--lm-glass-shadow);
+}
+.dashboard-shell[data-theme-mode='light'] .brand-lockup::before,
+.dashboard-shell[data-theme-mode='light'] .hospital-copy::before {
+  border-color: color-mix(in srgb, var(--border-strong) 42%, transparent);
+}
+.dashboard-shell[data-theme-mode='light'] .brand-lockup::after,
+.dashboard-shell[data-theme-mode='light'] .hospital-copy::after {
+  opacity: 0.2;
+  animation: none;
+}
+.dashboard-shell[data-theme-mode='light'] .title-frame h1 {
+  background: none;
+  color: color-mix(in srgb, var(--accent) 76%, var(--text) 24%);
+  -webkit-text-stroke: 0;
+  animation: none;
+}
+.dashboard-shell[data-theme-mode='light'] .title-frame::before {
+  background: var(--lm-glass-fill);
+  -webkit-backdrop-filter: var(--lm-glass-blur);
+  backdrop-filter: var(--lm-glass-blur);
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.9),
+    inset 0 -0.0625rem 0 color-mix(in srgb, var(--border) 72%, transparent),
+    0 0.5rem 1.5rem rgba(41, 71, 115, 0.08);
+}
+.dashboard-shell[data-theme-mode='light'] .hospital-subtitle,
+.dashboard-shell[data-theme-mode='light'] .brand-clock {
+  color: color-mix(in srgb, var(--text) 72%, var(--muted) 28%);
+}
+.dashboard-shell[data-theme-mode='light'] .hospital-badge {
+  filter: saturate(1) contrast(1.02) drop-shadow(0 0.25rem 0.5rem rgba(41, 71, 115, 0.12));
+}

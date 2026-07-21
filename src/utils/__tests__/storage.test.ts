@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { readStorage, writeStorage } from '../storage'
 
 describe('storage 工具', () => {
@@ -19,5 +19,14 @@ describe('storage 工具', () => {
   it('readStorage 遇到非法 JSON 返回 null 而非抛错', () => {
     window.localStorage.setItem('bad-json', '{invalid}')
     expect(readStorage('bad-json')).toBeNull()
+  })
+
+  it('writeStorage 在浏览器拒绝写入时返回 false', () => {
+    const writeError = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('quota', 'QuotaExceededError')
+    })
+
+    expect(writeStorage('blocked-key', { value: 1 })).toBe(false)
+    writeError.mockRestore()
   })
 })

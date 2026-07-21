@@ -13,10 +13,11 @@ export function readStorage<T>(key: string): T | null {
   }
 }
 
-export function writeStorage(key: string, value: unknown): void {
+export function writeStorage(key: string, value: unknown): boolean {
   try {
     window.localStorage.setItem(key, JSON.stringify(value))
+    return true
   } catch {
-    // 忽略写入失败(隐私模式 / 配额超限)
+    return false
   }
 }

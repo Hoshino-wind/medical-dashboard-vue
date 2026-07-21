@@ -2,7 +2,7 @@
 import { Check } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { themes } from '@/data/themes'
-import { moduleCatalog } from '@/data/modules'
+import { configurableChartModules } from '@/data/modules'
 import { useDashboardStore } from '@/stores/dashboard'
 import type { ChartDisplayType, ColorMode, LayoutType, PanelStyle } from '@/types/config'
 import type { Theme, ThemeId } from '@/types/theme'
@@ -25,8 +25,6 @@ const chartTypeOptions: Array<{ id: ChartDisplayType; label: string }> = [
   { id: 'line', label: '折线图' },
   { id: 'bar', label: '柱状图' },
 ]
-
-const configurableChartModules = moduleCatalog.filter((module) => module.chart)
 
 function themeLabel(theme: Theme) {
   const aliases: Partial<Record<ThemeId, string>> = {
@@ -176,125 +174,4 @@ function themeLabel(theme: Theme) {
   </div>
 </template>
 
-<style scoped>
-/* 属性面板盒外框(原与另两列共用 .config-column-box 基线,拆出后自包含一份) */
-.config-column-box {
-  border: 0.0625rem solid color-mix(in srgb, var(--border-strong) 64%, transparent);
-  background: color-mix(in srgb, var(--surface-muted) 82%, transparent);
-}
-.property-panel {
-  min-height: 34.75rem;
-  max-height: 34.75rem;
-  overflow-y: auto;
-  scrollbar-width: none; /* Firefox */
-  padding: 1rem;
-}
-.property-panel::-webkit-scrollbar {
-  display: none; /* Chrome / Safari / Edge */
-}
-.property-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem 1.25rem;
-  min-width: 0;
-  border: 0;
-  margin: 0;
-  padding: 0 0 1.5rem;
-}
-.property-group + .property-group {
-  margin-top: 0.3rem;
-}
-.property-group legend {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  box-sizing: border-box;
-  width: 100%;
-  margin: 0 0 1.05rem;
-  border-bottom: 0.0625rem solid color-mix(in srgb, var(--accent) 30%, var(--border) 70%);
-  border-radius: 0.25rem 0.25rem 0 0;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--accent) 14%, var(--surface-strong) 86%),
-    transparent 82%
-  );
-  color: color-mix(in srgb, var(--text) 84%, var(--accent-2) 16%);
-  padding: 0.55rem 0.7rem;
-  font-size: calc(0.8rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 950;
-  letter-spacing: 0.03em;
-}
-.property-group legend::before {
-  content: '';
-  flex: 0 0 0.2rem;
-  width: 0.2rem;
-  height: 1rem;
-  border-radius: 62.4375rem;
-  background: linear-gradient(180deg, var(--accent-2), var(--accent));
-  box-shadow: 0 0 0.65rem color-mix(in srgb, var(--accent) 52%, transparent);
-}
-.property-radio {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  color: color-mix(in srgb, var(--text) 74%, #ffffff 26%);
-  font-size: calc(0.82rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 850;
-  cursor: pointer;
-}
-.property-radio input {
-  width: 0.95rem;
-  height: 0.95rem;
-  margin: 0;
-  accent-color: #3fa0f4;
-}
-.property-radio:has(input:checked),
-.property-radio.active {
-  color: #45aafc;
-}
-.theme-radio {
-  min-width: 4.4rem;
-}
-.panel-style-radio {
-  min-width: 6.6rem;
-}
-.color-mode-radio {
-  min-width: 5.2rem;
-}
-.chart-type-group {
-  display: grid;
-  gap: 0.75rem;
-}
-.chart-type-row {
-  display: grid;
-  grid-template-columns: minmax(5.25rem, 1fr) auto;
-  gap: 0.75rem;
-  align-items: center;
-  width: 100%;
-}
-.chart-type-title {
-  min-width: 0;
-  overflow: hidden;
-  color: color-mix(in srgb, var(--text) 78%, #ffffff 22%);
-  font-size: calc(0.8rem * var(--dashboard-font-scale, 1.45));
-  font-weight: 850;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.chart-type-options {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-.chart-type-radio {
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-@media (max-width: 73.75rem) {
-  .property-panel {
-    min-height: auto;
-    max-height: none;
-  }
-}
-</style>
+<style scoped src="./ConfigPropertyPanel.css"></style>

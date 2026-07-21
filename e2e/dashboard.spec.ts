@@ -16,6 +16,8 @@ test.describe('大屏主页加载', () => {
     // 注:addInitScript 会在每次 navigation(含 reload)重复执行,会干扰持久化相关调试;
     // 这里大屏测试不涉及持久化,但仍采用统一的「手动清一次 + reload」模式以保持一致。
     await page.goto('/')
+
+    expect(page.viewportSize()).toEqual({ width: 1920, height: 1080 })
     await page.evaluate(() => window.localStorage.clear())
     await page.reload()
   })

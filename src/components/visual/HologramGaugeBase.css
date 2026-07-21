@@ -1,0 +1,322 @@
+.hologram-gauge-base {
+  overflow: visible;
+  color: var(--gauge-tone);
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.hologram-gauge-volume {
+  position: absolute;
+  top: -72%;
+  left: 50%;
+  z-index: 0;
+  display: block;
+  width: 68%;
+  height: 116%;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gauge-tone) 7%, transparent),
+    color-mix(in srgb, var(--gauge-tone) 18%, transparent) 44%,
+    color-mix(in srgb, var(--gauge-tone-soft) 48%, transparent) 76%,
+    color-mix(in srgb, var(--gauge-tone-bright) 78%, transparent)
+  );
+  clip-path: polygon(2% 0, 98% 0, 57% 100%, 43% 100%);
+  filter: blur(5px);
+  mix-blend-mode: screen;
+  opacity: 0.42;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  animation: gauge-base-volume-pulse 3.2s ease-in-out infinite;
+}
+
+.hologram-gauge-volume::after {
+  content: '';
+  position: absolute;
+  inset: 8% 34% 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gauge-tone-bright) 4%, transparent),
+    color-mix(in srgb, var(--gauge-tone-bright) 54%, transparent) 74%,
+    color-mix(in srgb, #ffffff 82%, transparent)
+  );
+  clip-path: polygon(0 0, 100% 0, 64% 100%, 36% 100%);
+  filter: blur(2px);
+  opacity: 0.7;
+}
+
+.hologram-gauge-base-svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: var(--holo-intensity, 1);
+}
+
+.gauge-base-wall,
+.gauge-base-deck,
+.gauge-base-aperture,
+.gauge-base-aperture-ring,
+.gauge-base-rim,
+.gauge-base-rotor-rail,
+.gauge-base-rotor-spokes,
+.gauge-base-front,
+.gauge-base-fastener,
+.gauge-base-rotor-nodes circle {
+  vector-effect: non-scaling-stroke;
+}
+
+.gauge-base-ground-shadow {
+  opacity: 0.86;
+  filter: blur(2.2px);
+}
+
+.gauge-base-projector {
+  transform-origin: 110px 29px;
+  transform-box: view-box;
+  mix-blend-mode: screen;
+  animation: gauge-base-beam-pulse 3.2s ease-in-out infinite;
+}
+
+.gauge-base-beam {
+  transform-origin: 110px 29px;
+  transform-box: view-box;
+}
+
+.gauge-base-beam--outer {
+  stroke: color-mix(in srgb, var(--gauge-tone-soft) 34%, transparent);
+  stroke-width: 0.5;
+  opacity: 0.46;
+}
+
+.gauge-base-beam--inner {
+  opacity: 0.68;
+}
+
+.gauge-base-beam--core {
+  opacity: 0.9;
+}
+
+.gauge-base-rotor-plane {
+  pointer-events: none;
+}
+
+.gauge-base-rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+  backface-visibility: hidden;
+  will-change: transform;
+  animation: gauge-base-layer-rotate var(--holo-speed, 6.4s) linear infinite;
+}
+
+.gauge-base-rotor--middle {
+  animation-duration: var(--holo-speed-middle, 5.5s);
+  animation-direction: reverse;
+  animation-delay: -1.35s;
+}
+
+.gauge-base-rotor--top {
+  animation-duration: var(--holo-speed-fast, 4.6s);
+  animation-delay: -0.8s;
+}
+
+.hologram-gauge-base.is-counter-clockwise .gauge-base-rotor--bottom,
+.hologram-gauge-base.is-counter-clockwise .gauge-base-rotor--top {
+  animation-direction: reverse;
+}
+
+.hologram-gauge-base.is-counter-clockwise .gauge-base-rotor--middle {
+  animation-direction: normal;
+}
+
+.gauge-base-wall {
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 48%, var(--gauge-tone) 18%);
+  stroke-width: 0.95;
+}
+
+.gauge-base-deck {
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 58%, var(--gauge-tone) 18%);
+  stroke-width: 1;
+  filter: drop-shadow(0 1.5px 2px color-mix(in srgb, #000000 62%, transparent));
+}
+
+.gauge-base-deck--top {
+  stroke: color-mix(in srgb, var(--gauge-tone-bright) 68%, var(--instrument-base-rim));
+  stroke-width: 1.1;
+  opacity: 0.96;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gauge-tone) 72%, transparent));
+}
+
+.gauge-base-tier--bottom {
+  opacity: 0.96;
+}
+
+.gauge-base-tier--middle {
+  opacity: 0.94;
+}
+
+.gauge-base-tier--top {
+  opacity: 0.96;
+}
+
+.gauge-base-rim {
+  fill: none;
+  stroke-width: 1.4;
+  opacity: 0.82;
+}
+
+.gauge-base-strut {
+  fill: color-mix(in srgb, var(--instrument-base) 82%, var(--holo-shell-dark, #020711) 18%);
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 44%, transparent);
+  stroke-width: 0.75;
+}
+
+.gauge-base-rotor-rail {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gauge-tone-soft) 64%, var(--instrument-base-rim));
+  stroke-width: 0.9;
+  opacity: 0.58;
+}
+
+.gauge-base-rotor-rail--outer {
+  stroke-width: 1.05;
+  opacity: 0.72;
+}
+
+.gauge-base-rotor-spokes {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gauge-tone) 38%, var(--instrument-base-rim));
+  stroke-width: 0.72;
+  stroke-linecap: round;
+  opacity: 0.3;
+}
+
+.gauge-base-rotor-nodes circle {
+  fill: color-mix(in srgb, var(--gauge-tone-bright) 74%, #ffffff 26%);
+  stroke: color-mix(in srgb, var(--gauge-tone) 72%, var(--instrument-base-rim));
+  stroke-width: 0.72;
+  opacity: 0.84;
+}
+
+.gauge-base-rotor-nodes--top circle {
+  opacity: 0.96;
+}
+
+.gauge-base-aperture {
+  stroke: color-mix(in srgb, var(--gauge-tone-bright) 78%, #ffffff 22%);
+  stroke-width: 1.15;
+  opacity: 0.98;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gauge-tone) 88%, transparent));
+}
+
+.gauge-base-aperture-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--gauge-tone-bright) 86%, #ffffff 14%);
+  stroke-width: 0.8;
+  opacity: 0.86;
+}
+
+.gauge-base-status-window {
+  opacity: 0.84;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gauge-tone) 76%, transparent));
+}
+
+.gauge-base-fastener {
+  fill: color-mix(in srgb, var(--instrument-base-rim) 72%, #ffffff 28%);
+  stroke: color-mix(in srgb, var(--holo-shell-dark, #020711) 68%, var(--instrument-base-rim) 32%);
+  stroke-width: 0.75;
+  opacity: 0.72;
+}
+
+.gauge-base-lglow {
+  opacity: 0.68;
+}
+
+.gauge-base-front {
+  fill: none;
+  stroke: var(--gauge-tone-bright);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  opacity: 0.82;
+}
+
+.gauge-base-spark {
+  opacity: 0.96;
+  animation: gauge-base-emitter-breathe 2.6s ease-in-out infinite;
+}
+
+.gauge-base-dot {
+  fill: #fff;
+  opacity: 1;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px var(--gauge-tone-bright))
+    drop-shadow(0 0 11px var(--gauge-tone));
+}
+
+@keyframes gauge-base-layer-rotate {
+  from {
+    transform: rotate(0turn);
+  }
+
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes gauge-base-beam-pulse {
+  0%,
+  100% {
+    opacity: 0.76;
+    transform: scaleX(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1.018);
+  }
+}
+
+@keyframes gauge-base-emitter-breathe {
+  0%,
+  100% {
+    opacity: var(--holo-emitter-min, 0.76);
+    transform: scaleX(0.9);
+  }
+
+  50% {
+    opacity: var(--holo-emitter-max, 1);
+    transform: scaleX(1.06);
+  }
+}
+
+@keyframes gauge-base-volume-pulse {
+  0%,
+  100% {
+    opacity: var(--holo-volume-min, 0.32);
+    transform: translateX(-50%) scaleX(0.94);
+  }
+
+  50% {
+    opacity: var(--holo-volume-max, 0.46);
+    transform: translateX(-50%) scaleX(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gauge-base-rotor,
+  .gauge-base-spark,
+  .hologram-gauge-volume,
+  .gauge-base-projector {
+    animation: none;
+  }
+
+  .gauge-base-rotor {
+    will-change: auto;
+  }
+}
+
+/*
+ * 浅色主题下 .gauge-base-* 的覆盖统一放在全局 styles/rings.css。
+ * 不能写在这里的 scoped <style> 中：Vue 会把 `:global(A) .b` 编译成只剩 `A`，
+ * 后代选择器被丢弃，导致 opacity 直接落到 .dashboard-shell 本身（整壳半透明发白）。
+ */

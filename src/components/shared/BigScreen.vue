@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 import HeaderBar from './HeaderBar.vue'
 import ModuleRenderer from './ModuleRenderer.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useDashboardData } from '@/composables/useDashboardData'
-import { provideDashboardDataHolder } from '@/composables/useInjectedDashboardData'
 
 type TitleStyle = 'center' | 'left' | 'strip'
 
@@ -17,15 +16,6 @@ const screenFrameRef = ref<HTMLElement | null>(null)
 const isFauxFullscreen = ref(false)
 
 const { data, loading, error, refresh } = useDashboardData()
-
-/**
- * 在 setup 同步阶段 provide 一个数据 holder ref,
- * 数据就绪后 watch 把值同步进 holder,后代组件 inject 后响应式取值。
- */
-const dashboardDataHolder = provideDashboardDataHolder()
-watch(data, (next) => {
-  dashboardDataHolder.value = next
-})
 
 const layout = computed(() => store.config.layout)
 const titleStyle = computed<TitleStyle>(() => {
@@ -63,7 +53,7 @@ async function toggleFullscreen() {
       isFauxFullscreen.value = true
     }
   } catch {
-    // Fullscreen can be denied by browser policy or embedded preview environments.
+    // 浏览器策略或嵌入式预览可能拒绝全屏，此时回退到页面内全屏。
     isFauxFullscreen.value = true
   }
 }
@@ -113,13 +103,13 @@ onBeforeUnmount(() => {
     </div>
     <template v-else-if="data">
       <HeaderBar :data="data.header" />
-      <section class="screen-grid" :class="{ 'layout-2x3': layout === '2x3' }" :data-layout="layout">
+      <section
+        class="screen-grid"
+        :class="{ 'layout-2x3': layout === '2x3' }"
+        :data-layout="layout"
+      >
         <template v-for="(item, index) in visibleModules" :key="item?.id ?? `empty-${index}`">
-          <ModuleRenderer
-            v-if="item"
-            :module="item"
-            :theme="activeTheme"
-          />
+          <ModuleRenderer v-if="item" :module="item" :theme="activeTheme" :data="data" />
           <div v-else class="screen-grid-empty" aria-hidden="true"></div>
         </template>
       </section>

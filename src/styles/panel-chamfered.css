@@ -274,6 +274,8 @@
 }
 
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .panel-title-ornament {
   display: none;
 }

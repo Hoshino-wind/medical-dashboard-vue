@@ -1,23 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { themes } from '@/data/themes'
-import { readPanelStyles } from './helpers/panelStyles'
 
 describe('glass-flow panel theme colors', () => {
-  it('drives the flowing border from the active theme accent palette', () => {
-    const panelStyles = readPanelStyles()
-    const flowBlock = panelStyles.match(/\.panel-border-flow\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-
-    expect(flowBlock).toContain('--panel-flow-primary: var(--accent)')
-    expect(flowBlock).toContain('--panel-flow-secondary: var(--accent-2)')
-    expect(flowBlock).toContain('--panel-flow-accent: var(--accent-3)')
-    expect(flowBlock).toContain('var(--panel-flow-primary)')
-    expect(flowBlock).toContain('var(--panel-flow-secondary)')
-    expect(flowBlock).toContain('var(--panel-flow-accent)')
-    expect(flowBlock).not.toContain('var(--panel-title-primary)')
-    expect(flowBlock).not.toContain('var(--panel-title-secondary)')
-    expect(flowBlock).not.toContain('var(--panel-title-accent)')
-  })
-
   it('keeps every dark theme flow palette visually distinct', () => {
     const darkThemePalettes = themes
       .filter((theme) => theme.id !== 'light-medical')

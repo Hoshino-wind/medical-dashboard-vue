@@ -13,3 +13,6 @@ coverage
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# 旧版 Playwright 平台后缀快照（当前配置使用跨平台稳定文件名）
+*-chromium-darwin.png

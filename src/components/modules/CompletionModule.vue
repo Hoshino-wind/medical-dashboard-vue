@@ -26,7 +26,7 @@ function themeColor(token: `--${string}`, fallback: string): string {
 }
 
 function isLightTheme(theme: Theme | undefined): boolean {
-  return theme?.id.startsWith('light-') ?? false
+  return theme?.mode === 'light'
 }
 
 // 完成率进度环:亮弧 = 本月保养完成率(data.rate = 已完成÷总数),其余为暗色空轨道。

@@ -1,0 +1,148 @@
+/* Light dashboard module overrides */
+.dashboard-shell[data-theme-mode='light'] .overview-metrics,
+.dashboard-shell[data-theme-mode='light'] .overview-stat {
+  border-color: color-mix(in srgb, var(--border) 92%, transparent);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, currentColor 3%, transparent), transparent 54%),
+    #ffffff;
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92),
+    0 0.25rem 0.625rem rgba(31, 58, 68, 0.035);
+}
+.dashboard-shell[data-theme-mode='light'] .overview-stat {
+  box-shadow:
+    inset 0.1875rem 0 0 color-mix(in srgb, currentColor 58%, transparent),
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.94);
+}
+.dashboard-shell[data-theme-mode='light'] .overview-stat-icon {
+  background: color-mix(in srgb, currentColor 5%, #ffffff);
+  box-shadow: none;
+}
+.dashboard-shell[data-theme-mode='light'] .pie-summary-panel {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--data-pie-primary) 2.5%, transparent),
+      transparent 54%
+    ),
+    #ffffff;
+}
+.dashboard-shell[data-theme-mode='light'] .pie-summary-panel::before {
+  width: 0.125rem;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 45%, transparent) 16%,
+    var(--accent) 50%,
+    color-mix(in srgb, var(--accent) 45%, transparent) 84%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 0.3rem color-mix(in srgb, var(--accent) 68%, transparent),
+    0 0 0.85rem color-mix(in srgb, var(--accent) 42%, transparent),
+    0 0 1.5rem color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.dashboard-shell[data-theme-mode='light'] .module-status-summary {
+  border-color: color-mix(in srgb, var(--border) 86%, transparent);
+  background: linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--bg-soft) 24%, #ffffff));
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
+}
+.dashboard-shell[data-theme-mode='light'] .module-status-summary > div {
+  border-right-color: color-mix(in srgb, var(--border) 72%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--status-tone, var(--data-pie-primary)) 4.5%, transparent),
+    transparent 62%
+  );
+}
+.dashboard-shell[data-theme-mode='light'] .module-status-summary > div:last-child {
+  border-right: 0;
+}
+.dashboard-shell[data-theme-mode='light'] .inspection-pie-shell .pie3d-three-shell,
+.dashboard-shell[data-theme-mode='light'] .health-pie-panel .health-pie-core,
+.dashboard-shell[data-theme-mode='light'] .health-pie-core {
+  filter: saturate(1.12) brightness(1.02);
+}
+.dashboard-shell[data-theme-mode='light'] .inspection-pie-base,
+.dashboard-shell[data-theme-mode='light'] .health-pie-panel .health-pie-base,
+.dashboard-shell[data-theme-mode='light'] .health-pie-base {
+  opacity: 0.68;
+}
+.dashboard-shell[data-theme-mode='light'] .pie-center-value {
+  color: color-mix(in srgb, var(--text) 92%, var(--data-inspection-pie-finished) 8%);
+  text-shadow: none;
+}
+.dashboard-shell[data-theme-mode='light'] .health-pie-heart {
+  color: color-mix(in srgb, var(--data-health-pie-pending) 54%, var(--text) 12%);
+}
+/* 浅色玻璃体系：内部状态卡是透明薄片，不重复主面板的强模糊。 */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .overview-stat {
+  border: 0.0625rem solid rgba(255, 255, 255, 0.52);
+  border-radius: 0.6875rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.72),
+    inset 0 0 0 0.0625rem rgba(95, 137, 177, 0.055),
+    inset 0.1875rem 0 0 var(--glass-stat-tint, rgba(10, 132, 255, 0.065)),
+    0 0.25rem 0.75rem rgba(48, 79, 109, 0.06);
+}
+.dashboard-shell[data-theme-id='light-medical'] .overview-stat--total {
+  --glass-stat-tint: rgba(10, 132, 255, 0.07);
+}
+.dashboard-shell[data-theme-id='light-medical'] .overview-stat--available {
+  --glass-stat-tint: rgba(48, 176, 137, 0.075);
+}
+.dashboard-shell[data-theme-id='light-medical'] .overview-stat--repair {
+  --glass-stat-tint: rgba(218, 83, 109, 0.07);
+}
+.dashboard-shell[data-theme-id='light-medical'] .overview-stat--maintenance {
+  --glass-stat-tint: rgba(209, 157, 50, 0.075);
+}
+.dashboard-shell[data-theme-id='light-medical'] .overview-stat--inspection {
+  --glass-stat-tint: rgba(29, 170, 190, 0.07);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .overview-stat-icon {
+  border: 0.0625rem solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, currentColor 7%, rgba(255, 255, 255, 0.82));
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .module-status-summary {
+  gap: 0.1875rem;
+  overflow: hidden;
+  padding: 0.1875rem;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.5);
+  border-radius: 0.6875rem;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.68),
+    0 0.25rem 0.75rem rgba(48, 79, 109, 0.055);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .module-status-summary
+  > div {
+  border: 0;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.66);
+}
+/* 工单内部延续外层玻璃，不再铺一块不透明白色画布。 */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  :is(.order-list-panel, .paged-viewport, .paged-track, .paged-page) {
+  background: transparent;
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .pie-summary-panel {
+  border-left-color: rgba(113, 154, 190, 0.16);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.035));
+  box-shadow:
+    inset 0.0625rem 0 0 rgba(255, 255, 255, 0.38),
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.42);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .pie-summary-title {
+  text-shadow: 0 0.0625rem 0 rgba(255, 255, 255, 0.72);
+}

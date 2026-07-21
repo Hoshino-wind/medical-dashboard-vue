@@ -1,0 +1,72 @@
+/* Health status pie module */
+.health-pie-panel .health-pie-chart {
+  width: 100%;
+  min-height: 7.75rem;
+  transform: translateY(-1.1rem);
+}
+.health-pie-panel .health-pie-base {
+  top: 4.75rem;
+  bottom: auto;
+  display: block;
+  width: min(16.25rem, 124%);
+  height: 6.25rem;
+  opacity: 0.94;
+}
+.health-pie-panel .health-pie-core {
+  width: 12.85rem;
+  height: 8.5rem;
+  max-width: 100%;
+  transform: translateY(-0.25rem);
+  filter: saturate(1.06);
+}
+.health-pie-chart {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 20rem;
+  min-height: 13.125rem;
+  transform: translateY(0);
+}
+.health-pie-base {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 0;
+  width: 21.25rem;
+  height: 8.5rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.health-pie-core {
+  position: relative;
+  z-index: 2;
+  width: 17.625rem;
+  height: 10.375rem;
+  transform: translateY(-1.5rem) scale(1.06);
+  filter: saturate(1.08);
+}
+/* 心心相对 .health-pie-core 定位，top 对齐 3D 饼图顶面圆心（viewBox Y=61/188≈32.4%） */
+.health-pie-heart {
+  position: absolute;
+  left: 50%;
+  top: 32.4%;
+  z-index: 4;
+  display: grid;
+  /* 尺寸贴近内圈孔（约 59×24px），只漏一点边缘 */
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--data-health-pie-pending) 86%, transparent);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.health-pie-heart svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke-width: 2.4;
+}

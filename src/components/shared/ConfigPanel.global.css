@@ -1,0 +1,14 @@
+.dashboard-shell.config-mode .config-live-preview .screen-frame {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0.6rem 0.65rem 0.45rem;
+}
+.dashboard-shell.config-mode .config-live-preview .screen-frame::before {
+  display: block;
+}
+.dashboard-shell.config-mode .config-live-preview .screen-grid {
+  height: auto;
+}

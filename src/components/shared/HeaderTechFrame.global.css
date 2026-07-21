@@ -1,0 +1,26 @@
+.dashboard-shell[data-theme-mode='light'] .header-tech-frame {
+  opacity: 0.28;
+  animation: none;
+}
+.dashboard-shell[data-theme-mode='light'] .header-stop-primary {
+  stop-opacity: 0.24;
+}
+.dashboard-shell[data-theme-mode='light'] .header-stop-secondary,
+.dashboard-shell[data-theme-mode='light'] .header-stop-tertiary {
+  stop-opacity: 0.26;
+}
+.dashboard-shell[data-theme-mode='light'] .header-stop-primary.is-soft,
+.dashboard-shell[data-theme-mode='light'] .header-stop-secondary.is-soft,
+.dashboard-shell[data-theme-mode='light'] .header-stop-tertiary.is-soft {
+  stop-opacity: 0.08;
+}
+.dashboard-shell[data-theme-mode='light'] .header-flow,
+.dashboard-shell[data-theme-mode='light'] .header-flow-glow,
+.dashboard-shell[data-theme-mode='light'] .header-core-glow {
+  opacity: 0;
+  animation: none;
+}
+.dashboard-shell[data-theme-mode='light'] .header-title-fill {
+  fill: rgba(255, 255, 255, 0.9);
+  stroke: color-mix(in srgb, var(--border) 82%, transparent);
+}

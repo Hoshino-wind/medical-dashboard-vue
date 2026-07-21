@@ -1,0 +1,94 @@
+.pie3d-three-shell {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+}
+
+.pie3d-25d-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pie3d-ground {
+  fill: color-mix(in srgb, var(--pie-surface) 46%, transparent);
+  opacity: 0.36;
+}
+
+.pie3d-depth-layer {
+  transform-box: view-box;
+}
+
+.pie3d-depth-layer path {
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-front-wall {
+  filter: saturate(1.02);
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-top-segment {
+  cursor: default;
+  outline: none;
+  transition:
+    filter 180ms ease,
+    transform 180ms ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-top-segment:hover,
+.pie3d-top-segment:focus,
+.pie3d-top-segment.is-active {
+  filter: brightness(1.11) saturate(1.08);
+  transform: translateY(-0.125rem);
+}
+
+.pie3d-center-cap {
+  fill: color-mix(in srgb, var(--pie-surface) 72%, transparent);
+  stroke: color-mix(in srgb, var(--pie-edge) 40%, transparent);
+  stroke-width: 1;
+}
+
+.pie3d-inner-rim {
+  fill: transparent;
+  stroke: color-mix(in srgb, var(--pie-accent) 44%, transparent);
+  stroke-width: 1.2;
+}
+
+.pie3d-bottom-rim {
+  fill: none;
+  stroke: var(--pie-edge, var(--glass-edge));
+  stroke-width: 1.1;
+  opacity: 0.9;
+  vector-effect: non-scaling-stroke;
+}
+
+.pie3d-three-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  box-sizing: border-box;
+  min-width: 5.25rem;
+  max-width: 5.75rem;
+  padding: 0.3125rem 0.4375rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--pie-edge) 74%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--pie-surface) 72%, #020814);
+  color: var(--pie-text);
+  font-size: 0.68rem;
+  font-weight: 780;
+  line-height: 1.32;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pie3d-top-segment {
+    transition: none;
+  }
+}

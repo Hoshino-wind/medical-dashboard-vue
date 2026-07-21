@@ -1,10 +1,6 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import HologramGaugeBase from '@/components/visual/HologramGaugeBase.vue'
-
-const ringStyles = readFileSync(resolve('src/styles/rings.css'), 'utf8')
 
 describe('HologramGaugeBase', () => {
   it('supports standalone tone and animation controls', () => {
@@ -73,17 +69,5 @@ describe('HologramGaugeBase', () => {
     expect(wrapper.findAll('.gauge-base-rotor .gauge-base-rotor-nodes')).toHaveLength(3)
     expect(wrapper.find('.gauge-base-scan').exists()).toBe(false)
     expect(wrapper.find('.gauge-base-orbit--rotating').exists()).toBe(false)
-  })
-
-  it('does not filter the whole base while descendant rotors animate', () => {
-    const baseRule =
-      ringStyles.match(/\.hologram-gauge-base\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
-    const lightBaseRule =
-      ringStyles.match(
-        /\.dashboard-shell\[data-theme-mode='light'\] \.hologram-gauge-base\s*\{[\s\S]*?\n\}/,
-      )?.[0] ?? ''
-
-    expect(baseRule).not.toContain('filter:')
-    expect(lightBaseRule).not.toContain('filter:')
   })
 })

@@ -10,7 +10,7 @@ const { activeTheme, config } = storeToRefs(store)
 const route = useRoute()
 
 const themeStyle = computed(() => activeTheme.value.variables)
-const themeMode = computed(() => (activeTheme.value.id.startsWith('light-') ? 'light' : 'dark'))
+const themeMode = computed(() => activeTheme.value.mode)
 const isConfig = computed(() => route.name === 'config')
 
 watchEffect(() => {
@@ -49,7 +49,7 @@ function requestDashboardFullscreen(e: MouseEvent) {
     :data-panel-style="config.panelStyle"
     :style="themeStyle"
   >
-    <div class="view-switch" :class="{ 'screen-mode': !isConfig }">
+    <nav class="view-switch" :class="{ 'screen-mode': !isConfig }" aria-label="页面视图">
       <button
         v-if="!isConfig"
         class="app-button"
@@ -57,17 +57,18 @@ function requestDashboardFullscreen(e: MouseEvent) {
         aria-label="全屏显示"
         @click="requestDashboardFullscreen"
       >
-        <Expand class="h-4 w-4" />
+        <Expand class="h-4 w-4" aria-hidden="true" />
         全屏
       </button>
       <RouterLink v-else to="/" custom v-slot="{ navigate, isActive }">
         <button
           class="app-button"
           :class="{ active: isActive }"
+          :aria-current="isActive ? 'page' : undefined"
           type="button"
           @click="(e) => navigateAndBlur(navigate, e)"
         >
-          <Monitor class="h-4 w-4" />
+          <Monitor class="h-4 w-4" aria-hidden="true" />
           大屏
         </button>
       </RouterLink>
@@ -75,14 +76,15 @@ function requestDashboardFullscreen(e: MouseEvent) {
         <button
           class="app-button"
           :class="{ active: isActive }"
+          :aria-current="isActive ? 'page' : undefined"
           type="button"
           @click="(e) => navigateAndBlur(navigate, e)"
         >
-          <Settings class="h-4 w-4" />
+          <Settings class="h-4 w-4" aria-hidden="true" />
           配置
         </button>
       </RouterLink>
-    </div>
+    </nav>
 
     <RouterView />
   </div>

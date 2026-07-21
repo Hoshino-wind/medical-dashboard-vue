@@ -2,6 +2,7 @@
   "name": "medical-dashboard-vue",
   "private": true,
   "version": "0.1.0",
+  "packageManager": "pnpm@11.11.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -13,12 +14,17 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write src/",
     "test": "vitest",
+    "test:run": "vitest run",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "e2e:install": "playwright install chromium"
+    "e2e:install": "playwright install chromium",
+    "audit:deps": "pnpm audit --registry=https://registry.npmjs.org --audit-level moderate",
+    "check:bundle": "node scripts/check-bundle-size.mjs",
+    "check": "run-s lint type-check test:run build-only check:bundle",
+    "check:ci": "run-s audit:deps check e2e"
   },
   "dependencies": {
-    "echarts": "^5.5.1",
+    "echarts": "^6.1.0",
     "lucide-vue-next": "^0.468.0",
     "pinia": "^2.2.6",
     "vue": "^3.5.13",
