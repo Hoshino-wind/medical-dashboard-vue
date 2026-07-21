@@ -1,0 +1,334 @@
+/* Panel style — chamfered-instrument: 机械边框皮肤(从 panel.css 拆分) */
+
+/* 机械边框由主题专属 PNG 提供；容器背景不再给边框叠加染色。 */
+:where(.dashboard-shell[data-panel-style='chamfered-instrument']) .screen-grid > .panel {
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--surface) 92%, var(--bg) 8%);
+  box-shadow: none;
+  clip-path: none;
+  filter: none;
+}
+
+:where(.dashboard-shell[data-panel-style='chamfered-instrument']) .screen-grid > .panel::before {
+  inset: 0.5rem;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  clip-path: none;
+}
+
+:where(.dashboard-shell[data-panel-style='chamfered-instrument'])
+  .screen-grid
+  > .panel
+  > .panel-border-flow {
+  display: none;
+}
+
+:where(.dashboard-shell[data-panel-style='chamfered-instrument']) .screen-grid > .panel:hover {
+  border-color: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+/* 标题框压在外框顶部中央，层级高于外层机械边框。 */
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-header--main {
+  z-index: 5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+  padding-top: 0;
+  padding-bottom: 0.0625rem;
+  transform: translateY(-0.1875rem);
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  > .panel-body {
+  height: calc(100% - 2.4375rem);
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .screen-grid > .panel .panel-title-frame {
+  grid-column: 2;
+  align-items: center;
+  justify-self: center;
+  min-height: 2.375rem;
+  padding: 0.25rem 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  isolation: isolate;
+}
+
+/* 用与卡片内层接近的实色遮住机械外框中段，让标题真正嵌在上边框中。 */
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame::before {
+  content: '';
+  position: absolute;
+  inset: -0.125rem -8rem -0.125rem -2.25rem;
+  z-index: 0;
+  background: color-mix(in srgb, var(--bg) 76%, var(--bg-soft) 24%);
+  pointer-events: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame
+  > .mechanical-frame,
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-mini-bars {
+  display: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament {
+  z-index: 1;
+  display: block;
+  filter:
+    brightness(1.18)
+    saturate(1.28)
+    drop-shadow(0 0 0.2rem color-mix(in srgb, var(--chart-primary) 72%, transparent));
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament--left {
+  right: calc(100% + 0.75rem);
+  width: 7.2rem;
+  transform: translateY(-50%) scaleY(1.05);
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-ornament--right {
+  top: calc(50% + 0.2rem);
+  left: calc(100% - 7.25rem);
+  width: 15.25rem;
+  height: 2.1rem;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-text {
+  z-index: 2;
+  padding-bottom: 0;
+  font-size: 1.375rem;
+  font-weight: 550;
+  line-height: 1.1;
+  letter-spacing: 0.075em;
+  transform: translateY(-0.1875rem);
+  text-shadow:
+    0 0 0.35rem color-mix(in srgb, var(--panel-title-primary) 42%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 18%, transparent);
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-text::after {
+  display: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-header--main
+  > .panel-title-suffix {
+  grid-column: 3;
+  justify-self: start;
+  margin-left: 0.375rem;
+  transform: translateY(0.0625rem);
+}
+
+/* 紧凑型机械框：总览指标卡和工单汇总条跟随外层卡片样式。 */
+.dashboard-shell[data-panel-style='chamfered-instrument'] .screen-grid > .panel .overview-stat {
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  box-shadow: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .overview-stat--total {
+  --status-tone: #15a7e1;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .overview-stat--available {
+  --status-tone: #2bba90;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .overview-stat--repair {
+  --status-tone: #c95965;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .overview-stat--maintenance {
+  --status-tone: #c4ac5a;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument'] .overview-stat--inspection {
+  --status-tone: #0db3d9;
+}
+
+/* 浅色医疗主题：真正透明的单层玻璃，机械边框图片在组件内被禁用。 */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel {
+  border: 0.0625rem solid rgba(255, 255, 255, 0.58);
+  border-radius: 0.875rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 255, 255, 0.12) 47%,
+    rgba(226, 247, 252, 0.2) 100%
+  );
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.82),
+    inset 0 0 0 0.0625rem rgba(90, 137, 178, 0.09),
+    0 0.75rem 2rem rgba(47, 78, 109, 0.1);
+  -webkit-backdrop-filter: blur(1.125rem) saturate(1.28);
+  backdrop-filter: blur(1.125rem) saturate(1.28);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel::before {
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    112deg,
+    rgba(255, 255, 255, 0.38),
+    transparent 19%,
+    transparent 74%,
+    rgba(102, 205, 220, 0.08)
+  );
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.7),
+    inset 0 0 0 0.0625rem rgba(91, 133, 174, 0.07);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel:hover {
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 0.0625rem rgba(74, 128, 181, 0.11),
+    0 0.875rem 2.25rem rgba(47, 78, 109, 0.12);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame {
+  min-height: 1.75rem;
+  padding: 0.125rem 0.6875rem;
+  border: 0.0625rem solid rgba(255, 255, 255, 0.62);
+  border-radius: 62.4375rem;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.1));
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.78),
+    0 0.1875rem 0.625rem rgba(49, 83, 116, 0.07);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame::before {
+  display: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .panel-title-mini-bars
+  i {
+  display: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .panel-title-mini-bars--left {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #64d2ff, #0a84ff);
+  box-shadow: 0 0 0 0.1875rem rgba(10, 132, 255, 0.08);
+  transform: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .panel-title-mini-bars--right {
+  display: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .panel-title-ornament {
+  display: none;
+}
+
+/* 底部汇总项拆成独立卡片；流光玻璃模式继续保留连续汇总条。 */
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  :is(.inspection-order-grid, .health-status-grid) {
+  grid-template-rows: minmax(0, 1fr) 3.25rem;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .module-status-summary {
+  width: calc(100% - 1.25rem);
+  height: 3.25rem;
+  justify-self: center;
+  align-self: end;
+  gap: 0.5rem;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  border-image: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .module-status-summary
+  > div {
+  width: calc(100% - 0.75rem);
+  min-height: 3.25rem;
+  justify-self: center;
+  padding: 0.375rem 0.625rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  box-shadow: none;
+}
+
+.dashboard-shell[data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .module-status-summary
+  .mechanical-frame--compact {
+  display: block;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+  border-width: 0.5625rem;
+  border-image-width: 0.5625rem;
+}

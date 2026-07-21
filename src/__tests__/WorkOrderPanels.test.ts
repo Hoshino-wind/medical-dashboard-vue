@@ -31,8 +31,8 @@ describe('work order style panels', () => {
           waiting: 71,
           overdue: 12,
           rows: [
-            ['血液科层流病房', '不锈钢床头柜', '25天', '叶茂永'],
-            ['血液科层流病房', '病房对讲机', '25天', '叶茂永'],
+            { department: '血液科层流病房', equipName: '不锈钢床头柜', remainLabel: '25天', engineer: '叶茂永' },
+            { department: '血液科层流病房', equipName: '病房对讲机', remainLabel: '25天', engineer: '叶茂永' },
           ],
         },
       },
@@ -69,8 +69,8 @@ describe('work order style panels', () => {
           pending: 102,
           score: 96.8,
           rows: [
-            ['运行正常', '生命支持设备', '15,744台', '稳定'],
-            ['维保预警', '呼吸机/监护仪', '68台', '需排查'],
+            { department: '运行正常', equipName: '生命支持设备', remainLabel: '15,744台', engineer: '稳定' },
+            { department: '维保预警', equipName: '呼吸机/监护仪', remainLabel: '68台', engineer: '需排查' },
           ],
         },
       },
@@ -202,8 +202,8 @@ describe('work order style panels', () => {
           waiting: 71,
           overdue: 12,
           rows: [
-            ['临床药学组', '微量分析天平', '29天', '刘民华'],
-            ['临床药学组', '分析天平', '29天', '刘民华'],
+            { department: '临床药学组', equipName: '微量分析天平', remainLabel: '29天', engineer: '刘民华' },
+            { department: '临床药学组', equipName: '分析天平', remainLabel: '29天', engineer: '刘民华' },
           ],
         },
       },
@@ -224,8 +224,8 @@ describe('work order style panels', () => {
           pending: 102,
           score: 96.8,
           rows: [
-            ['全院设备', '运行正常', '15,744台', '稳定'],
-            ['生命支持设备', '维保预警', '68台', '需排查'],
+            { department: '全院设备', equipName: '运行正常', remainLabel: '15,744台', engineer: '稳定' },
+            { department: '生命支持设备', equipName: '维保预警', remainLabel: '68台', engineer: '需排查' },
           ],
         },
       },

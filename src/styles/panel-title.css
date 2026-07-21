@@ -1,0 +1,314 @@
+/* Panel title: 面板头部/标题/主体与浅色主题覆盖(从 panel.css 拆分) */
+
+.panel-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.45rem;
+  padding: 0.375rem 0.625rem 0.3125rem;
+  color: var(--text);
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.panel-header--main {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0.75rem;
+}
+
+.panel-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8125rem;
+  height: 1.4375rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--chart-primary) 86%, transparent);
+  border-radius: 0.25rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--instrument-rim) 22%, transparent),
+      transparent
+    ),
+    color-mix(in srgb, var(--chart-primary) 28%, transparent);
+  color: color-mix(in srgb, var(--text) 88%, var(--chart-primary) 12%);
+  font-size: 0.8125rem;
+  box-shadow:
+    inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 28%, transparent),
+    0 0 0.75rem color-mix(in srgb, var(--chart-primary) 22%, transparent);
+  position: relative;
+}
+
+.panel-number::after {
+  content: '';
+  position: absolute;
+  inset: -0.125rem;
+  border-radius: 0.25rem;
+  border: 0.0625rem solid color-mix(in srgb, var(--instrument-rim) 36%, transparent);
+  opacity: 0.58;
+}
+
+.panel-header .panel-number {
+  min-width: 2.6rem;
+  height: 1.65rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 950;
+}
+
+.panel-header h2 {
+  font-size: 1.25rem;
+  font-weight: 950;
+  line-height: 1.05;
+  color: color-mix(in srgb, var(--text) 96%, var(--panel-title-primary) 4%);
+}
+
+.panel-title-frame {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 1.875rem;
+  margin: 0;
+  padding: 0;
+  gap: 0.625rem;
+  overflow: hidden;
+}
+
+.panel-title-ornament {
+  position: absolute;
+  top: 50%;
+  z-index: 0;
+  display: none;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transform: translateY(-50%);
+}
+
+.panel-title-text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  min-width: 0;
+  max-width: min(100%, 17.25rem);
+  padding: 0 0.125rem 0.3125rem;
+  overflow: hidden;
+  color: inherit;
+  font-family: var(--font-dashboard-rounded-heavy);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-title-text::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.0625rem;
+  width: min(96%, 8.5rem);
+  height: 0.22rem;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(71, 205, 255, 0.45) 18%,
+    #7de4ff 38%,
+    #ffffff 50%,
+    #7de4ff 62%,
+    rgba(71, 205, 255, 0.45) 82%,
+    transparent 100%
+  );
+  clip-path: ellipse(50% 50% at 50% 50%);
+  filter: drop-shadow(0 0 0.15rem rgba(91, 221, 255, 0.95))
+    drop-shadow(0 0 0.4rem rgba(50, 178, 255, 0.65));
+  transform: translateX(-50%);
+}
+
+.panel-title-mini-bars {
+  display: inline-flex;
+  flex: none;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.1875rem;
+  width: 1rem;
+  height: 0.875rem;
+}
+
+.panel-title-mini-bars i {
+  display: block;
+  width: 0.125rem;
+  border-radius: 62.4375rem;
+  background: var(--panel-title-primary);
+  box-shadow: 0 0 0.375rem var(--panel-title-primary);
+  animation: panel-title-mini-bar 1s ease-in-out infinite;
+}
+
+.panel-title-mini-bars--left {
+  transform: scaleX(-1);
+}
+
+.panel-title-mini-bars i:nth-child(1) {
+  height: 0.3125rem;
+}
+
+.panel-title-mini-bars i:nth-child(2) {
+  height: 0.5625rem;
+  animation-delay: 0.15s;
+}
+
+.panel-title-mini-bars i:nth-child(3) {
+  height: 0.8125rem;
+  animation-delay: 0.3s;
+}
+
+@keyframes panel-title-mini-bar {
+  50% {
+    height: 0.25rem;
+    opacity: 0.45;
+  }
+}
+
+.title-style-center .panel-title-frame {
+  justify-content: center;
+}
+
+.title-style-left .panel-header--main,
+.title-style-strip .panel-header--main {
+  justify-content: flex-start;
+}
+
+.title-style-left .panel-title-frame {
+  justify-content: center;
+}
+
+.title-style-left .panel-title-text,
+.title-style-strip .panel-title-text {
+  max-width: min(100%, 17.5rem);
+  text-align: center;
+}
+
+.title-style-strip .panel-title-frame {
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-grid > .panel {
+    animation: none;
+  }
+
+  .panel-border-flow {
+    animation: none;
+    opacity: 0.72;
+  }
+
+  .panel-title-mini-bars i {
+    animation: none;
+  }
+}
+
+.panel-title-suffix {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.panel-body {
+  position: relative;
+  padding: 0.375rem 0.625rem 0.625rem;
+  z-index: 3;
+}
+
+.panel-body::before {
+  content: '';
+  position: absolute;
+  display: none;
+  inset: 0 0.625rem auto;
+  height: 1.875rem;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at top,
+    color-mix(in srgb, var(--accent) 12%, transparent),
+    transparent 70%
+  );
+  opacity: 0.28;
+}
+
+.panel-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel {
+  --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 84%, var(--accent) 16%);
+  --panel-title-secondary: color-mix(in srgb, var(--accent) 78%, var(--chart-secondary) 22%);
+  --panel-title-accent: color-mix(in srgb, var(--warn) 86%, var(--accent) 14%);
+  border-radius: 1.125rem;
+  border: 0.0625rem solid var(--lm-glass-border);
+  background: var(--lm-glass-fill);
+  -webkit-backdrop-filter: var(--lm-glass-blur);
+  backdrop-filter: var(--lm-glass-blur);
+  box-shadow: var(--lm-glass-shadow);
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel::before {
+  border-radius: inherit;
+  background: var(--lm-glass-sheen);
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.9),
+    inset 0 -0.0625rem 0 rgba(255, 255, 255, 0.34);
+}
+
+.dashboard-shell[data-theme-mode='light'] .screen-grid > .panel:hover {
+  border-color: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--lm-glass-shadow-hover);
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel-border-flow {
+  display: none;
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel-title-mini-bars i {
+  background: color-mix(in srgb, var(--accent) 82%, var(--text) 18%);
+  box-shadow:
+    inset 0 0 1rem color-mix(in srgb, var(--chart-primary) 7%, transparent),
+    0 0 0.55rem color-mix(in srgb, var(--chart-primary) 9%, transparent);
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel-header h2 {
+  color: color-mix(in srgb, var(--text) 92%, var(--accent) 8%);
+}
+
+/* 卡片标题:去霓虹辉光,改成克制的苹果风细下划线 */
+.dashboard-shell[data-theme-mode='light'] .panel-title-text {
+  color: color-mix(in srgb, var(--text) 88%, var(--accent) 12%);
+  letter-spacing: 0.04em;
+}
+
+.dashboard-shell[data-theme-mode='light'] .panel-title-text::after {
+  height: 0.15rem;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 42%, transparent) 22%,
+    var(--accent) 50%,
+    color-mix(in srgb, var(--accent) 42%, transparent) 78%,
+    transparent 100%
+  );
+  filter: none;
+  opacity: 0.82;
+}
+

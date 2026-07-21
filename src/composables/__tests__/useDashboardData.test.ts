@@ -21,7 +21,12 @@ describe('useDashboardData', () => {
       '/',
       '待响应',
     ])
-    expect(data.inspectionOrders.rows[0]).toEqual(['紧急医学救援队', '呼吸机', '0天', '/'])
+    expect(data.inspectionOrders.rows[0]).toEqual({
+      department: '紧急医学救援队',
+      equipName: '呼吸机',
+      remainLabel: '0天',
+      engineer: '/',
+    })
     expect(data.repairStats.labels).toEqual([
       '2025-07',
       '2025-08',

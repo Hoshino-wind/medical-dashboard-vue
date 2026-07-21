@@ -5,6 +5,7 @@ import type {
   HealthTrendData,
   InspectionOrders,
   RepairOrder,
+  ServiceOrderRow,
 } from '@/types/dashboard'
 import type {
   ParsedBigScreenFakeData,
@@ -79,13 +80,13 @@ function toMaintenanceTrend(source: ParsedBigScreenFakeData): HealthTrendData {
   }
 }
 
-function toServiceOrderRow(order: ServiceOrderItem): string[] {
-  return [
-    order.department,
-    order.equipName,
-    formatRemainDays(order.remainDays),
-    order.engineerName,
-  ]
+function toServiceOrderRow(order: ServiceOrderItem): ServiceOrderRow {
+  return {
+    department: order.department,
+    equipName: order.equipName,
+    remainLabel: formatRemainDays(order.remainDays),
+    engineer: order.engineerName,
+  }
 }
 
 function formatRemainDays(value: number | string): string {

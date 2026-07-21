@@ -1,13 +1,10 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { themes } from '@/data/themes'
-
-const testDir = import.meta.dirname
+import { readPanelStyles } from './helpers/panelStyles'
 
 describe('glass-flow panel theme colors', () => {
   it('drives the flowing border from the active theme accent palette', () => {
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const flowBlock = panelStyles.match(/\.panel-border-flow\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(flowBlock).toContain('--panel-flow-primary: var(--accent)')

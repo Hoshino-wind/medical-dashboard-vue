@@ -5,6 +5,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import MechanicalFrame from '@/components/visual/MechanicalFrame.vue'
 import PanelShell from '@/components/shared/PanelShell.vue'
+import { readPanelStyles } from './helpers/panelStyles'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
 const frameAssetDir = join(testDir, '../assets/mechanical-frames')
@@ -87,7 +88,7 @@ describe('MechanicalFrame', () => {
       'utf8',
     )
     const layoutStyles = readFileSync(join(testDir, '../styles/layout.css'), 'utf8')
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const moduleStyles = readFileSync(join(testDir, '../styles/modules.css'), 'utf8')
     const tableStyles = readFileSync(join(testDir, '../styles/tables.css'), 'utf8')
 

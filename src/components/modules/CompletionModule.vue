@@ -64,10 +64,10 @@ const inspectionPieItems = computed(() => {
             <table class="data-table compact-order-table inspection-order-table">
               <tbody>
                 <tr v-for="(row, rowIndex) in page" :key="rowIndex">
-                  <td>{{ row[0] }}</td>
-                  <td>{{ row[1] }}</td>
-                  <td class="order-time-cell">{{ row[2] }}</td>
-                  <td>{{ row[3] }}</td>
+                  <td>{{ row.department }}</td>
+                  <td>{{ row.equipName }}</td>
+                  <td class="order-time-cell">{{ row.remainLabel }}</td>
+                  <td>{{ row.engineer }}</td>
                 </tr>
               </tbody>
             </table>

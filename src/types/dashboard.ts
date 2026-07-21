@@ -28,6 +28,19 @@ export interface OverviewData {
 /** 维修工单:一行数据为字符串数组,顺序对应表头 */
 export type RepairOrder = string[]
 
+/**
+ * 服务工单行(巡检 / 保养通用)。
+ * 替代原先的 string[](按下标 row[0..3] 取值,位置一变就静默错位),
+ * 改用命名字段,消除语义位置型访问的脆弱性。
+ */
+export interface ServiceOrderRow {
+  department: string
+  equipName: string
+  /** 剩余时间的展示文案(如 "25天") */
+  remainLabel: string
+  engineer: string
+}
+
 /** 巡检工单聚合 */
 export interface InspectionOrders {
   rate: number
@@ -35,7 +48,7 @@ export interface InspectionOrders {
   finished: number
   waiting: number
   overdue: number
-  rows: string[][]
+  rows: ServiceOrderRow[]
 }
 
 /** 设备可用率条目(生命支持 / 超声) */
@@ -80,7 +93,7 @@ export interface HealthTrendData {
   repairing: number
   pending: number
   score: number
-  rows: string[][]
+  rows: ServiceOrderRow[]
 }
 
 /** 大屏全量数据聚合 */

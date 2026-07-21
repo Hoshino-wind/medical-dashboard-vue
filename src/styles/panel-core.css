@@ -1,0 +1,180 @@
+/* Panel core: 卡片外壳、四边流光边框与基础动画(从 panel.css 拆分) */
+
+/* Panel chrome */
+@property --panel-flow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  --panel-title-primary: color-mix(in srgb, var(--instrument-rim) 92%, var(--chart-primary) 8%);
+  --panel-title-secondary: color-mix(in srgb, var(--chart-primary) 72%, var(--chart-secondary) 28%);
+  --panel-title-accent: color-mix(in srgb, var(--warn) 78%, var(--chart-primary) 22%);
+  border: 0.0625rem solid color-mix(in srgb, var(--glass-edge) 100%, transparent);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--panel-title-primary) 9%, transparent),
+      transparent 4.8rem
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--panel-title-primary) 4%, transparent),
+      transparent 42%,
+      color-mix(in srgb, var(--panel-title-secondary) 4%, transparent)
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--surface-strong) 12%, transparent),
+      color-mix(in srgb, var(--surface) 6%, transparent)
+    );
+  box-shadow:
+    inset 0 0 0.0625rem color-mix(in srgb, var(--instrument-rim) 34%, transparent),
+    inset 0 0 1.35rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent),
+    0 0 1rem color-mix(in srgb, var(--panel-title-primary) 18%, transparent);
+  isolation: isolate;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 0.0625rem color-mix(in srgb, var(--glass-edge) 42%, transparent),
+    inset 0 0 1.15rem color-mix(in srgb, var(--panel-title-primary) 6%, transparent);
+}
+
+.screen-grid > .panel:hover {
+  border-color: var(--border-strong);
+  box-shadow:
+    inset 0 0 0.0625rem color-mix(in srgb, var(--instrument-rim) 42%, transparent),
+    0 0 1.2rem color-mix(in srgb, var(--panel-title-primary) 24%, transparent);
+}
+
+.screen-grid > .panel {
+  animation: panel-card-enter 520ms ease-out both;
+}
+
+.screen-grid > .panel:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.screen-grid > .panel:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+.screen-grid > .panel:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.screen-grid > .panel:nth-child(5) {
+  animation-delay: 280ms;
+}
+
+.screen-grid > .panel:nth-child(6) {
+  animation-delay: 350ms;
+}
+
+.screen-grid > .panel:nth-child(7) {
+  animation-delay: 420ms;
+}
+
+.screen-grid > .panel:nth-child(8) {
+  animation-delay: 490ms;
+}
+
+.screen-grid > .panel:nth-child(9) {
+  animation-delay: 560ms;
+}
+
+.screen-grid > .panel:nth-child(10) {
+  animation-delay: 630ms;
+}
+
+/* 四边流光边框 */
+.panel-border-flow {
+  position: absolute;
+  inset: -0.0625rem;
+  z-index: 2;
+  padding: 0.125rem;
+  --panel-flow-angle: 0deg;
+  --panel-flow-primary: var(--accent);
+  --panel-flow-secondary: var(--accent-2);
+  --panel-flow-accent: var(--accent-3);
+  pointer-events: none;
+  border-radius: inherit;
+  mix-blend-mode: screen;
+  background: conic-gradient(
+    from var(--panel-flow-angle),
+    transparent 0deg 28deg,
+    color-mix(in srgb, var(--panel-flow-primary) 92%, var(--text) 8%) 42deg,
+    color-mix(in srgb, var(--panel-flow-accent) 90%, var(--panel-flow-primary) 10%) 60deg,
+    transparent 84deg 164deg,
+    color-mix(in srgb, var(--panel-flow-secondary) 96%, transparent) 188deg,
+    color-mix(in srgb, var(--panel-flow-accent) 94%, transparent) 218deg,
+    transparent 244deg 360deg
+  );
+  opacity: 0.98;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation:
+    panel-border-flow-spin 8.4s linear infinite,
+    panel-border-breathe 3.8s ease-in-out infinite;
+}
+
+.screen-grid > .panel:nth-child(3n + 2) .panel-border-flow {
+  animation-delay:
+    -2.1s,
+    -0.9s;
+}
+
+.screen-grid > .panel:nth-child(3n) .panel-border-flow {
+  animation-delay:
+    -4.2s,
+    -1.8s;
+}
+
+@keyframes panel-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.625rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes panel-border-flow-spin {
+  to {
+    --panel-flow-angle: 360deg;
+  }
+}
+
+@keyframes panel-border-breathe {
+  0%,
+  100% {
+    opacity: 0.72;
+    filter: brightness(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.18);
+  }
+}
+

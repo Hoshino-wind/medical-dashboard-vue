@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { readPanelStyles } from './helpers/panelStyles'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
 
@@ -19,7 +20,10 @@ describe('global theme adaptation', () => {
     const cssWithTextSizes = [
       'styles/layout.css',
       'styles/header.css',
-      'styles/panel.css',
+      'styles/panel-core.css',
+      'styles/panel-title.css',
+      'styles/panel-borderless.css',
+      'styles/panel-chamfered.css',
       'styles/rings.css',
       'styles/modules.css',
       'styles/tables.css',
@@ -38,7 +42,7 @@ describe('global theme adaptation', () => {
     // 头部文字样式已随 HeaderBar 组件化搬入其 <style scoped>
     const headerStyles = readSource('components/shared/HeaderBar.vue')
     const moduleStyles = readSource('styles/modules.css')
-    const panelStyles = readSource('styles/panel.css')
+    const panelStyles = readPanelStyles()
     const tableStyles = readSource('styles/tables.css')
     const cubeBar = readSource('components/charts/CubeBarChart.vue')
     const lineArea = readSource('components/charts/LineAreaChart.vue')
@@ -98,7 +102,7 @@ describe('global theme adaptation', () => {
   })
 
   it('uses theme-driven SVG stops for the top header frame', () => {
-    const header = readSource('components/shared/HeaderBar.vue')
+    const header = readSource('components/shared/HeaderTechFrame.vue')
 
     expect(header).not.toMatch(/stop-color="rgba\(/)
   })
@@ -246,7 +250,7 @@ describe('global theme adaptation', () => {
 
   it('renders panel flowing borders with reduced-motion fallback', () => {
     const panelShell = readSource('components/shared/PanelShell.vue')
-    const panelStyles = readSource('styles/panel.css')
+    const panelStyles = readPanelStyles()
     const panelBeforeBlock = panelStyles.match(/\.panel::before\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
 
     expect(panelShell).toContain('panel-border-flow')
@@ -268,7 +272,7 @@ describe('global theme adaptation', () => {
     const bigScreen = readSource('components/shared/BigScreen.vue')
     const panelShell = readSource('components/shared/PanelShell.vue')
     const moduleRenderer = readSource('components/shared/ModuleRenderer.vue')
-    const panelStyles = readSource('styles/panel.css')
+    const panelStyles = readPanelStyles()
     const panelHeaderBlock = panelStyles.match(/\.panel-header\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const panelTitleFrameBlock =
       panelStyles.match(/\.panel-title-frame\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
@@ -521,7 +525,7 @@ describe('global theme adaptation', () => {
 
   it('keeps global chrome free of text and card glow effects', () => {
     const globalChrome = [
-      readSource('styles/panel.css'),
+      readPanelStyles(),
       readSource('styles/header.css'),
       readSource('styles/tables.css'),
       readSource('styles/charts.css'),

@@ -6,6 +6,7 @@ import { createPinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import ConfigPanel from '@/components/shared/ConfigPanel.vue'
 import { useDashboardStore } from '@/stores/dashboard'
+import { readPanelStyles } from './helpers/panelStyles'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
 
@@ -188,7 +189,7 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('keeps borderless panels frame-free while preserving raised card depth', () => {
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const borderlessPanelBlock =
       panelStyles.match(
         /\.dashboard-shell\[data-panel-style='borderless'\][\s\S]*?\.screen-grid\s*>\s*\.panel\s*\{[\s\S]*?\n\}/,
@@ -218,7 +219,7 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('centers chamfered panel titles on the outer mechanical frame', () => {
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const chamferedTitleBlock =
       panelStyles.match(
         /\.dashboard-shell\[data-panel-style='chamfered-instrument'\][\s\S]*?\.panel-header--main\s*\{[\s\S]*?\n\}/,
@@ -256,7 +257,7 @@ describe('ConfigPanel workbench configuration', () => {
   })
 
   it('gives chamfered status summary cards enough text height and a shorter width', () => {
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const mechanicalFrame = readFileSync(
       join(testDir, '../components/visual/MechanicalFrame.vue'),
       'utf8',

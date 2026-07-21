@@ -2,12 +2,13 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { readPanelStyles } from './helpers/panelStyles'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
 
 describe('panel title styles', () => {
   it('keeps the original title color and adds only a short glow line', () => {
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const headingBlock = panelStyles.match(/\.panel-header h2\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const titleBlock = panelStyles.match(/\.panel-title-text\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
     const glowLineBlock = panelStyles.match(/\.panel-title-text::after\s*\{[\s\S]*?\n\}/)?.[0] ?? ''
@@ -34,7 +35,7 @@ describe('panel title styles', () => {
 
   it('uses the medical pulse ornament with a flat border-masking title background', () => {
     const panelShell = readFileSync(join(testDir, '../components/shared/PanelShell.vue'), 'utf8')
-    const panelStyles = readFileSync(join(testDir, '../styles/panel.css'), 'utf8')
+    const panelStyles = readPanelStyles()
     const ornamentPath = join(
       testDir,
       '../assets/panel-titles/medical-pulse-title-left-v3.png',
@@ -57,11 +58,11 @@ describe('panel title styles', () => {
       )?.[0] ?? ''
     const chamferedHeaderBlock =
       panelStyles.match(
-        /\.panel-header--main\s*\{\n  z-index: 5;[\s\S]*?\n\}/,
+        /\.panel-header--main\s*\{\n {2}z-index: 5;[\s\S]*?\n\}/,
       )?.[0] ?? ''
     const chamferedTitleBlock =
       panelStyles.match(
-        /\.panel-title-text\s*\{\n  z-index: 2;[\s\S]*?\n\}/,
+        /\.panel-title-text\s*\{\n {2}z-index: 2;[\s\S]*?\n\}/,
       )?.[0] ?? ''
 
     expect(existsSync(ornamentPath)).toBe(true)
