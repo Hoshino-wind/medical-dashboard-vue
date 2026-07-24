@@ -41,6 +41,9 @@ export interface ThemeVariables {
   '--accent': string
   '--accent-2': string
   '--accent-3': string
+  '--header-path-primary': string
+  '--header-path-secondary': string
+  '--header-path-accent': string
   '--chart-primary': string
   '--chart-secondary': string
   '--chart-tertiary': string

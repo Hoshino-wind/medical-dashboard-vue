@@ -66,7 +66,7 @@ describe('work order style panels', () => {
   it('renders health trend as a compact status list plus full-width bottom status summary', () => {
     const wrapper = mount(HealthTrendModule, {
       props: {
-        theme: themes[1],
+        theme: themes[0],
         data: {
           online: 15744,
           warning: 68,
@@ -109,6 +109,12 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('维修中44台')
     expect(wrapper.text()).toContain('待保养102台')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
+    const pie = wrapper.findComponent(PieStub)
+    expect(pie.props('tone')).toBe('#1677ff')
+    expect(pie.props('items')[0]).toMatchObject({
+      name: '运行正常',
+      color: '#1677ff',
+    })
   })
 
   it('does not render the removed static repair summary row', () => {

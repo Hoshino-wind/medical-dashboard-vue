@@ -10,16 +10,24 @@
         <stop
           class="header-stop-primary is-transparent"
           offset="0"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
-        <stop class="header-stop-primary" offset="0.18" stop-color="var(--chart-primary)" />
-        <stop class="header-stop-secondary" offset="0.5" stop-color="var(--accent-2)" />
-        <stop class="header-stop-tertiary" offset="0.68" stop-color="var(--chart-secondary)" />
-        <stop class="header-stop-primary" offset="0.82" stop-color="var(--chart-primary)" />
+        <stop class="header-stop-primary" offset="0.18" stop-color="var(--header-path-primary)" />
+        <stop
+          class="header-stop-secondary"
+          offset="0.5"
+          stop-color="var(--header-path-secondary)"
+        />
+        <stop
+          class="header-stop-tertiary"
+          offset="0.68"
+          stop-color="var(--header-path-accent)"
+        />
+        <stop class="header-stop-primary" offset="0.82" stop-color="var(--header-path-primary)" />
         <stop
           class="header-stop-primary is-transparent"
           offset="1"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
       </linearGradient>
       <!-- 流光亮芯渐变:中央纯白高亮 -->
@@ -27,16 +35,28 @@
         <stop
           class="header-stop-primary is-transparent"
           offset="0"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
-        <stop class="header-stop-primary is-soft" offset="0.3" stop-color="var(--chart-primary)" />
+        <stop
+          class="header-stop-primary is-soft"
+          offset="0.3"
+          stop-color="var(--header-path-primary)"
+        />
         <stop class="header-flow-core" offset="0.5" stop-color="#ffffff" />
-        <stop class="header-stop-secondary is-strong" offset="0.64" stop-color="var(--accent-2)" />
-        <stop class="header-stop-primary is-soft" offset="0.76" stop-color="var(--chart-primary)" />
+        <stop
+          class="header-stop-secondary is-strong"
+          offset="0.64"
+          stop-color="var(--header-path-secondary)"
+        />
+        <stop
+          class="header-stop-primary is-soft"
+          offset="0.76"
+          stop-color="var(--header-path-primary)"
+        />
         <stop
           class="header-stop-primary is-transparent"
           offset="1"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
       </linearGradient>
       <!-- 流光辉光底层渐变 -->
@@ -44,13 +64,17 @@
         <stop
           class="header-stop-primary is-transparent"
           offset="0"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
-        <stop class="header-stop-secondary" offset="0.5" stop-color="var(--accent-2)" />
+        <stop
+          class="header-stop-secondary"
+          offset="0.5"
+          stop-color="var(--header-path-secondary)"
+        />
         <stop
           class="header-stop-primary is-transparent"
           offset="1"
-          stop-color="var(--chart-primary)"
+          stop-color="var(--header-path-primary)"
         />
       </linearGradient>
       <filter id="headerPathGlow" x="-18%" y="-120%" width="136%" height="340%">
@@ -58,14 +82,14 @@
           dx="0"
           dy="0"
           stdDeviation="2.6"
-          flood-color="var(--chart-primary)"
+          flood-color="var(--header-path-primary)"
           flood-opacity="0.72"
         />
         <feDropShadow
           dx="0"
           dy="0"
           stdDeviation="5.5"
-          flood-color="var(--accent-2)"
+          flood-color="var(--header-path-secondary)"
           flood-opacity="0.32"
         />
       </filter>

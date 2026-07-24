@@ -113,6 +113,28 @@ describe('CubeBarChart', () => {
     wrapper.unmount()
   })
 
+  it('renders the black-gold primary column without a cyan highlight', () => {
+    const blackGoldTheme = themes.find((theme) => theme.id === 'black-gold-blue')!
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: chartData,
+        theme: blackGoldTheme,
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    const primarySwatchStyle = wrapper.find('.cube-bar-legend i').attributes('style') ?? ''
+
+    expect(primarySwatchStyle).toContain('245, 184, 32')
+    expect(primarySwatchStyle).not.toContain('56, 198, 232')
+
+    wrapper.unmount()
+  })
+
   it('renders each warranty type as a separate grouped column', async () => {
     const wrapper = mount(CubeBarChart, {
       props: {

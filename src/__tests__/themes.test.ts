@@ -31,6 +31,9 @@ const requiredVariableKeys: Array<keyof ThemeVariables> = [
   '--accent',
   '--accent-2',
   '--accent-3',
+  '--header-path-primary',
+  '--header-path-secondary',
+  '--header-path-accent',
   '--chart-primary',
   '--chart-secondary',
   '--chart-tertiary',
@@ -148,13 +151,41 @@ describe('dashboard themes', () => {
     expect(theme.variables['--chart-secondary']).toBe('#69b1ff')
     expect(theme.variables['--chart-tertiary']).toBe('#9ccaff')
     expect(theme.variables['--data-ring']).toBe('#1677ff')
-    expect(theme.variables['--data-pie-primary']).toBe('#237804')
-    expect(theme.variables['--data-health-pie-good']).toBe('#237804')
+    expect(theme.variables['--data-pie-primary']).toBe('#1677ff')
+    expect(theme.variables['--data-health-pie-good']).toBe('#1677ff')
     expect(theme.variables['--data-inspection-pie-finished']).toBe('#1677ff')
     expect(theme.variables['--data-inspection-line']).toBe('#20b486')
     expect(theme.variables['--data-health-pie-pending']).toBe('#7c3aed')
     expect(theme.variables['--good']).toBe('#2fbf8f')
     expect(theme.variables['--warn']).toBe('#d97706')
     expect(theme.variables['--danger']).toBe('#e11d48')
+  })
+
+  it('keeps the black-gold primary bar and its highlight purely gold', () => {
+    const theme = themes.find((item) => item.id === 'black-gold-blue')!
+
+    expect(theme.variables['--data-bar']).toBe('#f5b820')
+    expect(theme.variables['--data-bar-secondary']).toBe('#f5b820')
+  })
+
+  it('defines a dedicated header path palette for every theme', () => {
+    const expected = {
+      'light-medical': ['#1677ff', '#69b1ff', '#9ccaff'],
+      'deep-sea-instrument': ['#06c3e8', '#4ec8ff', '#3d7bff'],
+      'ink-blue-medical': ['#0fd6a0', '#6ee7c8', '#34d399'],
+      'midnight-violet': ['#7c6dff', '#c084fc', '#3bd7ff'],
+      'black-gold-blue': ['#f5b820', '#e7b94d', '#fff0a8'],
+    } as const
+
+    for (const theme of themes) {
+      expect(
+        [
+          theme.variables['--header-path-primary'],
+          theme.variables['--header-path-secondary'],
+          theme.variables['--header-path-accent'],
+        ],
+        theme.id,
+      ).toEqual(expected[theme.id])
+    }
   })
 })

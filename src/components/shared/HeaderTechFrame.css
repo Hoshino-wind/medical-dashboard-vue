@@ -10,15 +10,15 @@
   animation: header-frame-breathe 5.2s ease-in-out infinite;
 }
 .header-stop-primary {
-  stop-color: var(--chart-primary);
+  stop-color: var(--header-path-primary);
   stop-opacity: 0.82;
 }
 .header-stop-secondary {
-  stop-color: var(--accent-2);
+  stop-color: var(--header-path-secondary);
   stop-opacity: 0.96;
 }
 .header-stop-tertiary {
-  stop-color: var(--chart-secondary);
+  stop-color: var(--header-path-accent);
   stop-opacity: 0.9;
 }
 .header-stop-primary.is-soft,
@@ -39,8 +39,8 @@
   z-index: 1;
 }
 .header-title-fill {
-  fill: color-mix(in srgb, var(--chart-primary) 4%, transparent);
-  stroke: color-mix(in srgb, var(--chart-primary) 42%, transparent);
+  fill: color-mix(in srgb, var(--header-path-primary) 4%, transparent);
+  stroke: color-mix(in srgb, var(--header-path-primary) 42%, transparent);
 }
 .header-line,
 .header-ticks path,
@@ -135,7 +135,7 @@
 }
 .header-core-glow {
   display: block;
-  fill: color-mix(in srgb, var(--accent-2) 92%, transparent);
+  fill: color-mix(in srgb, var(--header-path-secondary) 92%, transparent);
   opacity: 0.94;
   transform-origin: 50% 50%;
   animation: header-core-breathe 2.8s ease-in-out infinite;

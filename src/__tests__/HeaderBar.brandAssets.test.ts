@@ -1,8 +1,12 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
 import HeaderBar from '@/components/shared/HeaderBar.vue'
 import hospitalLogo from '@/assets/jiangmen-central-hospital-logo.png'
 import sunnicareLogo from '@/assets/sunnicare-logo.png'
+
+const headerBarCss = readFileSync(resolve('src/components/shared/HeaderBar.css'), 'utf8')
 
 enableAutoUnmount(afterEach)
 
@@ -35,5 +39,46 @@ describe('HeaderBar brand assets', () => {
     expect(rightStep.attributes('d')).toBe(leftStep.attributes('d'))
     expect(rightConnector.attributes('transform')).toBe('translate(1400 0) scale(-1 1)')
     expect(rightStep.attributes('transform')).toBe('translate(1400 0) scale(-1 1)')
+  })
+
+  it('draws the decorative paths with dedicated theme tokens', () => {
+    const wrapper = mount(HeaderBar, { props: { data: header } })
+    const primaryStops = wrapper.findAll('.header-stop-primary')
+    const secondaryStops = wrapper.findAll('.header-stop-secondary')
+    const tertiaryStops = wrapper.findAll('.header-stop-tertiary')
+
+    expect(primaryStops).not.toHaveLength(0)
+    expect(secondaryStops).not.toHaveLength(0)
+    expect(tertiaryStops).not.toHaveLength(0)
+    expect(primaryStops.every((stop) => stop.attributes('stop-color') === 'var(--header-path-primary)'))
+      .toBe(true)
+    expect(
+      secondaryStops.every(
+        (stop) => stop.attributes('stop-color') === 'var(--header-path-secondary)',
+      ),
+    ).toBe(true)
+    expect(
+      tertiaryStops.every((stop) => stop.attributes('stop-color') === 'var(--header-path-accent)'),
+    ).toBe(true)
+  })
+
+  it('keeps both side header chips on the dedicated header palette', () => {
+    const sideHeaderCss = headerBarCss.slice(0, headerBarCss.indexOf('.title-frame'))
+
+    expect(sideHeaderCss).toContain('var(--header-path-primary)')
+    expect(sideHeaderCss).toContain('var(--header-path-secondary)')
+    expect(sideHeaderCss).toContain('var(--header-path-accent)')
+    expect(sideHeaderCss).not.toContain('var(--chart-primary)')
+    expect(sideHeaderCss).not.toContain('var(--chart-secondary)')
+    expect(sideHeaderCss).not.toContain('var(--glass-edge)')
+  })
+
+  it('moves only the hospital copy left while keeping the badge group in place', () => {
+    expect(headerBarCss).toMatch(
+      /\.hospital-chip\s*\{[\s\S]*?transform:\s*translate\(0\.125rem,\s*-0\.0625rem\);[\s\S]*?\}/,
+    )
+    expect(headerBarCss).toMatch(
+      /\.hospital-copy\s*\{[\s\S]*?transform:\s*translateX\(-1\.25rem\);[\s\S]*?\}/,
+    )
   })
 })
