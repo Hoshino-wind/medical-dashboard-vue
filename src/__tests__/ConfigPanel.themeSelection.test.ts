@@ -116,6 +116,37 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.panel-style-radio.active').text()).toContain('无边框')
   })
 
+  it('configures and persists custom colors for rings and progress bars', async () => {
+    const pinia = createPinia()
+    const wrapper = mount(ConfigPanel, {
+      global: {
+        plugins: [pinia],
+        stubs: { BigScreen: true },
+      },
+    })
+    const store = useDashboardStore(pinia)
+
+    await wrapper.find('[data-testid="ring-color-mode-custom"]').setValue()
+    await wrapper.find('[data-testid="ring-custom-color"]').setValue('#f05a28')
+    await wrapper.find('[data-testid="bar-color-mode-custom"]').setValue()
+    await wrapper.find('[data-testid="bar-custom-color"]').setValue('#3456c8')
+    await flushPromises()
+
+    expect(store.config.ringColorMode).toBe('custom')
+    expect(store.config.ringCustomColor).toBe('#f05a28')
+    expect(store.config.barColorMode).toBe('custom')
+    expect(store.config.barCustomColor).toBe('#3456c8')
+    expect(JSON.parse(window.localStorage.getItem('medical-dashboard-config') ?? '{}')).toMatchObject(
+      {
+        schemaVersion: 3,
+        ringColorMode: 'custom',
+        ringCustomColor: '#f05a28',
+        barColorMode: 'custom',
+        barCustomColor: '#3456c8',
+      },
+    )
+  })
+
   it('switches between 3x3 and 2x3 layout slot counts', async () => {
     const wrapper = mount(ConfigPanel, {
       global: {

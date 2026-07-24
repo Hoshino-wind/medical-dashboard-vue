@@ -82,7 +82,7 @@ const inspectionPieItems = computed(() => {
         <HologramGaugeBase
           class="inspection-pie-base"
           :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
-          :intensity="isLightTheme(theme) ? 0.72 : 0.96"
+          :intensity="isLightTheme(theme) ? 0.86 : 0.96"
           :speed="7.2"
           direction="clockwise"
         />

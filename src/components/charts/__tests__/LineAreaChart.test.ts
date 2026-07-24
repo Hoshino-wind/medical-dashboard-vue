@@ -6,6 +6,18 @@ import type { BarChartData, LineChartData } from '@/types/dashboard'
 import type { CartesianChartVariant } from '@/types/module'
 
 interface LineChartOption {
+  grid: {
+    left: number
+    right: number
+    outerBoundsMode: string
+    outerBoundsContain: string
+  }
+  xAxis: {
+    axisLabel: {
+      showMinLabel: boolean
+      showMaxLabel: boolean
+    }
+  }
   yAxis: {
     max: number
     interval: number
@@ -30,6 +42,29 @@ const chartData: LineChartData = {
 }
 
 describe('LineAreaChart', () => {
+  it('keeps the first and last x-axis labels inside the chart grid', () => {
+    const wrapper = mount(LineAreaChart, {
+      props: {
+        data: chartData,
+        theme: themes[1],
+        variant: 'maintenance',
+      },
+      global: { stubs: { EChart: EChartStub } },
+    })
+
+    const option = wrapper.findComponent(EChartStub).props('option') as LineChartOption
+
+    expect(option.grid).toMatchObject({
+      left: 12,
+      right: 12,
+      outerBoundsMode: 'same',
+      outerBoundsContain: 'axisLabel',
+    })
+    expect(option.xAxis.axisLabel).toMatchObject({ showMinLabel: true, showMaxLabel: true })
+
+    wrapper.unmount()
+  })
+
   it.each<CartesianChartVariant>(['maintenance', 'inspection'])(
     'scales the %s y axis from the actual line data maximum',
     (variant) => {

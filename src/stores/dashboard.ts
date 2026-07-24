@@ -4,6 +4,7 @@ import {
   findAvailableSlot,
   getLayoutCapacity,
   hasRowTableConflict,
+  isDashboardCustomColor,
   loadDashboardConfig,
   normalizeSlotIds,
   saveDashboardConfig,
@@ -64,6 +65,18 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   function setBarColorMode(mode: ColorMode) {
     config.barColorMode = mode
+  }
+
+  function setRingCustomColor(color: string) {
+    if (!isDashboardCustomColor(color)) return false
+    config.ringCustomColor = color.toLowerCase()
+    return true
+  }
+
+  function setBarCustomColor(color: string) {
+    if (!isDashboardCustomColor(color)) return false
+    config.barCustomColor = color.toLowerCase()
+    return true
   }
 
   function setModuleChartType(moduleId: ModuleId, type: ChartDisplayType) {
@@ -158,6 +171,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     setPanelStyle,
     setRingColorMode,
     setBarColorMode,
+    setRingCustomColor,
+    setBarCustomColor,
     setModuleChartType,
     setLayout,
     addModuleToLayout,

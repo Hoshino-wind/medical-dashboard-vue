@@ -45,7 +45,7 @@ export const themes: Theme[] = [
       '--data-health-pie-warning': '#d97706',
       '--data-health-pie-repairing': '#e11d48',
       '--data-health-pie-pending': '#7c3aed',
-      '--data-inspection-pie-finished': '#237804',
+      '--data-inspection-pie-finished': '#1677ff',
       '--data-inspection-pie-waiting': '#d97706',
       '--data-inspection-pie-overdue': '#e11d48',
       '--instrument-base': '#dbe8f6',

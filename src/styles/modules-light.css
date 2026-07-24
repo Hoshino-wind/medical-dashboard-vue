@@ -66,7 +66,7 @@
 .dashboard-shell[data-theme-mode='light'] .inspection-pie-base,
 .dashboard-shell[data-theme-mode='light'] .health-pie-panel .health-pie-base,
 .dashboard-shell[data-theme-mode='light'] .health-pie-base {
-  opacity: 0.68;
+  opacity: 0.86;
 }
 .dashboard-shell[data-theme-mode='light'] .pie-center-value {
   color: color-mix(in srgb, var(--text) 92%, var(--data-inspection-pie-finished) 8%);

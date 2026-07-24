@@ -24,7 +24,7 @@ test.describe('大屏视觉基线', () => {
     await page.addInitScript(() => {
       window.localStorage.setItem(
         'medical-dashboard-config',
-        JSON.stringify({ schemaVersion: 2, themeId: 'light-medical', layout: '3x3' }),
+        JSON.stringify({ schemaVersion: 3, themeId: 'light-medical', layout: '3x3' }),
       )
     })
     await waitForDashboard(page)

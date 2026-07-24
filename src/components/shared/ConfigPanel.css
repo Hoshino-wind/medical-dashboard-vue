@@ -171,17 +171,17 @@
   min-height: 1.45rem;
   place-items: center;
   border-radius: 0.25rem;
-  background: color-mix(in srgb, #081018 78%, transparent);
+  background: color-mix(in srgb, var(--surface-strong) 82%, var(--bg) 18%);
   font-size: calc(0.75rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;
 }
 .business-component-card.is-table .component-type-badge {
-  border: 0.0625rem solid color-mix(in srgb, #8ef66d 58%, transparent);
-  color: #84e56d;
+  border: 0.0625rem solid color-mix(in srgb, var(--good) 58%, transparent);
+  color: color-mix(in srgb, var(--good) 88%, var(--text) 12%);
 }
 .business-component-card.is-chart .component-type-badge {
-  border: 0.0625rem solid color-mix(in srgb, #54b7ff 62%, transparent);
-  color: #54b7ff;
+  border: 0.0625rem solid color-mix(in srgb, var(--chart-primary) 62%, transparent);
+  color: color-mix(in srgb, var(--chart-primary) 88%, var(--text) 12%);
 }
 .component-card-title {
   min-width: 0;
@@ -228,10 +228,18 @@
     transform 140ms ease;
 }
 .layout-slot.is-chart {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-3) 22%, #429bf0), #429bf0);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--chart-primary) 84%, var(--accent-3) 16%),
+    var(--chart-primary)
+  );
 }
 .layout-slot.is-table {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--good) 24%, #61c635), #61c635);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--good) 84%, var(--accent-2) 16%),
+    var(--good)
+  );
 }
 .layout-slot.is-empty {
   background: transparent;
@@ -264,10 +272,10 @@
   gap: 0.55rem;
   min-height: 2.6rem;
   margin: 1.45rem auto 0;
-  border: 0.0625rem solid color-mix(in srgb, #7fc6ff 86%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--accent-2) 86%, transparent);
   border-radius: 0.375rem;
-  background: color-mix(in srgb, #0e2439 86%, transparent);
-  color: #45aafc;
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-strong) 86%);
+  color: color-mix(in srgb, var(--accent) 88%, var(--text) 12%);
   padding: 0 1.1rem;
   font-size: calc(0.9rem * var(--dashboard-font-scale, 1.45));
   font-weight: 950;

@@ -1,6 +1,9 @@
 .hologram-gauge-base {
+  --gauge-base-tone: var(--gauge-tone);
+  --gauge-base-tone-soft: var(--gauge-tone-soft);
+  --gauge-base-tone-bright: var(--gauge-tone-bright);
   overflow: visible;
-  color: var(--gauge-tone);
+  color: var(--gauge-base-tone);
   isolation: isolate;
   pointer-events: none;
 }
@@ -15,10 +18,10 @@
   height: 116%;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--gauge-tone) 7%, transparent),
-    color-mix(in srgb, var(--gauge-tone) 18%, transparent) 44%,
-    color-mix(in srgb, var(--gauge-tone-soft) 48%, transparent) 76%,
-    color-mix(in srgb, var(--gauge-tone-bright) 78%, transparent)
+    color-mix(in srgb, var(--gauge-base-tone) 7%, transparent),
+    color-mix(in srgb, var(--gauge-base-tone) 18%, transparent) 44%,
+    color-mix(in srgb, var(--gauge-base-tone-soft) 48%, transparent) 76%,
+    color-mix(in srgb, var(--gauge-base-tone-bright) 78%, transparent)
   );
   clip-path: polygon(2% 0, 98% 0, 57% 100%, 43% 100%);
   filter: blur(5px);
@@ -35,8 +38,8 @@
   inset: 8% 34% 0;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--gauge-tone-bright) 4%, transparent),
-    color-mix(in srgb, var(--gauge-tone-bright) 54%, transparent) 74%,
+    color-mix(in srgb, var(--gauge-base-tone-bright) 4%, transparent),
+    color-mix(in srgb, var(--gauge-base-tone-bright) 54%, transparent) 74%,
     color-mix(in srgb, #ffffff 82%, transparent)
   );
   clip-path: polygon(0 0, 100% 0, 64% 100%, 36% 100%);
@@ -85,7 +88,7 @@
 }
 
 .gauge-base-beam--outer {
-  stroke: color-mix(in srgb, var(--gauge-tone-soft) 34%, transparent);
+  stroke: color-mix(in srgb, var(--gauge-base-tone-soft) 34%, transparent);
   stroke-width: 0.5;
   opacity: 0.46;
 }
@@ -131,21 +134,21 @@
 }
 
 .gauge-base-wall {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 48%, var(--gauge-tone) 18%);
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 48%, var(--gauge-base-tone) 18%);
   stroke-width: 0.95;
 }
 
 .gauge-base-deck {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 58%, var(--gauge-tone) 18%);
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 58%, var(--gauge-base-tone) 18%);
   stroke-width: 1;
   filter: drop-shadow(0 1.5px 2px color-mix(in srgb, #000000 62%, transparent));
 }
 
 .gauge-base-deck--top {
-  stroke: color-mix(in srgb, var(--gauge-tone-bright) 68%, var(--instrument-base-rim));
+  stroke: color-mix(in srgb, var(--gauge-base-tone-bright) 68%, var(--instrument-base-rim));
   stroke-width: 1.1;
   opacity: 0.96;
-  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gauge-tone) 72%, transparent));
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gauge-base-tone) 72%, transparent));
 }
 
 .gauge-base-tier--bottom {
@@ -174,7 +177,7 @@
 
 .gauge-base-rotor-rail {
   fill: none;
-  stroke: color-mix(in srgb, var(--gauge-tone-soft) 64%, var(--instrument-base-rim));
+  stroke: color-mix(in srgb, var(--gauge-base-tone-soft) 64%, var(--instrument-base-rim));
   stroke-width: 0.9;
   opacity: 0.58;
 }
@@ -186,15 +189,15 @@
 
 .gauge-base-rotor-spokes {
   fill: none;
-  stroke: color-mix(in srgb, var(--gauge-tone) 38%, var(--instrument-base-rim));
+  stroke: color-mix(in srgb, var(--gauge-base-tone) 38%, var(--instrument-base-rim));
   stroke-width: 0.72;
   stroke-linecap: round;
   opacity: 0.3;
 }
 
 .gauge-base-rotor-nodes circle {
-  fill: color-mix(in srgb, var(--gauge-tone-bright) 74%, #ffffff 26%);
-  stroke: color-mix(in srgb, var(--gauge-tone) 72%, var(--instrument-base-rim));
+  fill: color-mix(in srgb, var(--gauge-base-tone-bright) 74%, #ffffff 26%);
+  stroke: color-mix(in srgb, var(--gauge-base-tone) 72%, var(--instrument-base-rim));
   stroke-width: 0.72;
   opacity: 0.84;
 }
@@ -204,22 +207,22 @@
 }
 
 .gauge-base-aperture {
-  stroke: color-mix(in srgb, var(--gauge-tone-bright) 78%, #ffffff 22%);
+  stroke: color-mix(in srgb, var(--gauge-base-tone-bright) 78%, #ffffff 22%);
   stroke-width: 1.15;
   opacity: 0.98;
-  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gauge-tone) 88%, transparent));
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gauge-base-tone) 88%, transparent));
 }
 
 .gauge-base-aperture-ring {
   fill: none;
-  stroke: color-mix(in srgb, var(--gauge-tone-bright) 86%, #ffffff 14%);
+  stroke: color-mix(in srgb, var(--gauge-base-tone-bright) 86%, #ffffff 14%);
   stroke-width: 0.8;
   opacity: 0.86;
 }
 
 .gauge-base-status-window {
   opacity: 0.84;
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gauge-tone) 76%, transparent));
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gauge-base-tone) 76%, transparent));
 }
 
 .gauge-base-fastener {
@@ -235,7 +238,7 @@
 
 .gauge-base-front {
   fill: none;
-  stroke: var(--gauge-tone-bright);
+  stroke: var(--gauge-base-tone-bright);
   stroke-width: 1.7;
   stroke-linecap: round;
   opacity: 0.82;
@@ -249,8 +252,8 @@
 .gauge-base-dot {
   fill: #fff;
   opacity: 1;
-  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px var(--gauge-tone-bright))
-    drop-shadow(0 0 11px var(--gauge-tone));
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px var(--gauge-base-tone-bright))
+    drop-shadow(0 0 11px var(--gauge-base-tone));
 }
 
 @keyframes gauge-base-layer-rotate {

@@ -44,6 +44,7 @@ function resolveAvailability(
     items: ctx.data[module.dataKey],
     variant: module.variant,
     ringColorMode: ctx.config.ringColorMode,
+    ringCustomColor: ctx.config.ringCustomColor,
   }
 }
 
@@ -85,6 +86,7 @@ export const moduleRegistry: ModuleRegistry = {
     resolveProps: (module, ctx) => ({
       items: ctx.data[module.dataKey],
       barColorMode: ctx.config.barColorMode,
+      barCustomColor: ctx.config.barCustomColor,
     }),
   },
 }

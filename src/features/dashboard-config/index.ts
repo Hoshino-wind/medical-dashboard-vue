@@ -10,3 +10,7 @@ export {
   loadDashboardConfig,
   saveDashboardConfig,
 } from './model/configPersistence'
+export {
+  isDashboardCustomColor,
+  normalizeDashboardCustomColor,
+} from './model/customColor'

@@ -18,10 +18,13 @@ const props = withDefaults(
     variant?: AvailabilityVariant
     /** 环图配色模式,由上层配置(moduleRegistry)注入,不再直接读 store */
     ringColorMode?: ColorMode
+    /** custom 模式使用的统一环图色 */
+    ringCustomColor?: string
   }>(),
   {
     variant: 'life',
     ringColorMode: 'solid',
+    ringCustomColor: '#1677ff',
   },
 )
 
@@ -50,8 +53,12 @@ const { currentIndex, shouldPaginate } = usePagedCarousel({
 })
 
 const currentPage = computed(() => pages.value[currentIndex.value] ?? [])
+const renderedColorMode = computed(() =>
+  props.ringColorMode === 'gradient' ? 'gradient' : 'solid',
+)
 
 function ringColorAt(localIndex: number, value: number): string {
+  if (props.ringColorMode === 'custom') return props.ringCustomColor
   if (value < 50) return 'var(--danger)'
   const offset = props.variant === 'ultrasound' ? 2 : 0
   const globalIndex = currentIndex.value * PAGE_SIZE + localIndex + offset
@@ -79,7 +86,7 @@ function ringColorAt(localIndex: number, value: number): string {
           :count="item.count"
           :size="ringSize"
           :tone="ringColorAt(localIndex, item.value)"
-          :color-mode="ringColorMode"
+          :color-mode="renderedColorMode"
         />
       </div>
     </Transition>

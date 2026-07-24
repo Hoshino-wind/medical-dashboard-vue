@@ -28,14 +28,14 @@ describe('dashboard store configuration', () => {
 
     const store = useDashboardStore()
 
-    expect(store.config.schemaVersion).toBe(2)
+    expect(store.config.schemaVersion).toBe(3)
     expect(store.config.selectedModuleIds).toEqual(oldModuleOrder.slice(0, 9))
     expect(store.availableModules.map((module) => module.id)).toContain('deviceDistribution')
 
     store.persistConfig()
     await nextTick()
     const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
-    expect(persisted.schemaVersion).toBe(2)
+    expect(persisted.schemaVersion).toBe(3)
     expect(persisted).not.toHaveProperty('moduleOrder')
   })
 
@@ -88,6 +88,34 @@ describe('dashboard store configuration', () => {
       maintenanceStats: 'line',
       inspectionStats: 'line',
     })
+  })
+
+  it('migrates and validates custom ring and progress colors', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        themeId: 'light-medical',
+        layout: '3x3',
+        ringColorMode: 'custom',
+        ringCustomColor: '#AABBCC',
+        barColorMode: 'custom',
+        barCustomColor: 'not-a-color',
+      }),
+    )
+
+    const store = useDashboardStore()
+
+    expect(store.config.ringColorMode).toBe('custom')
+    expect(store.config.ringCustomColor).toBe('#aabbcc')
+    expect(store.config.barColorMode).toBe('custom')
+    expect(store.config.barCustomColor).toBe('#20b486')
+    expect(store.setRingCustomColor('#F05A28')).toBe(true)
+    expect(store.setBarCustomColor('#123')).toBe(false)
+    await nextTick()
+
+    const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
+    expect(persisted.ringCustomColor).toBe('#f05a28')
+    expect(persisted.barCustomColor).toBe('#20b486')
   })
 
   it('replaces an occupied layout slot when placing an available module into it', () => {

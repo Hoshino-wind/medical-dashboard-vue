@@ -111,7 +111,7 @@ describe('work order style panels', () => {
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
   })
 
-  it('animates work order summary numbers with CountUp', () => {
+  it('does not render the removed static repair summary row', () => {
     const wrapper = mount(WorkOrderTable, {
       props: {
         rows: [
@@ -140,10 +140,11 @@ describe('work order style panels', () => {
       },
     })
 
-    expect(wrapper.find('.work-order-summary').text()).toContain('维修中44单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('配件运输中18单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('待接修1单')
-    expect(wrapper.find('.work-order-summary').text()).toContain('已维修1326单')
+    expect(wrapper.find('.work-order-summary').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('维修中44单')
+    expect(wrapper.text()).not.toContain('配件运输中18单')
+    expect(wrapper.text()).not.toContain('待接修1单')
+    expect(wrapper.text()).not.toContain('已维修1326单')
   })
 
   it('pins pending repair orders before the scrolling repair list with distinct status colors and no vertical warning stripes', () => {

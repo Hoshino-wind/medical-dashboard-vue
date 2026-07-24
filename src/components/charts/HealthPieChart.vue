@@ -34,7 +34,7 @@ function isLightTheme(theme: Theme | undefined): boolean {
     <HologramGaugeBase
       class="health-pie-base"
       :tone="tone ?? themeColor(theme, '--data-health-pie-good', '#1cf3ff')"
-      :intensity="isLightTheme(theme) ? 0.72 : 0.96"
+      :intensity="isLightTheme(theme) ? 0.86 : 0.96"
       :speed="8.4"
       direction="counter-clockwise"
     />

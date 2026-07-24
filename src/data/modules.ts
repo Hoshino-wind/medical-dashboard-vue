@@ -148,7 +148,9 @@ export const defaultConfig: DashboardConfig = {
   panelStyle: 'glass-flow',
   layout: '3x3',
   ringColorMode: 'solid',
+  ringCustomColor: '#1677ff',
   barColorMode: 'gradient',
+  barCustomColor: '#20b486',
   chartTypes,
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
 }

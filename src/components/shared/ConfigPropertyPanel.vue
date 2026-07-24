@@ -19,6 +19,7 @@ const panelStyleOptions: Array<{ id: PanelStyle; label: string }> = [
 const colorModeOptions: Array<{ id: ColorMode; label: string }> = [
   { id: 'solid', label: '纯色' },
   { id: 'gradient', label: '渐变色' },
+  { id: 'custom', label: '自定义' },
 ]
 
 const chartTypeOptions: Array<{ id: ChartDisplayType; label: string }> = [
@@ -35,6 +36,14 @@ function themeLabel(theme: Theme) {
     'black-gold-blue': '黑金',
   }
   return aliases[theme.id] ?? theme.name.replace(/^\d+\s*/, '')
+}
+
+function setRingCustomColor(event: Event) {
+  store.setRingCustomColor((event.target as HTMLInputElement).value)
+}
+
+function setBarCustomColor(event: Event) {
+  store.setBarCustomColor((event.target as HTMLInputElement).value)
 }
 </script>
 
@@ -149,6 +158,16 @@ function themeLabel(theme: Theme) {
         <span>{{ mode.label }}</span>
         <Check v-if="mode.id === config.ringColorMode" class="h-3.5 w-3.5" aria-hidden="true" />
       </label>
+      <label v-if="config.ringColorMode === 'custom'" class="custom-color-field">
+        <span>自定义颜色</span>
+        <input
+          data-testid="ring-custom-color"
+          type="color"
+          :value="config.ringCustomColor"
+          @input="setRingCustomColor"
+        />
+        <output>{{ config.ringCustomColor.toUpperCase() }}</output>
+      </label>
     </fieldset>
 
     <fieldset class="property-group">
@@ -169,6 +188,16 @@ function themeLabel(theme: Theme) {
         />
         <span>{{ mode.label }}</span>
         <Check v-if="mode.id === config.barColorMode" class="h-3.5 w-3.5" aria-hidden="true" />
+      </label>
+      <label v-if="config.barColorMode === 'custom'" class="custom-color-field">
+        <span>自定义颜色</span>
+        <input
+          data-testid="bar-custom-color"
+          type="color"
+          :value="config.barCustomColor"
+          @input="setBarCustomColor"
+        />
+        <output>{{ config.barCustomColor.toUpperCase() }}</output>
       </label>
     </fieldset>
   </div>

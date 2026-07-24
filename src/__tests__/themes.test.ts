@@ -150,7 +150,7 @@ describe('dashboard themes', () => {
     expect(theme.variables['--data-ring']).toBe('#1677ff')
     expect(theme.variables['--data-pie-primary']).toBe('#237804')
     expect(theme.variables['--data-health-pie-good']).toBe('#237804')
-    expect(theme.variables['--data-inspection-pie-finished']).toBe('#237804')
+    expect(theme.variables['--data-inspection-pie-finished']).toBe('#1677ff')
     expect(theme.variables['--data-inspection-line']).toBe('#20b486')
     expect(theme.variables['--data-health-pie-pending']).toBe('#7c3aed')
     expect(theme.variables['--good']).toBe('#2fbf8f')

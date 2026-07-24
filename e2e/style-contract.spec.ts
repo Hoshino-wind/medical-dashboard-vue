@@ -33,7 +33,7 @@ test.describe('渲染样式与交互契约', () => {
 
     await expect(page.locator('.panel-border-flow').first()).toHaveCSS('animation-name', 'none')
     await expect(page.locator('.hologram-gauge-base').first()).toHaveCSS('filter', 'none')
-    await expect(page.locator('.work-order-summary > div')).toHaveCount(4)
+    await expect(page.locator('.work-order-summary')).toHaveCount(0)
 
     const rootAccent = await page
       .locator('html')
@@ -50,12 +50,12 @@ test.describe('渲染样式与交互契约', () => {
     await expect(switchButton).toHaveCSS('opacity', '1')
   })
 
-  test('浅色立体边框模式使用单层玻璃并禁用机械贴图', async ({ page }) => {
+  test('浅色立体边框模式使用单层玻璃与矢量切角框', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem(
         'medical-dashboard-config',
         JSON.stringify({
-          schemaVersion: 2,
+          schemaVersion: 3,
           themeId: 'light-medical',
           panelStyle: 'chamfered-instrument',
           layout: '3x3',
@@ -67,7 +67,10 @@ test.describe('渲染样式与交互契约', () => {
     const shell = page.locator('.dashboard-shell')
     await expect(shell).toHaveAttribute('data-theme-mode', 'light')
     await expect(shell).toHaveAttribute('data-panel-style', 'chamfered-instrument')
-    await expect(page.locator('.mechanical-frame').first()).toHaveCSS('display', 'none')
+    const mechanicalFrame = page.locator('.mechanical-frame--panel').first()
+    await expect(mechanicalFrame).toHaveCSS('display', 'block')
+    await expect(mechanicalFrame).toHaveCSS('border-image-source', 'none')
+    await expect(mechanicalFrame).toHaveCSS('clip-path', /polygon/)
 
     const panelStyles = await page
       .locator('.screen-grid .panel')
@@ -79,9 +82,9 @@ test.describe('渲染样式与交互契约', () => {
           backdropFilter: style.backdropFilter || style.getPropertyValue('-webkit-backdrop-filter'),
         }
       })
-    expect(panelStyles.borderRadius).toBeGreaterThan(0)
+    expect(panelStyles.borderRadius).toBe(0)
     expect(panelStyles.backdropFilter).toContain('blur')
 
-    await expect(page.locator('.panel-title-ornament').first()).toHaveCSS('display', 'none')
+    await expect(page.locator('.panel-title-ornament').first()).toHaveCSS('display', 'block')
   })
 })

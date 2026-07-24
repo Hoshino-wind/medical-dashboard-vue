@@ -1,12 +1,15 @@
 /* 浅色主题下的仪表环与全息底座覆盖 */
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-base {
-  --holo-shell-dark: #a8bacb;
-  --holo-deck-dark: #d5e1eb;
-  --holo-aperture-dark: #afc1d2;
-  --holo-shadow: rgba(73, 103, 132, 0.2);
-  --holo-emitter-min: 0.42;
-  --holo-emitter-max: 0.68;
-  opacity: calc(0.72 * var(--gauge-base-density, 1));
+  --gauge-base-tone: var(--gauge-tone);
+  --gauge-base-tone-soft: color-mix(in srgb, var(--gauge-tone) 80%, #ffffff 20%);
+  --gauge-base-tone-bright: color-mix(in srgb, var(--gauge-tone) 52%, #ffffff 48%);
+  --holo-shell-dark: #6685a3;
+  --holo-deck-dark: #9fb8cf;
+  --holo-aperture-dark: #6f91b3;
+  --holo-shadow: rgba(41, 78, 114, 0.38);
+  --holo-emitter-min: 0.58;
+  --holo-emitter-max: 0.88;
+  opacity: calc(1 * var(--gauge-base-density, 1));
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-ring {
@@ -77,100 +80,102 @@
 }
 
 /*
- * 浅色主题下全息底座（.gauge-base-*）的覆盖：主体采用雾银医疗仪器材质，
- * 档位色只保留在发射窗与少量状态线。放在全局这里而非 HologramGaugeBase.vue 的 scoped 样式，
+ * 浅色主题下全息底座（.gauge-base-*）的覆盖：主体采用高对比雾银医疗仪器材质，
+ * 用蓝灰壳体托住更饱和的档位色。放在全局这里而非 HologramGaugeBase.vue 的 scoped 样式，
  * 因为 Vue scoped 会把 `:global(A) .b` 编译成只剩 `A`，使 opacity 误落到 .dashboard-shell。
  */
 .dashboard-shell[data-theme-mode='light'] .gauge-base-glow {
-  opacity: 0.26;
+  opacity: 0.48;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-ground-shadow {
-  opacity: 0.16;
+  opacity: 0.38;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-beam--outer {
-  opacity: 0.08;
+  opacity: 0.18;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-beam--inner {
-  opacity: 0.13;
+  opacity: 0.3;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-beam--core {
-  opacity: 0.24;
+  opacity: 0.46;
 }
 
 .dashboard-shell[data-theme-mode='light'] .hologram-gauge-volume {
-  --holo-volume-min: 0.035;
-  --holo-volume-max: 0.085;
+  --holo-volume-min: 0.08;
+  --holo-volume-max: 0.18;
   mix-blend-mode: multiply;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-rotor-rail {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 78%, var(--gauge-tone));
-  opacity: 0.32;
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 58%, var(--gauge-tone) 42%);
+  opacity: 0.56;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-rotor-spokes {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 76%, var(--gauge-tone));
-  opacity: 0.18;
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 56%, var(--gauge-tone) 44%);
+  opacity: 0.32;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-rotor-nodes circle {
-  fill: color-mix(in srgb, var(--gauge-tone) 32%, #ffffff 68%);
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 66%, var(--gauge-tone));
-  opacity: 0.5;
+  fill: color-mix(in srgb, var(--gauge-tone) 54%, #ffffff 46%);
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 50%, var(--gauge-tone) 50%);
+  opacity: 0.72;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-wall {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 46%, #ffffff 54%);
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 76%, var(--gauge-tone) 24%);
+  stroke-width: 1.1;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-deck {
-  stroke: color-mix(in srgb, var(--instrument-base-rim) 52%, #ffffff 48%);
-  filter: none;
+  stroke: color-mix(in srgb, var(--instrument-base-rim) 65%, var(--gauge-tone) 35%);
+  stroke-width: 1.1;
+  filter: drop-shadow(0 1.5px 2px rgba(38, 76, 112, 0.22));
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-deck--top {
-  stroke: color-mix(in srgb, var(--gauge-tone) 24%, var(--instrument-base-rim));
-  opacity: 0.68;
-  filter: none;
+  stroke: color-mix(in srgb, var(--gauge-tone) 48%, var(--instrument-base-rim) 52%);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gauge-tone) 28%, transparent));
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-aperture {
-  stroke: color-mix(in srgb, var(--gauge-tone) 38%, #ffffff 62%);
-  opacity: 0.72;
-  filter: none;
+  stroke: color-mix(in srgb, var(--gauge-tone) 62%, #ffffff 38%);
+  opacity: 0.94;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gauge-tone) 34%, transparent));
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-aperture-ring {
-  stroke: color-mix(in srgb, var(--gauge-tone) 44%, var(--instrument-base-rim));
-  opacity: 0.48;
+  stroke: color-mix(in srgb, var(--gauge-tone) 65%, var(--instrument-base-rim) 35%);
+  opacity: 0.72;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-status-window {
-  opacity: 0.38;
-  filter: none;
+  opacity: 0.72;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--gauge-tone) 36%, transparent));
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-fastener {
-  opacity: 0.4;
+  opacity: 0.64;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-rim {
-  opacity: 0.58;
+  opacity: 0.88;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-front {
-  stroke: color-mix(in srgb, var(--gauge-tone) 46%, var(--instrument-base-rim));
-  opacity: 0.46;
+  stroke: color-mix(in srgb, var(--gauge-tone) 66%, var(--instrument-base-rim) 34%);
+  opacity: 0.78;
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-dot {
-  fill: color-mix(in srgb, var(--gauge-tone) 52%, #ffffff 48%);
+  fill: color-mix(in srgb, var(--gauge-tone) 72%, #ffffff 28%);
 }
 
 .dashboard-shell[data-theme-mode='light'] .gauge-base-lglow {
-  opacity: 0.22;
+  opacity: 0.38;
 }

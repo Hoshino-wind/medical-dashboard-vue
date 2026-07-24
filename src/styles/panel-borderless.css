@@ -30,10 +30,7 @@
   display: none;
 }
 
-.dashboard-shell[data-panel-style='borderless']
-  .screen-grid
-  > .panel
-  > .panel-border-flow {
+.dashboard-shell[data-panel-style='borderless'] .screen-grid > .panel > .panel-border-flow {
   display: none;
 }
 
@@ -55,12 +52,13 @@
   overflow: hidden;
   border: 0;
   border-radius: 0.375rem;
-  background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--text) 54%, var(--panel-title-primary) 46%),
-      var(--panel-title-primary)
-    )
-    left 0.75rem center / 0.1875rem 1rem no-repeat,
+  background:
+    linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--text) 54%, var(--panel-title-primary) 46%),
+        var(--panel-title-primary)
+      )
+      left 0.75rem center / 0.1875rem 1rem no-repeat,
     linear-gradient(
       90deg,
       color-mix(in srgb, var(--panel-title-primary) 20%, var(--surface-strong)) 0%,
@@ -72,33 +70,21 @@
     inset 0 0.25rem 0.75rem color-mix(in srgb, var(--glass-highlight) 8%, transparent);
 }
 
-.dashboard-shell[data-panel-style='borderless']
-  .screen-grid
-  > .panel
-  .panel-title-mini-bars {
+.dashboard-shell[data-panel-style='borderless'] .screen-grid > .panel .panel-title-mini-bars {
   display: none;
 }
 
-.dashboard-shell[data-panel-style='borderless']
-  .screen-grid
-  > .panel
-  .panel-title-text {
+.dashboard-shell[data-panel-style='borderless'] .screen-grid > .panel .panel-title-text {
   padding: 0;
   line-height: 1.1;
   letter-spacing: 0.04em;
 }
 
-.dashboard-shell[data-panel-style='borderless']
-  .screen-grid
-  > .panel
-  .panel-title-text::after {
+.dashboard-shell[data-panel-style='borderless'] .screen-grid > .panel .panel-title-text::after {
   display: none;
 }
 
-.dashboard-shell[data-panel-style='borderless']
-  .screen-grid
-  > .panel
-  .panel-title-suffix {
+.dashboard-shell[data-panel-style='borderless'] .screen-grid > .panel .panel-title-suffix {
   margin-left: 0.5rem;
   padding: 0.1875rem 0.375rem;
   border-radius: 62.4375rem;
@@ -107,39 +93,68 @@
   color: color-mix(in srgb, var(--muted) 82%, var(--text) 18%);
 }
 
-.dashboard-shell[data-theme-mode='light'][data-panel-style='borderless']
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
   .screen-grid
   > .panel {
   border: 0;
-  background:
-    radial-gradient(circle at 12% 0%, rgba(66, 183, 235, 0.1), transparent 42%),
-    linear-gradient(155deg, rgba(255, 255, 255, 0.78), rgba(242, 249, 253, 0.58));
-  box-shadow:
-    0 0.85rem 1.9rem rgba(41, 71, 115, 0.13),
-    0 0.2rem 0.55rem rgba(41, 71, 115, 0.07),
-    inset 0 0.6rem 1.5rem rgba(255, 255, 255, 0.34),
-    inset 0 -0.75rem 1.5rem rgba(98, 147, 184, 0.06);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 0.5rem 1.5rem rgba(41, 71, 115, 0.045);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
-.dashboard-shell[data-theme-mode='light'][data-panel-style='borderless']
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
+  .screen-grid
+  > .panel:hover {
+  border: 0;
+  box-shadow: 0 0.625rem 1.75rem rgba(41, 71, 115, 0.06);
+  transform: translateY(-0.0625rem);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
   .screen-grid
   > .panel
   .panel-title-frame {
-  background: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--text) 42%, var(--panel-title-primary) 58%),
-      var(--panel-title-primary)
-    )
-    left 0.75rem center / 0.1875rem 1rem no-repeat,
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--accent) 13%, rgba(255, 255, 255, 0.9)),
-      rgba(255, 255, 255, 0.44) 68%,
-      transparent
-    );
-  box-shadow:
-    0 0.35rem 0.9rem rgba(44, 80, 116, 0.1),
-    inset 0 0.25rem 0.75rem rgba(255, 255, 255, 0.34);
+  min-height: 1.875rem;
+  padding: 0.125rem 0.75rem;
+  overflow: visible;
+  border-left: 0.1875rem solid var(--accent);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
+  .screen-grid
+  > .panel
+  .panel-title-text {
+  padding-bottom: 0.25rem;
+  text-align: left;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
+  .screen-grid
+  > .panel
+  .panel-title-text::after {
+  display: block;
+  left: 0;
+  width: 100%;
+  height: 0.0625rem;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.5;
+  transform: none;
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='borderless']
+  .screen-grid
+  > .panel
+  .panel-title-suffix {
+  margin-left: 0.375rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -151,4 +166,3 @@
     transform: none;
   }
 }
-

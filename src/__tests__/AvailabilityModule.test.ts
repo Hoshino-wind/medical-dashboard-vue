@@ -5,11 +5,31 @@ import { nextTick } from 'vue'
 import AvailabilityModule from '@/components/modules/AvailabilityModule.vue'
 
 const RingStub = {
-  props: ['value', 'label', 'count'],
+  name: 'AvailabilityMetricRing',
+  props: ['value', 'label', 'count', 'tone', 'colorMode'],
   template: '<div class="ring-stub">{{ label }} {{ value }} {{ count }}</div>',
 }
 
 describe('availability module pagination', () => {
+  it('passes a validated custom color to every ring as a solid skin', () => {
+    const wrapper = mount(AvailabilityModule, {
+      props: {
+        items: [
+          { name: '除颤监护仪', value: 92.6, count: 68 },
+          { name: '呼吸机', value: 42, count: 7 },
+        ],
+        ringColorMode: 'custom',
+        ringCustomColor: '#f05a28',
+      },
+      global: { stubs: { AvailabilityMetricRing: RingStub } },
+    })
+
+    const rings = wrapper.findAllComponents(RingStub)
+    expect(rings).toHaveLength(2)
+    expect(rings.every((ring) => ring.props('tone') === '#f05a28')).toBe(true)
+    expect(rings.every((ring) => ring.props('colorMode') === 'solid')).toBe(true)
+  })
+
   it('marks the window as paginating and renders only the current page when more items are provided', () => {
     const wrapper = mount(AvailabilityModule, {
       props: {

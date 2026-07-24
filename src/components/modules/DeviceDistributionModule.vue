@@ -12,9 +12,12 @@ const props = withDefaults(
     items: DeviceDistributionItem[]
     /** 进度条配色模式,由上层配置(moduleRegistry)注入,不再直接读 store */
     barColorMode?: ColorMode
+    /** custom 模式使用的统一进度条色 */
+    barCustomColor?: string
   }>(),
   {
     barColorMode: 'gradient',
+    barCustomColor: '#20b486',
   },
 )
 
@@ -47,6 +50,7 @@ const { currentIndex } = usePagedCarousel({
   <div
     class="device-distribution"
     :class="`bar-${barColorMode}`"
+    :style="{ '--custom-bar-color': barCustomColor }"
     aria-label="设备分布台数占比"
   >
     <Transition name="dist-flip" mode="out-in">
@@ -187,6 +191,13 @@ const { currentIndex } = usePagedCarousel({
     0 0 0.5rem color-mix(in srgb, var(--data-bar) 40%, transparent),
     inset 0 0.0625rem 0 color-mix(in srgb, #ffffff 42%, transparent);
 }
+/* 自定义色模式：沿用纯色材质，只替换业务配置色。 */
+.device-distribution.bar-custom .device-distribution-bar {
+  background: var(--custom-bar-color);
+  box-shadow:
+    0 0 0.5rem color-mix(in srgb, var(--custom-bar-color) 40%, transparent),
+    inset 0 0.0625rem 0 color-mix(in srgb, #ffffff 42%, transparent);
+}
 </style>
 
 <!-- 浅色主题覆盖:引用祖先 .dashboard-shell,必须走全局(scoped 会把祖先也加 data-v 而失配) -->
@@ -217,5 +228,9 @@ const { currentIndex } = usePagedCarousel({
 .dashboard-shell[data-theme-mode='light'] .device-distribution.bar-solid .device-distribution-bar {
   background: var(--data-bar);
   box-shadow: 0 0 0.65rem color-mix(in srgb, var(--data-bar) 32%, transparent);
+}
+.dashboard-shell[data-theme-mode='light'] .device-distribution.bar-custom .device-distribution-bar {
+  background: var(--custom-bar-color);
+  box-shadow: 0 0 0.65rem color-mix(in srgb, var(--custom-bar-color) 32%, transparent);
 }
 </style>

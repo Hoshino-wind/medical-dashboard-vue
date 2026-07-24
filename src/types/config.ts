@@ -1,7 +1,7 @@
 import type { ThemeId } from './theme'
 import type { ChartModuleId, ModuleId } from './module'
 
-export const CURRENT_DASHBOARD_CONFIG_VERSION = 2 as const
+export const CURRENT_DASHBOARD_CONFIG_VERSION = 3 as const
 
 /** 布局类型:2行3列 / 3行3列 */
 export type LayoutType = '2x3' | '3x3'
@@ -10,8 +10,8 @@ export type LayoutType = '2x3' | '3x3'
 export const PANEL_STYLES = ['glass-flow', 'borderless', 'chamfered-instrument'] as const
 export type PanelStyle = (typeof PANEL_STYLES)[number]
 
-/** 配色模式:纯色 / 渐变色(环图与进度条通用) */
-export const COLOR_MODES = ['solid', 'gradient'] as const
+/** 配色模式:纯色 / 渐变色 / 自定义色(环图与进度条通用) */
+export const COLOR_MODES = ['solid', 'gradient', 'custom'] as const
 export type ColorMode = (typeof COLOR_MODES)[number]
 
 /** 统计卡片的图表展示形态；只控制怎么画，不改变模块的数据来源。 */
@@ -26,8 +26,12 @@ export interface DashboardConfig {
   layout: LayoutType
   /** 环图配色模式 */
   ringColorMode: ColorMode
+  /** 环图自定义色；仅在 custom 模式生效 */
+  ringCustomColor: string
   /** 进度条配色模式(设备分布台数) */
   barColorMode: ColorMode
+  /** 进度条自定义色；仅在 custom 模式生效 */
+  barCustomColor: string
   /** 按模块 id 保存统计卡片的展示形态 */
   chartTypes: Record<ChartModuleId, ChartDisplayType>
   /** 唯一布局事实来源：数组下标就是大屏槽位。 */

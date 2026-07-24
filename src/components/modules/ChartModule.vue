@@ -34,7 +34,7 @@ const lineFooter = computed(() => {
     value: total,
     unit: '台次',
     trend: `${Math.abs(changeRatio).toFixed(1)}%`,
-    direction: delta >= 0 ? 'up' : 'down',
+    direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable',
   }
 })
 </script>
@@ -68,7 +68,7 @@ const lineFooter = computed(() => {
       </div>
       <div class="line-chart-trend" :class="`is-${lineFooter.direction}`">
         <span>环比上周</span>
-        <b>{{ lineFooter.direction === 'up' ? '↑' : '↓' }}</b>
+        <b>{{ lineFooter.direction === 'up' ? '↑' : lineFooter.direction === 'down' ? '↓' : '—' }}</b>
         <strong>{{ lineFooter.trend }}</strong>
       </div>
     </div>
@@ -140,10 +140,14 @@ const lineFooter = computed(() => {
 }
 .line-chart-trend.is-up b,
 .line-chart-trend.is-up strong {
-  color: var(--good);
+  color: var(--danger);
 }
 .line-chart-trend.is-down b,
 .line-chart-trend.is-down strong {
-  color: var(--danger);
+  color: var(--good);
+}
+.line-chart-trend.is-stable b,
+.line-chart-trend.is-stable strong {
+  color: var(--muted);
 }
 </style>

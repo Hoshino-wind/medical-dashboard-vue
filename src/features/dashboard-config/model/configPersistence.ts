@@ -15,6 +15,7 @@ import {
 import type { ChartModuleId } from '@/types/module'
 import type { ThemeId } from '@/types/theme'
 import { catalogModuleIds, normalizeSlotIds } from './layoutRules'
+import { normalizeDashboardCustomColor } from './customColor'
 
 export const DASHBOARD_CONFIG_STORAGE_KEY = 'medical-dashboard-config'
 
@@ -76,7 +77,12 @@ export function loadDashboardConfig(): DashboardConfig {
     ringColorMode: isColorMode(saved.ringColorMode)
       ? saved.ringColorMode
       : defaultConfig.ringColorMode,
+    ringCustomColor: normalizeDashboardCustomColor(
+      saved.ringCustomColor,
+      defaultConfig.ringCustomColor,
+    ),
     barColorMode: isColorMode(saved.barColorMode) ? saved.barColorMode : defaultConfig.barColorMode,
+    barCustomColor: normalizeDashboardCustomColor(saved.barCustomColor, defaultConfig.barCustomColor),
     chartTypes: normalizeChartTypes(saved.chartTypes),
     selectedModuleIds: normalizeSlotIds(savedSlots, layout),
   }
@@ -89,7 +95,9 @@ export function saveDashboardConfig(config: DashboardConfig): boolean {
     panelStyle: config.panelStyle,
     layout: config.layout,
     ringColorMode: config.ringColorMode,
+    ringCustomColor: config.ringCustomColor,
     barColorMode: config.barColorMode,
+    barCustomColor: config.barCustomColor,
     chartTypes: config.chartTypes,
     selectedModuleIds: config.selectedModuleIds,
   })
