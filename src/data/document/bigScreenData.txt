@@ -89,14 +89,14 @@ const fakeTableData = [
 
 保养统计：
 const fakechartData = {
-  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
-  UpKeepTotal: [200, 180, 250, 160, 190, 220]
+  subBusiness: ['07-18', '07-19', '07-20', '07-21', '07-22', '07-23', '07-24'],
+  UpKeepTotal: [150, 160, 180, 140, 160, 190, 220]
 }
 
 巡检统计：
 const fakechartData = {
-  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
-  InspectionTotal: [200, 180, 250, 160, 190, 220]
+  subBusiness: ['07-18', '07-19', '07-20', '07-21', '07-22', '07-23', '07-24'],
+  InspectionTotal: [150, 160, 180, 140, 160, 190, 220]
 }
 
 巡检工单：
@@ -289,8 +289,8 @@ const fakeList = [
 
 报修统计：
 const fakechartData = {
-  subBusiness: ['2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12'],
-  FullyInsuredDeviceTotal: [23, 11, 26, 18, 22, 20],
-  TechnicalInsuredDeviceTotal: [10, 48, 32, 42, 38, 40],
-  FactoryInsureDeviceTotal: [12, 36, 24, 30, 34, 32]
+  subBusiness: ['07-18', '07-19', '07-20', '07-21', '07-22', '07-23', '07-24'],
+  FullyInsuredDeviceTotal: [18, 23, 11, 26, 18, 22, 20],
+  TechnicalInsuredDeviceTotal: [34, 10, 48, 32, 42, 38, 40],
+  FactoryInsureDeviceTotal: [28, 12, 36, 24, 30, 34, 32]
 }
