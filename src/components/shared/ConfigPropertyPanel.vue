@@ -1,25 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Check } from 'lucide-vue-next'
 import { storeToRefs } from 'pinia'
 import { themes } from '@/data/themes'
 import { configurableChartModules } from '@/data/modules'
 import { useDashboardStore } from '@/stores/dashboard'
-import type { ChartDisplayType, ColorMode, LayoutType, PanelStyle } from '@/types/config'
+import type { ChartColorKind, ChartDisplayType, LayoutType, PanelStyle } from '@/types/config'
 import type { Theme, ThemeId } from '@/types/theme'
+import DashboardColorPicker from './DashboardColorPicker.vue'
 
 const store = useDashboardStore()
-const { config } = storeToRefs(store)
+const { activeTheme, config } = storeToRefs(store)
 
 const panelStyleOptions: Array<{ id: PanelStyle; label: string }> = [
   { id: 'glass-flow', label: '流光玻璃' },
   { id: 'borderless', label: '无边框' },
   { id: 'chamfered-instrument', label: '立体边框' },
-]
-
-const colorModeOptions: Array<{ id: ColorMode; label: string }> = [
-  { id: 'solid', label: '纯色' },
-  { id: 'gradient', label: '渐变色' },
-  { id: 'custom', label: '自定义' },
 ]
 
 const chartTypeOptions: Array<{ id: ChartDisplayType; label: string }> = [
@@ -38,13 +34,37 @@ function themeLabel(theme: Theme) {
   return aliases[theme.id] ?? theme.name.replace(/^\d+\s*/, '')
 }
 
-function setRingCustomColor(event: Event) {
-  store.setRingCustomColor((event.target as HTMLInputElement).value)
-}
-
-function setBarCustomColor(event: Event) {
-  store.setBarCustomColor((event.target as HTMLInputElement).value)
-}
+const chartColorControls = computed<
+  Array<{
+    id: ChartColorKind
+    label: string
+    description: string
+    value: string
+    overridden: boolean
+  }>
+>(() => [
+  {
+    id: 'ring',
+    label: '环图颜色',
+    description: '设备可用率环图',
+    value: config.value.chartColors.ring ?? activeTheme.value.variables['--data-ring'],
+    overridden: config.value.chartColors.ring !== null,
+  },
+  {
+    id: 'pie',
+    label: '饼图颜色',
+    description: '完成率与健康状态主色',
+    value: config.value.chartColors.pie ?? activeTheme.value.variables['--data-pie-primary'],
+    overridden: config.value.chartColors.pie !== null,
+  },
+  {
+    id: 'bar',
+    label: '柱状图颜色',
+    description: '统计柱状图与占比条',
+    value: config.value.chartColors.bar ?? activeTheme.value.variables['--data-bar'],
+    overridden: config.value.chartColors.bar !== null,
+  },
+])
 </script>
 
 <template>
@@ -139,66 +159,20 @@ function setBarCustomColor(event: Event) {
       </div>
     </fieldset>
 
-    <fieldset class="property-group">
-      <legend>环图配色</legend>
-      <label
-        v-for="mode in colorModeOptions"
-        :key="`ring-${mode.id}`"
-        class="property-radio color-mode-radio"
-        :class="{ active: mode.id === config.ringColorMode }"
-      >
-        <input
-          :data-testid="`ring-color-mode-${mode.id}`"
-          type="radio"
-          name="ring-color-mode"
-          :value="mode.id"
-          :checked="mode.id === config.ringColorMode"
-          @change="store.setRingColorMode(mode.id)"
-        />
-        <span>{{ mode.label }}</span>
-        <Check v-if="mode.id === config.ringColorMode" class="h-3.5 w-3.5" aria-hidden="true" />
-      </label>
-      <label v-if="config.ringColorMode === 'custom'" class="custom-color-field">
-        <span>自定义颜色</span>
-        <input
-          data-testid="ring-custom-color"
-          type="color"
-          :value="config.ringCustomColor"
-          @input="setRingCustomColor"
-        />
-        <output>{{ config.ringCustomColor.toUpperCase() }}</output>
-      </label>
-    </fieldset>
-
-    <fieldset class="property-group">
-      <legend>进度条配色</legend>
-      <label
-        v-for="mode in colorModeOptions"
-        :key="`bar-${mode.id}`"
-        class="property-radio color-mode-radio"
-        :class="{ active: mode.id === config.barColorMode }"
-      >
-        <input
-          :data-testid="`bar-color-mode-${mode.id}`"
-          type="radio"
-          name="bar-color-mode"
-          :value="mode.id"
-          :checked="mode.id === config.barColorMode"
-          @change="store.setBarColorMode(mode.id)"
-        />
-        <span>{{ mode.label }}</span>
-        <Check v-if="mode.id === config.barColorMode" class="h-3.5 w-3.5" aria-hidden="true" />
-      </label>
-      <label v-if="config.barColorMode === 'custom'" class="custom-color-field">
-        <span>自定义颜色</span>
-        <input
-          data-testid="bar-custom-color"
-          type="color"
-          :value="config.barCustomColor"
-          @input="setBarCustomColor"
-        />
-        <output>{{ config.barCustomColor.toUpperCase() }}</output>
-      </label>
+    <fieldset class="property-group chart-color-group">
+      <legend>图表颜色设置</legend>
+      <DashboardColorPicker
+        v-for="item in chartColorControls"
+        :key="item.id"
+        :label="item.label"
+        :description="item.description"
+        :value="item.value"
+        :overridden="item.overridden"
+        :test-id="`${item.id}-color-picker`"
+        :dark="activeTheme.mode === 'dark'"
+        @change="store.setChartColor(item.id, $event)"
+        @reset="store.resetChartColor(item.id)"
+      />
     </fieldset>
   </div>
 </template>

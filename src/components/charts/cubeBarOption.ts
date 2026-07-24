@@ -53,7 +53,7 @@ export function buildCubeBarOption({
   const text = token('--text')
   const muted = token('--muted')
   const grid = token('--chart-grid')
-  const dataBar = token('--data-bar')
+  const dataBar = seriesTones[0]?.base ?? token('--data-bar')
   const instrumentBase = token('--instrument-base')
   const instrumentBaseRim = token('--instrument-base-rim')
   const surface = token('--surface')

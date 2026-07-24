@@ -5,15 +5,17 @@ describe('theme color helpers', () => {
   it('applies alpha to hex colors', () => {
     expect(colorWithAlpha('#2b6dff', 0.42)).toBe('rgba(43, 109, 255, 0.42)')
     expect(colorWithAlpha('#0af', 0.8)).toBe('rgba(0, 170, 255, 0.8)')
+    expect(colorWithAlpha('#1677ff80', 0.5)).toBe('rgba(22, 119, 255, 0.251)')
   })
 
   it('applies alpha to rgb and rgba colors', () => {
     expect(colorWithAlpha('rgb(10, 20, 30)', 0.5)).toBe('rgba(10, 20, 30, 0.5)')
-    expect(colorWithAlpha('rgba(10, 20, 30, 0.9)', 0.2)).toBe('rgba(10, 20, 30, 0.2)')
+    expect(colorWithAlpha('rgba(10, 20, 30, 0.9)', 0.2)).toBe('rgba(10, 20, 30, 0.18)')
   })
 
   it('mixes parseable colors and clamps the target ratio', () => {
     expect(mixColor('#000000', '#ffffff', 0.25)).toBe('rgb(64, 64, 64)')
     expect(mixColor('#1677ff', '#ffffff', 2)).toBe('rgb(255, 255, 255)')
+    expect(mixColor('#1677ff80', '#ffffff', 0.5)).toBe('rgba(139, 187, 255, 0.502)')
   })
 })

@@ -55,7 +55,7 @@ test.describe('渲染样式与交互契约', () => {
       window.localStorage.setItem(
         'medical-dashboard-config',
         JSON.stringify({
-          schemaVersion: 3,
+          schemaVersion: 4,
           themeId: 'light-medical',
           panelStyle: 'chamfered-instrument',
           layout: '3x3',

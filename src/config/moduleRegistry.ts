@@ -43,8 +43,8 @@ function resolveAvailability(
   return {
     items: ctx.data[module.dataKey],
     variant: module.variant,
-    ringColorMode: ctx.config.ringColorMode,
-    ringCustomColor: ctx.config.ringCustomColor,
+    ringColorMode: ctx.config.chartColors.ring ? 'custom' : 'solid',
+    ringCustomColor: ctx.config.chartColors.ring ?? undefined,
   }
 }
 
@@ -58,6 +58,7 @@ function resolveCartesian(
     seriesName: module.chart.seriesName,
     data: ctx.data[module.dataKey],
     theme: ctx.theme,
+    barColor: ctx.config.chartColors.bar ?? undefined,
   }
 }
 
@@ -74,19 +75,27 @@ export const moduleRegistry: ModuleRegistry = {
   availability: { component: AvailabilityModule, resolveProps: resolveAvailability },
   completion: {
     component: CompletionModule,
-    resolveProps: (module, ctx) => ({ data: ctx.data[module.dataKey], theme: ctx.theme }),
+    resolveProps: (module, ctx) => ({
+      data: ctx.data[module.dataKey],
+      theme: ctx.theme,
+      pieColor: ctx.config.chartColors.pie ?? undefined,
+    }),
   },
   line: { component: ChartModule, resolveProps: resolveCartesian },
   health: {
     component: HealthTrendModule,
-    resolveProps: (module, ctx) => ({ data: ctx.data[module.dataKey], theme: ctx.theme }),
+    resolveProps: (module, ctx) => ({
+      data: ctx.data[module.dataKey],
+      theme: ctx.theme,
+      pieColor: ctx.config.chartColors.pie ?? undefined,
+    }),
   },
   distribution: {
     component: DeviceDistributionModule,
     resolveProps: (module, ctx) => ({
       items: ctx.data[module.dataKey],
-      barColorMode: ctx.config.barColorMode,
-      barCustomColor: ctx.config.barCustomColor,
+      barColorMode: ctx.config.chartColors.bar ? 'custom' : 'gradient',
+      barCustomColor: ctx.config.chartColors.bar ?? undefined,
     }),
   },
 }

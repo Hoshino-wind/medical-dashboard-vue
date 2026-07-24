@@ -10,6 +10,8 @@ import type { Theme } from '@/types/theme'
 const props = defineProps<{
   data: HealthTrendData
   theme: Theme
+  /** 用户配置的饼图主色；空值表示使用主题色。 */
+  pieColor?: string
 }>()
 
 const healthHeaders = ['设备范围', '健康状态', '数量', '处置建议']
@@ -23,7 +25,7 @@ const pieItems = computed(() => {
     {
       name: '运行正常',
       value: props.data.online,
-      color: props.theme.variables['--data-health-pie-good'],
+      color: props.pieColor ?? props.theme.variables['--data-health-pie-good'],
     },
     {
       name: '维保预警',
@@ -81,7 +83,7 @@ const pieTotal = computed(
       <HealthPieChart
         :items="pieItems"
         :total="pieTotal"
-        :tone="theme.variables['--data-health-pie-good']"
+        :tone="pieColor ?? theme.variables['--data-health-pie-good']"
         :theme="theme"
       />
     </aside>

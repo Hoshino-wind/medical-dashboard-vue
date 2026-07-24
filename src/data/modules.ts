@@ -147,10 +147,11 @@ export const defaultConfig: DashboardConfig = {
   themeId: 'deep-sea-instrument',
   panelStyle: 'glass-flow',
   layout: '3x3',
-  ringColorMode: 'solid',
-  ringCustomColor: '#1677ff',
-  barColorMode: 'gradient',
-  barCustomColor: '#20b486',
+  chartColors: {
+    ring: null,
+    pie: null,
+    bar: null,
+  },
   chartTypes,
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),
 }

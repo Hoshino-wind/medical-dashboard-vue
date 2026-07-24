@@ -67,6 +67,7 @@ describe('work order style panels', () => {
     const wrapper = mount(HealthTrendModule, {
       props: {
         theme: themes[0],
+        pieColor: '#20b486',
         data: {
           online: 15744,
           warning: 68,
@@ -110,10 +111,39 @@ describe('work order style panels', () => {
     expect(wrapper.text()).toContain('待保养102台')
     expect(wrapper.find('[data-test="pie-chart"]').exists()).toBe(true)
     const pie = wrapper.findComponent(PieStub)
-    expect(pie.props('tone')).toBe('#1677ff')
+    expect(pie.props('tone')).toBe('#20b486')
     expect(pie.props('items')[0]).toMatchObject({
       name: '运行正常',
-      color: '#1677ff',
+      color: '#20b486',
+    })
+  })
+
+  it('applies the configured pie color to the completion chart primary segment', () => {
+    const wrapper = mount(CompletionModule, {
+      props: {
+        pieColor: '#f05a28',
+        data: {
+          rate: 75,
+          total: 20,
+          finished: 15,
+          waiting: 5,
+          overdue: 0,
+          rows: [],
+        },
+      },
+      global: {
+        stubs: {
+          CountUp: CountUpStub,
+          Pie3D: PieStub,
+        },
+      },
+    })
+
+    const pie = wrapper.findComponent(PieStub)
+    expect(pie.props('tone')).toBe('#f05a28')
+    expect(pie.props('items')[0]).toMatchObject({
+      name: '已完成',
+      color: '#f05a28',
     })
   })
 

@@ -3,11 +3,10 @@ import { themes } from '@/data/themes'
 import { readStorage, writeStorage } from '@/utils/storage'
 import {
   CHART_DISPLAY_TYPES,
-  COLOR_MODES,
   CURRENT_DASHBOARD_CONFIG_VERSION,
   PANEL_STYLES,
   type ChartDisplayType,
-  type ColorMode,
+  type ChartColorOverrides,
   type DashboardConfig,
   type LayoutType,
   type PanelStyle,
@@ -15,7 +14,7 @@ import {
 import type { ChartModuleId } from '@/types/module'
 import type { ThemeId } from '@/types/theme'
 import { catalogModuleIds, normalizeSlotIds } from './layoutRules'
-import { normalizeDashboardCustomColor } from './customColor'
+import { isDashboardCustomColor } from './customColor'
 
 export const DASHBOARD_CONFIG_STORAGE_KEY = 'medical-dashboard-config'
 
@@ -33,10 +32,6 @@ function isLayout(value: unknown): value is LayoutType {
 
 function isPanelStyle(value: unknown): value is PanelStyle {
   return typeof value === 'string' && PANEL_STYLES.some((style) => style === value)
-}
-
-function isColorMode(value: unknown): value is ColorMode {
-  return typeof value === 'string' && COLOR_MODES.some((mode) => mode === value)
 }
 
 function isChartDisplayType(value: unknown): value is ChartDisplayType {
@@ -61,6 +56,30 @@ function normalizeChartTypes(value: unknown): Record<ChartModuleId, ChartDisplay
   ) as Record<ChartModuleId, ChartDisplayType>
 }
 
+function normalizeOptionalColor(value: unknown): string | null {
+  return isDashboardCustomColor(value) ? value.toLowerCase() : null
+}
+
+function normalizeChartColors(saved: Record<string, unknown>): ChartColorOverrides {
+  const savedColors = isRecord(saved.chartColors) ? saved.chartColors : null
+
+  if (savedColors) {
+    return {
+      ring: normalizeOptionalColor(savedColors.ring),
+      pie: normalizeOptionalColor(savedColors.pie),
+      bar: normalizeOptionalColor(savedColors.bar),
+    }
+  }
+
+  // v3 及更早版本只有环图/进度条的 custom 模式；仅迁移真正生效的覆盖色。
+  return {
+    ring:
+      saved.ringColorMode === 'custom' ? normalizeOptionalColor(saved.ringCustomColor) : null,
+    pie: null,
+    bar: saved.barColorMode === 'custom' ? normalizeOptionalColor(saved.barCustomColor) : null,
+  }
+}
+
 /** 读取任意历史版本并归一化为当前配置；旧 moduleOrder 只用于一次性迁移槽位。 */
 export function loadDashboardConfig(): DashboardConfig {
   const stored = readStorage<unknown>(DASHBOARD_CONFIG_STORAGE_KEY)
@@ -74,15 +93,7 @@ export function loadDashboardConfig(): DashboardConfig {
     themeId: isThemeId(saved.themeId) ? saved.themeId : defaultConfig.themeId,
     panelStyle: isPanelStyle(saved.panelStyle) ? saved.panelStyle : defaultConfig.panelStyle,
     layout,
-    ringColorMode: isColorMode(saved.ringColorMode)
-      ? saved.ringColorMode
-      : defaultConfig.ringColorMode,
-    ringCustomColor: normalizeDashboardCustomColor(
-      saved.ringCustomColor,
-      defaultConfig.ringCustomColor,
-    ),
-    barColorMode: isColorMode(saved.barColorMode) ? saved.barColorMode : defaultConfig.barColorMode,
-    barCustomColor: normalizeDashboardCustomColor(saved.barCustomColor, defaultConfig.barCustomColor),
+    chartColors: normalizeChartColors(saved),
     chartTypes: normalizeChartTypes(saved.chartTypes),
     selectedModuleIds: normalizeSlotIds(savedSlots, layout),
   }
@@ -94,10 +105,7 @@ export function saveDashboardConfig(config: DashboardConfig): boolean {
     themeId: config.themeId,
     panelStyle: config.panelStyle,
     layout: config.layout,
-    ringColorMode: config.ringColorMode,
-    ringCustomColor: config.ringCustomColor,
-    barColorMode: config.barColorMode,
-    barCustomColor: config.barCustomColor,
+    chartColors: { ...config.chartColors },
     chartTypes: config.chartTypes,
     selectedModuleIds: config.selectedModuleIds,
   })

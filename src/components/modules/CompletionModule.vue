@@ -8,10 +8,13 @@ import { pxToRem } from '@/utils/rem'
 import { usePagedList } from '@/composables/usePagedList'
 import type { InspectionOrders } from '@/types/dashboard'
 import type { Theme } from '@/types/theme'
+import { mixColor } from '@/utils/themeColor'
 
 const props = defineProps<{
   data: InspectionOrders
   theme?: Theme
+  /** 用户配置的饼图主色；空值表示使用主题色。 */
+  pieColor?: string
 }>()
 
 const inspectionHeaders = ['所属科室', '设备名称', '剩余时间', '负责人']
@@ -29,6 +32,11 @@ function isLightTheme(theme: Theme | undefined): boolean {
   return theme?.mode === 'light'
 }
 
+const resolvedPieColor = computed(
+  () => props.pieColor ?? themeColor('--data-inspection-pie-finished', '#20e8ff'),
+)
+const pieAccent = computed(() => mixColor(resolvedPieColor.value, '#ffffff', 0.42))
+
 // 完成率进度环:亮弧 = 本月保养完成率(data.rate = 已完成÷总数),其余为暗色空轨道。
 // 与中心百分比同源(data.rate),保证「环的填充比例」与「中心数字」严格一致。
 const inspectionPieItems = computed(() => {
@@ -37,7 +45,7 @@ const inspectionPieItems = computed(() => {
     {
       name: '已完成',
       value: rate,
-      color: themeColor('--data-inspection-pie-finished', '#20e8ff'),
+      color: resolvedPieColor.value,
     },
     {
       name: '未完成',
@@ -81,7 +89,7 @@ const inspectionPieItems = computed(() => {
       <div class="pie-chart-shell inspection-pie-shell">
         <HologramGaugeBase
           class="inspection-pie-base"
-          :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
+          :tone="resolvedPieColor"
           :intensity="isLightTheme(theme) ? 0.86 : 0.96"
           :speed="7.2"
           direction="clockwise"
@@ -93,8 +101,8 @@ const inspectionPieItems = computed(() => {
           :thickness="7"
           :rotation="150"
           :theme="theme"
-          :tone="themeColor('--data-inspection-pie-finished', '#20e8ff')"
-          :accent="themeColor('--data-inspection-pie-waiting', '#7efcff')"
+          :tone="resolvedPieColor"
+          :accent="pieAccent"
         />
         <div class="pie-center-value"><CountUp :value="data.rate" :decimals="1" />%</div>
       </div>

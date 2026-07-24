@@ -2,6 +2,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import ConfigPanel from '@/components/shared/ConfigPanel.vue'
+import DashboardColorPicker from '@/components/shared/DashboardColorPicker.vue'
 import { useDashboardStore } from '@/stores/dashboard'
 
 describe('ConfigPanel workbench configuration', () => {
@@ -116,7 +117,7 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.panel-style-radio.active').text()).toContain('无边框')
   })
 
-  it('configures and persists custom colors for rings and progress bars', async () => {
+  it('configures, persists, and resets ring, pie, and bar colors', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
       global: {
@@ -126,25 +127,35 @@ describe('ConfigPanel workbench configuration', () => {
     })
     const store = useDashboardStore(pinia)
 
-    await wrapper.find('[data-testid="ring-color-mode-custom"]').setValue()
-    await wrapper.find('[data-testid="ring-custom-color"]').setValue('#f05a28')
-    await wrapper.find('[data-testid="bar-color-mode-custom"]').setValue()
-    await wrapper.find('[data-testid="bar-custom-color"]').setValue('#3456c8')
+    expect(wrapper.findAll('.dashboard-color-picker')).toHaveLength(3)
+
+    const colorPickers = wrapper.findAllComponents(DashboardColorPicker)
+    colorPickers[0].vm.$emit('change', '#f05a2880')
+    colorPickers[1].vm.$emit('change', '#20b48666')
+    colorPickers[2].vm.$emit('change', '#3456c8cc')
     await flushPromises()
 
-    expect(store.config.ringColorMode).toBe('custom')
-    expect(store.config.ringCustomColor).toBe('#f05a28')
-    expect(store.config.barColorMode).toBe('custom')
-    expect(store.config.barCustomColor).toBe('#3456c8')
-    expect(JSON.parse(window.localStorage.getItem('medical-dashboard-config') ?? '{}')).toMatchObject(
-      {
-        schemaVersion: 3,
-        ringColorMode: 'custom',
-        ringCustomColor: '#f05a28',
-        barColorMode: 'custom',
-        barCustomColor: '#3456c8',
+    expect(store.config.chartColors).toEqual({
+      ring: '#f05a2880',
+      pie: '#20b48666',
+      bar: '#3456c8cc',
+    })
+    expect(
+      JSON.parse(window.localStorage.getItem('medical-dashboard-config') ?? '{}'),
+    ).toMatchObject({
+      schemaVersion: 4,
+      chartColors: {
+        ring: '#f05a2880',
+        pie: '#20b48666',
+        bar: '#3456c8cc',
       },
-    )
+    })
+
+    await wrapper.find('[data-testid="pie-color-picker-reset"]').trigger('click')
+    await flushPromises()
+
+    expect(store.config.chartColors.pie).toBeNull()
+    expect(wrapper.findAll('.dashboard-color-picker-theme-state')).toHaveLength(1)
   })
 
   it('switches between 3x3 and 2x3 layout slot counts', async () => {

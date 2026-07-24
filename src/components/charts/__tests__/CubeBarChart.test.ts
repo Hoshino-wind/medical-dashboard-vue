@@ -135,6 +135,30 @@ describe('CubeBarChart', () => {
     wrapper.unmount()
   })
 
+  it('derives a distinct multi-series palette from the configured bar color', () => {
+    const wrapper = mount(CubeBarChart, {
+      props: {
+        data: chartData,
+        theme: themes[1],
+        barColor: '#3456c8',
+      },
+      global: {
+        stubs: {
+          EChart: EChartStub,
+        },
+      },
+    })
+
+    const legendStyles = wrapper
+      .findAll('.cube-bar-legend span')
+      .map((item) => item.attributes('style') ?? '')
+
+    expect(legendStyles[0]).toContain('52, 86, 200')
+    expect(new Set(legendStyles).size).toBe(3)
+
+    wrapper.unmount()
+  })
+
   it('renders each warranty type as a separate grouped column', async () => {
     const wrapper = mount(CubeBarChart, {
       props: {

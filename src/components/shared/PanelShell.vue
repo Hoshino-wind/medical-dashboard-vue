@@ -39,6 +39,7 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
         <span class="panel-title-text">
           {{ title }}
         </span>
+        <span v-if="subtitle" class="panel-title-suffix">（{{ subtitle }}）</span>
         <img
           class="panel-title-ornament panel-title-ornament--right"
           :src="panelTitleOrnamentRightUrl"
@@ -49,7 +50,6 @@ const panelVariantClass = computed(() => `panel--${props.variant}`)
           <i></i><i></i><i></i>
         </span>
       </h2>
-      <span v-if="subtitle" class="panel-title-suffix">（{{ subtitle }}）</span>
     </div>
     <div class="panel-body">
       <slot />

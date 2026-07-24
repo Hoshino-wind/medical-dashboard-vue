@@ -16,6 +16,8 @@ const props = defineProps<{
   seriesName: string
   data: CartesianChartData
   theme: Theme
+  /** 用户配置的柱状图主色；空值表示使用主题色板。 */
+  barColor?: string
 }>()
 
 const lineFooter = computed(() => {
@@ -51,6 +53,7 @@ const lineFooter = computed(() => {
         :data="data"
         :theme="theme"
         :series-name="seriesName"
+        :bar-color="barColor"
       />
       <LineAreaChart
         v-else

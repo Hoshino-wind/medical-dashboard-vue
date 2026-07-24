@@ -20,9 +20,9 @@ import { themes } from '@/data/themes'
 import {
   CHART_DISPLAY_TYPES,
   type ChartDisplayType,
+  type ChartColorKind,
   type LayoutType,
   type PanelStyle,
-  type ColorMode,
 } from '@/types/config'
 import type { ModuleCatalogItem, ModuleId } from '@/types/module'
 import type { Theme, ThemeId } from '@/types/theme'
@@ -59,24 +59,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
     config.panelStyle = panelStyle
   }
 
-  function setRingColorMode(mode: ColorMode) {
-    config.ringColorMode = mode
-  }
-
-  function setBarColorMode(mode: ColorMode) {
-    config.barColorMode = mode
-  }
-
-  function setRingCustomColor(color: string) {
+  function setChartColor(kind: ChartColorKind, color: string) {
     if (!isDashboardCustomColor(color)) return false
-    config.ringCustomColor = color.toLowerCase()
+    config.chartColors[kind] = color.toLowerCase()
     return true
   }
 
-  function setBarCustomColor(color: string) {
-    if (!isDashboardCustomColor(color)) return false
-    config.barCustomColor = color.toLowerCase()
-    return true
+  function resetChartColor(kind: ChartColorKind) {
+    config.chartColors[kind] = null
   }
 
   function setModuleChartType(moduleId: ModuleId, type: ChartDisplayType) {
@@ -149,6 +139,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   function resetConfig() {
     Object.assign(config, {
       ...defaultConfig,
+      chartColors: { ...defaultConfig.chartColors },
       chartTypes: { ...defaultConfig.chartTypes },
       selectedModuleIds: [...defaultConfig.selectedModuleIds],
     })
@@ -169,10 +160,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
     availableModules,
     setTheme,
     setPanelStyle,
-    setRingColorMode,
-    setBarColorMode,
-    setRingCustomColor,
-    setBarCustomColor,
+    setChartColor,
+    resetChartColor,
     setModuleChartType,
     setLayout,
     addModuleToLayout,

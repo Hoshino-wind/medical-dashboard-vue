@@ -28,14 +28,14 @@ describe('dashboard store configuration', () => {
 
     const store = useDashboardStore()
 
-    expect(store.config.schemaVersion).toBe(3)
+    expect(store.config.schemaVersion).toBe(4)
     expect(store.config.selectedModuleIds).toEqual(oldModuleOrder.slice(0, 9))
     expect(store.availableModules.map((module) => module.id)).toContain('deviceDistribution')
 
     store.persistConfig()
     await nextTick()
     const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
-    expect(persisted.schemaVersion).toBe(3)
+    expect(persisted.schemaVersion).toBe(4)
     expect(persisted).not.toHaveProperty('moduleOrder')
   })
 
@@ -90,7 +90,7 @@ describe('dashboard store configuration', () => {
     })
   })
 
-  it('migrates and validates custom ring and progress colors', async () => {
+  it('migrates legacy custom colors into validated chart color overrides', async () => {
     window.localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -105,17 +105,23 @@ describe('dashboard store configuration', () => {
 
     const store = useDashboardStore()
 
-    expect(store.config.ringColorMode).toBe('custom')
-    expect(store.config.ringCustomColor).toBe('#aabbcc')
-    expect(store.config.barColorMode).toBe('custom')
-    expect(store.config.barCustomColor).toBe('#20b486')
-    expect(store.setRingCustomColor('#F05A28')).toBe(true)
-    expect(store.setBarCustomColor('#123')).toBe(false)
+    expect(store.config.chartColors).toEqual({
+      ring: '#aabbcc',
+      pie: null,
+      bar: null,
+    })
+    expect(store.setChartColor('pie', '#F05A2880')).toBe(true)
+    expect(store.setChartColor('bar', '#123')).toBe(false)
     await nextTick()
 
     const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
-    expect(persisted.ringCustomColor).toBe('#f05a28')
-    expect(persisted.barCustomColor).toBe('#20b486')
+    expect(persisted.chartColors).toEqual({
+      ring: '#aabbcc',
+      pie: '#f05a2880',
+      bar: null,
+    })
+    expect(persisted).not.toHaveProperty('ringColorMode')
+    expect(persisted).not.toHaveProperty('barColorMode')
   })
 
   it('replaces an occupied layout slot when placing an available module into it', () => {

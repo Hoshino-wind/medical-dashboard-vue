@@ -6,7 +6,7 @@ import type { Theme } from '@/types/theme'
 import { normalizeCartesianChartData } from '@/utils/chartData'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { pxToRem } from '@/utils/rem'
-import { colorWithAlpha } from '@/utils/themeColor'
+import { colorWithAlpha, mixColor } from '@/utils/themeColor'
 import { BAR_ANIMATION_DURATION } from './cubeBarGeometry'
 import { buildCubeBarOption, type SeriesTone } from './cubeBarOption'
 import { registerCubeBarShapes } from './cubeBarShapes'
@@ -25,6 +25,7 @@ const props = withDefaults(
     data: CartesianChartData
     theme: Theme
     seriesName?: string
+    barColor?: string
   }>(),
   {
     seriesName: '数量',
@@ -39,11 +40,28 @@ let animationFrame = 0
 const { token, isLight: isLightTheme } = useChartTheme(() => props.theme)
 
 // 柱状图 3 系列使用独立的柱色(与语义状态色解耦),每套主题各不相同以增强区分度
-const seriesTonePalette = computed<SeriesTone[]>(() => [
-  { base: token('--data-bar'), accent: token('--data-bar-secondary') },
-  { base: token('--data-bar-2'), accent: token('--data-bar-2') },
-  { base: token('--data-bar-3'), accent: token('--data-bar-3') },
-])
+const seriesTonePalette = computed<SeriesTone[]>(() => {
+  if (!props.barColor) {
+    return [
+      { base: token('--data-bar'), accent: token('--data-bar-secondary') },
+      { base: token('--data-bar-2'), accent: token('--data-bar-2') },
+      { base: token('--data-bar-3'), accent: token('--data-bar-3') },
+    ]
+  }
+
+  // 一个用户主色派生出同色相的明暗层级，兼顾多系列辨识度和整体一致性。
+  return [
+    { base: props.barColor, accent: mixColor(props.barColor, '#ffffff', 0.42) },
+    {
+      base: mixColor(props.barColor, '#ffffff', 0.24),
+      accent: mixColor(props.barColor, '#ffffff', 0.58),
+    },
+    {
+      base: mixColor(props.barColor, '#000000', 0.2),
+      accent: mixColor(props.barColor, '#ffffff', 0.18),
+    },
+  ]
+})
 
 const legendItems = computed<LegendItem[]>(() => {
   const palette = seriesTonePalette.value

@@ -11,6 +11,9 @@ export {
   saveDashboardConfig,
 } from './model/configPersistence'
 export {
+  dashboardColorToHsva,
+  dashboardHsvaToColor,
   isDashboardCustomColor,
   normalizeDashboardCustomColor,
 } from './model/customColor'
+export type { DashboardHsvaColor } from './model/customColor'

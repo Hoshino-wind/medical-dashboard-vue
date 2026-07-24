@@ -215,10 +215,12 @@
 }
 
 .panel-title-suffix {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   flex: none;
   align-items: center;
-  margin-left: 0.25rem;
+  margin-left: -0.25rem;
   color: var(--muted);
   font-size: 0.8125rem;
   font-weight: 800;

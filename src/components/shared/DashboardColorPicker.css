@@ -1,0 +1,382 @@
+.dashboard-color-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 2.35rem;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.dashboard-color-picker-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.dashboard-color-picker-copy strong {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--text) 88%, var(--accent-2) 12%);
+  font-size: calc(0.76rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-color-picker-copy span {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--muted) 88%, transparent);
+  font-size: calc(0.58rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-color-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  box-sizing: border-box;
+  min-width: 8.3rem;
+  height: 2rem;
+  padding: 0.18rem 0.4rem;
+  overflow: hidden;
+  border: 0.0625rem solid color-mix(in srgb, var(--border-strong) 56%, var(--border) 44%);
+  border-radius: 0.375rem;
+  background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  box-shadow: 0 0.125rem 0.5rem color-mix(in srgb, var(--bg) 26%, transparent);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.dashboard-color-picker-trigger:hover,
+.dashboard-color-picker-trigger:focus-visible,
+.dashboard-color-picker-trigger.active {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.125rem color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+.dashboard-color-picker-swatch,
+.dashboard-color-panel-swatch {
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #d6d6d6 25%, transparent 25%),
+    linear-gradient(-45deg, #d6d6d6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #d6d6d6 75%),
+    linear-gradient(-45deg, transparent 75%, #d6d6d6 75%);
+  background-position:
+    0 0,
+    0 0.25rem,
+    0.25rem -0.25rem,
+    -0.25rem 0;
+  background-size: 0.5rem 0.5rem;
+}
+
+.dashboard-color-picker-swatch::after,
+.dashboard-color-panel-swatch::after {
+  position: absolute;
+  inset: 0;
+  background: var(--swatch-color);
+  content: '';
+}
+
+.dashboard-color-picker-swatch {
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  box-shadow: inset 0 0 0 0.0625rem rgba(255, 255, 255, 0.42);
+}
+
+.dashboard-color-picker-trigger output {
+  flex: 1;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(0.54rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 850;
+  line-height: 1;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-color-picker-trigger svg {
+  flex: 0 0 0.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  color: var(--muted);
+  transition: transform 0.18s ease;
+}
+
+.dashboard-color-picker-trigger.active svg {
+  transform: rotate(180deg);
+}
+
+.dashboard-color-picker-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-2);
+  cursor: pointer;
+}
+
+.dashboard-color-picker-reset:hover {
+  color: var(--accent);
+}
+
+.dashboard-color-picker-reset svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.dashboard-color-picker-reset span {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.dashboard-color-picker-theme-state {
+  color: color-mix(in srgb, var(--muted) 82%, transparent);
+  font-size: calc(0.56rem * var(--dashboard-font-scale, 1.45));
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dashboard-color-picker-panel {
+  --picker-panel-bg: #ffffff;
+  --picker-panel-border: #d9d9d9;
+  --picker-panel-text: rgba(0, 0, 0, 0.88);
+  --picker-panel-muted: rgba(0, 0, 0, 0.45);
+  --picker-input-bg: #ffffff;
+  position: fixed;
+  z-index: 2100;
+  display: grid;
+  box-sizing: border-box;
+  width: 17.875rem;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 0.0625rem solid var(--picker-panel-border);
+  border-radius: 0.5rem;
+  background: var(--picker-panel-bg);
+  box-shadow:
+    0 0.375rem 1rem rgba(0, 0, 0, 0.12),
+    0 0.1875rem 0.375rem -0.25rem rgba(0, 0, 0, 0.12),
+    0 0.5625rem 1.75rem 0.5rem rgba(0, 0, 0, 0.05);
+  color: var(--picker-panel-text);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+.dashboard-color-picker-panel.is-dark {
+  --picker-panel-bg: #1f1f1f;
+  --picker-panel-border: #303030;
+  --picker-panel-text: rgba(255, 255, 255, 0.88);
+  --picker-panel-muted: rgba(255, 255, 255, 0.45);
+  --picker-input-bg: #141414;
+  box-shadow:
+    0 0.375rem 1rem rgba(0, 0, 0, 0.38),
+    0 0.75rem 2rem rgba(0, 0, 0, 0.42);
+}
+
+.dashboard-color-saturation {
+  position: relative;
+  width: 100%;
+  height: 10rem;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background:
+    linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, var(--picker-hue));
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.dashboard-color-saturation:focus-visible {
+  outline: 0.125rem solid #1677ff;
+  outline-offset: 0.125rem;
+}
+
+.dashboard-color-saturation-thumb {
+  position: absolute;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 0.125rem solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.0625rem rgba(0, 0, 0, 0.28);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.dashboard-color-sliders {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1.75rem;
+  grid-template-rows: 0.75rem 0.75rem;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.dashboard-color-sliders input[type='range'] {
+  width: 100%;
+  height: 0.5rem;
+  margin: 0;
+  border-radius: 62.4375rem;
+  appearance: none;
+  cursor: pointer;
+}
+
+.dashboard-color-hue {
+  grid-column: 1;
+  grid-row: 1;
+  background: linear-gradient(
+    90deg,
+    #ff0000 0%,
+    #ffff00 16.67%,
+    #00ff00 33.33%,
+    #00ffff 50%,
+    #0000ff 66.67%,
+    #ff00ff 83.33%,
+    #ff0000 100%
+  );
+}
+
+.dashboard-color-alpha {
+  grid-column: 1;
+  grid-row: 2;
+  background:
+    linear-gradient(90deg, transparent, var(--picker-color)),
+    conic-gradient(#d7d7d7 25%, #fff 0 50%, #d7d7d7 0 75%, #fff 0) 0 / 0.5rem 0.5rem;
+}
+
+.dashboard-color-sliders input[type='range']::-webkit-slider-thumb {
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 0.125rem solid #ffffff;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 0.0625rem rgba(0, 0, 0, 0.35);
+  appearance: none;
+}
+
+.dashboard-color-sliders input[type='range']::-moz-range-thumb {
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 0.125rem solid #ffffff;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 0 0.0625rem rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-color-panel-swatch {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.25rem;
+  box-shadow: inset 0 0 0 0.0625rem rgba(127, 127, 127, 0.32);
+}
+
+.dashboard-color-values {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) 4.25rem;
+  gap: 0.5rem;
+}
+
+.dashboard-color-values label {
+  min-width: 0;
+}
+
+.dashboard-color-values select,
+.dashboard-color-values input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 1.75rem;
+  border: 0.0625rem solid var(--picker-panel-border);
+  border-radius: 0.375rem;
+  outline: none;
+  background: var(--picker-input-bg);
+  color: var(--picker-panel-text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.dashboard-color-values select {
+  padding: 0 0.25rem;
+  border-color: transparent;
+  background: transparent;
+  color: var(--picker-panel-text);
+  cursor: pointer;
+}
+
+.dashboard-color-values input {
+  padding: 0 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.dashboard-color-values input:focus,
+.dashboard-color-values select:focus-visible {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 0.125rem rgba(22, 119, 255, 0.16);
+}
+
+.dashboard-color-alpha-input {
+  position: relative;
+}
+
+.dashboard-color-alpha-input input {
+  padding-right: 1.3rem;
+  appearance: textfield;
+}
+
+.dashboard-color-alpha-input input::-webkit-inner-spin-button,
+.dashboard-color-alpha-input input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.dashboard-color-alpha-input > span:not(.sr-only) {
+  position: absolute;
+  top: 50%;
+  right: 0.45rem;
+  color: var(--picker-panel-muted);
+  font-size: 0.7rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 0.0625rem;
+  height: 0.0625rem;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  margin: -0.0625rem;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-color-picker-trigger,
+  .dashboard-color-picker-trigger svg {
+    transition: none;
+  }
+}

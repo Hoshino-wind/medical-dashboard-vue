@@ -158,12 +158,11 @@
 .dashboard-shell[data-panel-style='chamfered-instrument']
   .screen-grid
   > .panel
-  .panel-header--main
+  .panel-title-frame
   > .panel-title-suffix {
-  grid-column: 3;
-  justify-self: start;
-  margin-left: 0.375rem;
-  transform: translateY(0.0625rem);
+  z-index: 2;
+  margin-left: -0.25rem;
+  transform: translateY(-0.1875rem);
 }
 
 /* 紧凑型机械框：总览指标卡和工单汇总条跟随外层卡片样式。 */
