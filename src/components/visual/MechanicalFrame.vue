@@ -92,14 +92,13 @@ withDefaults(
   opacity: 0.82;
 }
 
-/* 浅色主题使用连续的玻璃立体框，不复用暗色 PNG，也不做切角。 */
+/* 浅色主题使用高明度冰蓝材质，避免任何暗色框观感。 */
 :global(
   .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
     .mechanical-frame
 ) {
   display: block;
-  border: 0;
-  border-image: none;
+  background: transparent;
   filter: none;
 }
 
@@ -107,49 +106,31 @@ withDefaults(
   .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
     .mechanical-frame--panel
 ) {
-  padding: 0.09375rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 72%, #ffffff) 0%,
-    color-mix(in srgb, var(--instrument-rim) 58%, #ffffff) 28%,
-    color-mix(in srgb, var(--instrument-rim) 48%, #ffffff) 72%,
-    color-mix(in srgb, var(--accent-2) 72%, #ffffff) 100%
-  );
-  border-radius: 0.625rem;
-  opacity: 0.82;
-  filter: drop-shadow(0 0.0625rem 0 rgba(255, 255, 255, 0.92))
-    drop-shadow(0 0.125rem 0.125rem rgba(66, 100, 137, 0.14));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  border: 0.9375rem solid transparent;
+  border-image-source: url('../../assets/mechanical-frames/panel-light-medical-v4.png');
+  border-image-slice: 15;
+  border-image-width: 0.9375rem;
+  border-image-outset: 0;
+  border-image-repeat: stretch;
+  border-radius: 0.75rem;
+  opacity: 0.92;
+  filter: none;
 }
 
 :global(
   .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
     .mechanical-frame--compact
 ) {
-  inset: -0.0625rem;
-  padding: 0.0625rem;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--status-tone, var(--panel-title-primary)) 68%, #ffffff),
-    color-mix(in srgb, var(--instrument-rim) 42%, #ffffff),
-    color-mix(in srgb, var(--status-tone, var(--panel-title-primary)) 52%, #ffffff)
-  );
-  border-radius: 0.375rem;
-  opacity: 0.72;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
+  inset: 0;
+  border: 0.0625rem solid;
+  border-image: none;
+  border-color:
+    rgba(250, 253, 255, 0.98)
+    color-mix(in srgb, var(--status-tone, var(--accent)) 24%, #9ed8f8)
+    color-mix(in srgb, var(--status-tone, var(--accent)) 32%, #5aaee7)
+    rgba(190, 225, 247, 0.96);
+  border-radius: 0.5rem;
+  opacity: 1;
+  box-shadow: none;
 }
 </style>

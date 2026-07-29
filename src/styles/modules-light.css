@@ -75,41 +75,147 @@
 .dashboard-shell[data-theme-mode='light'] .health-pie-heart {
   color: color-mix(in srgb, var(--data-health-pie-pending) 54%, var(--text) 12%);
 }
-/* 浅色玻璃体系：内部状态卡是透明薄片，不重复主面板的强模糊。 */
+/* 日间医疗主题：小指标卡使用统一的瓷白卡面和状态色边条。 */
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .overview-stat {
-  border: 0.0625rem solid rgba(255, 255, 255, 0.52);
-  border-radius: 0.6875rem;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.08));
+  --overview-frame-tone: color-mix(
+    in srgb,
+    var(--status-tone, var(--accent)) 64%,
+    var(--accent-2) 36%
+  );
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 3.2rem;
+  padding: 0.45rem 0.65rem 0.45rem 0.75rem;
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--status-tone, var(--accent)) 26%, rgba(146, 172, 190, 0.62));
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(90deg, var(--overview-frame-tone), transparent) left top / 1.35rem 0.1rem
+      no-repeat,
+    linear-gradient(180deg, var(--overview-frame-tone), transparent) left top / 0.1rem 1rem
+      no-repeat,
+    linear-gradient(270deg, var(--overview-frame-tone), transparent) right top / 1.35rem 0.1rem
+      no-repeat,
+    linear-gradient(180deg, var(--overview-frame-tone), transparent) right top / 0.1rem 1rem
+      no-repeat,
+    linear-gradient(90deg, var(--overview-frame-tone), transparent) left bottom / 1.35rem
+      0.1rem no-repeat,
+    linear-gradient(0deg, var(--overview-frame-tone), transparent) left bottom / 0.1rem 1rem
+      no-repeat,
+    linear-gradient(270deg, var(--overview-frame-tone), transparent) right bottom / 1.35rem
+      0.1rem no-repeat,
+    linear-gradient(0deg, var(--overview-frame-tone), transparent) right bottom / 0.1rem 1rem
+      no-repeat,
+    linear-gradient(
+      138deg,
+      color-mix(in srgb, var(--status-tone, var(--accent)) 7%, #fcfeff) 0%,
+      #f7fbfd 54%,
+      #edf4f7 100%
+    );
   box-shadow:
-    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.72),
-    inset 0 0 0 0.0625rem rgba(95, 137, 177, 0.055),
-    inset 0.1875rem 0 0 var(--glass-stat-tint, rgba(10, 132, 255, 0.065)),
-    0 0.25rem 0.75rem rgba(48, 79, 109, 0.06);
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.94),
+    inset 0 0 0 0.0625rem rgba(72, 106, 132, 0.035),
+    0 0.3rem 0.85rem rgba(24, 50, 74, 0.075),
+    0 0 0.65rem color-mix(in srgb, var(--status-tone, var(--accent)) 8%, transparent);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .overview-stat::before {
+  content: '';
+  position: absolute;
+  left: -0.0625rem;
+  top: 0.72rem;
+  bottom: 0.72rem;
+  width: 0.15625rem;
+  border-radius: 0 62.4375rem 62.4375rem 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--status-tone, var(--accent)) 72%, #ffffff),
+    var(--status-tone, var(--accent))
+  );
+  box-shadow: 0 0 0.45rem
+    color-mix(in srgb, var(--status-tone, var(--accent)) 32%, transparent);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .overview-stat::after {
+  content: '';
+  position: absolute;
+  right: 0.42rem;
+  bottom: 0.35rem;
+  width: 0.72rem;
+  height: 0.18rem;
+  background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--overview-frame-tone) 68%, transparent) 0 0.055rem,
+      transparent 0.07rem
+    )
+    0 50% / 0.24rem 0.18rem repeat-x;
+  opacity: 0.72;
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .overview-stat
+  > .mechanical-frame--compact {
+  display: none;
 }
 .dashboard-shell[data-theme-id='light-medical'] .overview-stat--total {
-  --glass-stat-tint: rgba(10, 132, 255, 0.07);
+  --status-tone: var(--data-pie-primary);
 }
 .dashboard-shell[data-theme-id='light-medical'] .overview-stat--available {
-  --glass-stat-tint: rgba(48, 176, 137, 0.075);
+  --status-tone: var(--good);
 }
 .dashboard-shell[data-theme-id='light-medical'] .overview-stat--repair {
-  --glass-stat-tint: rgba(218, 83, 109, 0.07);
+  --status-tone: var(--danger);
 }
 .dashboard-shell[data-theme-id='light-medical'] .overview-stat--maintenance {
-  --glass-stat-tint: rgba(209, 157, 50, 0.075);
+  --status-tone: var(--warn);
 }
 .dashboard-shell[data-theme-id='light-medical'] .overview-stat--inspection {
-  --glass-stat-tint: rgba(29, 170, 190, 0.07);
+  --status-tone: var(--data-inspection-line);
 }
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .overview-stat-icon {
-  border: 0.0625rem solid color-mix(in srgb, currentColor 16%, transparent);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, currentColor 7%, rgba(255, 255, 255, 0.82));
-  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92);
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0.34rem;
+  border: 0.0625rem solid color-mix(in srgb, currentColor 24%, rgba(255, 255, 255, 0.76));
+  border-radius: 0.5625rem;
+  background: color-mix(in srgb, currentColor 8%, rgba(250, 253, 255, 0.96));
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.92),
+    0 0.125rem 0.35rem color-mix(in srgb, currentColor 7%, transparent),
+    0 0 0.5rem color-mix(in srgb, currentColor 6%, transparent);
 }
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .overview-stat
+  .kpi-label {
+  color: color-mix(in srgb, var(--muted) 88%, var(--text) 12%);
+  font-weight: 780;
+  letter-spacing: 0.015em;
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .overview-stat
+  .overview-value {
+  color: color-mix(in srgb, var(--status-tone, var(--accent)) 84%, var(--text) 16%) !important;
+  text-shadow: 0 0.0625rem 0 rgba(255, 255, 255, 0.82);
+}
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .module-status-summary {
   gap: 0.1875rem;
   overflow: hidden;
@@ -122,19 +228,32 @@
     0 0.25rem 0.75rem rgba(48, 79, 109, 0.055);
 }
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .module-status-summary
   > div {
-  border: 0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 0.0625rem 0 rgba(255, 255, 255, 0.66);
+  border: 0.0625rem solid
+    color-mix(in srgb, var(--status-tone, var(--accent)) 16%, rgba(146, 172, 190, 0.52));
+  border-radius: 0.625rem;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--status-tone, var(--accent)) 5%, #fbfdfe),
+    #eef5f8
+  );
+  box-shadow:
+    inset 0 0.0625rem 0 rgba(255, 255, 255, 0.82),
+    0 0.2rem 0.6rem rgba(24, 50, 74, 0.05);
 }
 /* 工单内部延续外层玻璃，不再铺一块不透明白色画布。 */
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   :is(.order-list-panel, .paged-viewport, .paged-track, .paged-page) {
   background: transparent;
 }
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .pie-summary-panel {
   border-left-color: rgba(113, 154, 190, 0.16);
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.035));
@@ -143,6 +262,36 @@
     inset 0 0.0625rem 0 rgba(255, 255, 255, 0.42);
 }
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
   .pie-summary-title {
   text-shadow: 0 0.0625rem 0 rgba(255, 255, 255, 0.72);
+}
+
+/* 面板由原来的整块冰蓝改为更克制的瓷白雾蓝，强化页面背景与内容的层级。 */
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel {
+  background:
+    linear-gradient(148deg, rgba(249, 252, 254, 0.97), rgba(235, 244, 248, 0.94)),
+    radial-gradient(circle at 12% 0%, rgba(82, 169, 216, 0.08), transparent 42%);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel::before {
+  background: linear-gradient(180deg, rgba(200, 222, 234, 0.13), transparent 34%);
+}
+
+.dashboard-shell[data-theme-id='light-medical'][data-panel-style='chamfered-instrument']
+  .screen-grid
+  > .panel
+  .panel-title-frame::before {
+  background: linear-gradient(
+    90deg,
+    rgba(235, 244, 248, 0),
+    rgba(235, 244, 248, 0.9) 12%,
+    rgba(232, 242, 247, 0.94) 88%,
+    rgba(232, 242, 247, 0)
+  );
 }
