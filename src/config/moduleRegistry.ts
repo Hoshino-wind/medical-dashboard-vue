@@ -94,8 +94,8 @@ export const moduleRegistry: ModuleRegistry = {
     component: DeviceDistributionModule,
     resolveProps: (module, ctx) => ({
       items: ctx.data[module.dataKey],
-      barColorMode: ctx.config.chartColors.bar ? 'custom' : 'gradient',
-      barCustomColor: ctx.config.chartColors.bar ?? undefined,
+      barColorMode: ctx.config.chartColors.horizontalBar ? 'custom' : 'gradient',
+      barCustomColor: ctx.config.chartColors.horizontalBar ?? undefined,
     }),
   },
 }

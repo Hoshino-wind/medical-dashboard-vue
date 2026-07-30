@@ -93,18 +93,19 @@
 
 ## 配置状态
 
-当前配置 Schema 版本为 4，保存在 localStorage 的 `medical-dashboard-config` 中：
+当前配置 Schema 版本为 5，保存在 localStorage 的 `medical-dashboard-config` 中：
 
 ```json
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "themeId": "deep-sea-instrument",
   "panelStyle": "glass-flow",
   "layout": "3x3",
   "chartColors": {
     "ring": null,
     "pie": null,
-    "bar": null
+    "bar": null,
+    "horizontalBar": null
   },
   "chartTypes": {
     "repairStats": "bar",
@@ -125,6 +126,6 @@
 }
 ```
 
-`chartColors` 中的 `null` 表示继续跟随当前主题；自定义色使用 `#RRGGBB`，带透明度时使用 `#RRGGBBAA`（例如 50% 透明度为 `#1677ff80`），分别覆盖环图、饼图主色和柱状图色板。
+`chartColors` 中的 `null` 表示继续跟随当前主题；自定义色使用 `#RRGGBB`，带透明度时使用 `#RRGGBBAA`（例如 50% 透明度为 `#1677ff80`），分别覆盖环图、饼图主色、柱状图色板和设备分布条形图。读取 v4 配置时，旧的 `bar` 颜色会同时迁移到 `bar` 与 `horizontalBar`，之后两者独立保存。
 
 配置尚未接服务端保存/发布。接入时应新增独立配置 Repository，不应在组件或 Pinia action 中直接调用 `fetch`。

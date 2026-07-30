@@ -355,7 +355,6 @@
   display: block;
   background: var(--accent);
   box-shadow: none;
-  animation: none;
 }
 
 .dashboard-shell[data-theme-id='light-medical'][data-panel-style='glass-flow']

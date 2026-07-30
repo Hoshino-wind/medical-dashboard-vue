@@ -64,19 +64,26 @@ function normalizeChartColors(saved: Record<string, unknown>): ChartColorOverrid
   const savedColors = isRecord(saved.chartColors) ? saved.chartColors : null
 
   if (savedColors) {
+    const bar = normalizeOptionalColor(savedColors.bar)
     return {
       ring: normalizeOptionalColor(savedColors.ring),
       pie: normalizeOptionalColor(savedColors.pie),
-      bar: normalizeOptionalColor(savedColors.bar),
+      bar,
+      // v4 的 bar 同时控制柱状图和条形图；仅在新字段缺失时复制旧值。
+      horizontalBar: Object.prototype.hasOwnProperty.call(savedColors, 'horizontalBar')
+        ? normalizeOptionalColor(savedColors.horizontalBar)
+        : bar,
     }
   }
 
   // v3 及更早版本只有环图/进度条的 custom 模式；仅迁移真正生效的覆盖色。
+  const legacyBar =
+    saved.barColorMode === 'custom' ? normalizeOptionalColor(saved.barCustomColor) : null
   return {
-    ring:
-      saved.ringColorMode === 'custom' ? normalizeOptionalColor(saved.ringCustomColor) : null,
+    ring: saved.ringColorMode === 'custom' ? normalizeOptionalColor(saved.ringCustomColor) : null,
     pie: null,
-    bar: saved.barColorMode === 'custom' ? normalizeOptionalColor(saved.barCustomColor) : null,
+    bar: legacyBar,
+    horizontalBar: legacyBar,
   }
 }
 

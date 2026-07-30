@@ -151,6 +151,7 @@ export const defaultConfig: DashboardConfig = {
     ring: null,
     pie: null,
     bar: null,
+    horizontalBar: null,
   },
   chartTypes,
   selectedModuleIds: moduleCatalog.slice(0, 9).map((item) => item.id),

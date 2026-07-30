@@ -1,7 +1,7 @@
 import type { ThemeId } from './theme'
 import type { ChartModuleId, ModuleId } from './module'
 
-export const CURRENT_DASHBOARD_CONFIG_VERSION = 4 as const
+export const CURRENT_DASHBOARD_CONFIG_VERSION = 5 as const
 
 /** 布局类型:2行3列 / 3行3列 */
 export type LayoutType = '2x3' | '3x3'
@@ -15,7 +15,7 @@ export const COLOR_MODES = ['solid', 'gradient', 'custom'] as const
 export type ColorMode = (typeof COLOR_MODES)[number]
 
 /** 可单独覆盖主题色的图表类型。 */
-export const CHART_COLOR_KINDS = ['ring', 'pie', 'bar'] as const
+export const CHART_COLOR_KINDS = ['ring', 'pie', 'bar', 'horizontalBar'] as const
 export type ChartColorKind = (typeof CHART_COLOR_KINDS)[number]
 export type ChartColorOverrides = Record<ChartColorKind, string | null>
 

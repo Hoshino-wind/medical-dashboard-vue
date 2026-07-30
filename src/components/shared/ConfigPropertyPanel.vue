@@ -60,9 +60,16 @@ const chartColorControls = computed<
   {
     id: 'bar',
     label: '柱状图颜色',
-    description: '统计柱状图与占比条',
+    description: '保修、保养与巡检统计',
     value: config.value.chartColors.bar ?? activeTheme.value.variables['--data-bar'],
     overridden: config.value.chartColors.bar !== null,
+  },
+  {
+    id: 'horizontalBar',
+    label: '条形图颜色',
+    description: '设备分布台数占比',
+    value: config.value.chartColors.horizontalBar ?? activeTheme.value.variables['--data-bar'],
+    overridden: config.value.chartColors.horizontalBar !== null,
   },
 ])
 </script>

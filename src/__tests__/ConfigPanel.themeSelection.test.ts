@@ -117,7 +117,7 @@ describe('ConfigPanel workbench configuration', () => {
     expect(wrapper.find('.panel-style-radio.active').text()).toContain('无边框')
   })
 
-  it('configures, persists, and resets ring, pie, and bar colors', async () => {
+  it('configures, persists, and resets ring, pie, column, and horizontal bar colors', async () => {
     const pinia = createPinia()
     const wrapper = mount(ConfigPanel, {
       global: {
@@ -127,27 +127,30 @@ describe('ConfigPanel workbench configuration', () => {
     })
     const store = useDashboardStore(pinia)
 
-    expect(wrapper.findAll('.dashboard-color-picker')).toHaveLength(3)
+    expect(wrapper.findAll('.dashboard-color-picker')).toHaveLength(4)
 
     const colorPickers = wrapper.findAllComponents(DashboardColorPicker)
     colorPickers[0].vm.$emit('change', '#f05a2880')
     colorPickers[1].vm.$emit('change', '#20b48666')
     colorPickers[2].vm.$emit('change', '#3456c8cc')
+    colorPickers[3].vm.$emit('change', '#e99b36cc')
     await flushPromises()
 
     expect(store.config.chartColors).toEqual({
       ring: '#f05a2880',
       pie: '#20b48666',
       bar: '#3456c8cc',
+      horizontalBar: '#e99b36cc',
     })
     expect(
       JSON.parse(window.localStorage.getItem('medical-dashboard-config') ?? '{}'),
     ).toMatchObject({
-      schemaVersion: 4,
+      schemaVersion: 5,
       chartColors: {
         ring: '#f05a2880',
         pie: '#20b48666',
         bar: '#3456c8cc',
+        horizontalBar: '#e99b36cc',
       },
     })
 

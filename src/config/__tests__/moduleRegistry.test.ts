@@ -14,6 +14,7 @@ describe('module registry chart color overrides', () => {
         ring: '#f05a28',
         pie: '#20b486',
         bar: '#3456c8',
+        horizontalBar: '#e99b36',
       },
     },
   }
@@ -31,7 +32,7 @@ describe('module registry chart color overrides', () => {
     })
     expect(resolveModuleRender(findModuleById('deviceDistribution'), context).props).toMatchObject({
       barColorMode: 'custom',
-      barCustomColor: '#3456c8',
+      barCustomColor: '#e99b36',
     })
   })
 })

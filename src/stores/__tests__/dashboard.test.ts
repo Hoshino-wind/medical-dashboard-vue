@@ -28,14 +28,14 @@ describe('dashboard store configuration', () => {
 
     const store = useDashboardStore()
 
-    expect(store.config.schemaVersion).toBe(4)
+    expect(store.config.schemaVersion).toBe(5)
     expect(store.config.selectedModuleIds).toEqual(oldModuleOrder.slice(0, 9))
     expect(store.availableModules.map((module) => module.id)).toContain('deviceDistribution')
 
     store.persistConfig()
     await nextTick()
     const persisted = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}')
-    expect(persisted.schemaVersion).toBe(4)
+    expect(persisted.schemaVersion).toBe(5)
     expect(persisted).not.toHaveProperty('moduleOrder')
   })
 
@@ -109,6 +109,7 @@ describe('dashboard store configuration', () => {
       ring: '#aabbcc',
       pie: null,
       bar: null,
+      horizontalBar: null,
     })
     expect(store.setChartColor('pie', '#F05A2880')).toBe(true)
     expect(store.setChartColor('bar', '#123')).toBe(false)
@@ -119,9 +120,45 @@ describe('dashboard store configuration', () => {
       ring: '#aabbcc',
       pie: '#f05a2880',
       bar: null,
+      horizontalBar: null,
     })
     expect(persisted).not.toHaveProperty('ringColorMode')
     expect(persisted).not.toHaveProperty('barColorMode')
+  })
+
+  it('migrates the shared v4 bar color and then persists column and horizontal bars independently', async () => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 4,
+        themeId: 'light-medical',
+        layout: '3x3',
+        chartColors: {
+          ring: null,
+          pie: null,
+          bar: '#3456C8',
+        },
+      }),
+    )
+
+    const store = useDashboardStore()
+
+    expect(store.config.chartColors).toEqual({
+      ring: null,
+      pie: null,
+      bar: '#3456c8',
+      horizontalBar: '#3456c8',
+    })
+
+    expect(store.setChartColor('horizontalBar', '#E99B36CC')).toBe(true)
+    await nextTick()
+
+    expect(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '{}').chartColors).toEqual({
+      ring: null,
+      pie: null,
+      bar: '#3456c8',
+      horizontalBar: '#e99b36cc',
+    })
   })
 
   it('replaces an occupied layout slot when placing an available module into it', () => {
