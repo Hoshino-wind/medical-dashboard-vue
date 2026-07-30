@@ -232,6 +232,8 @@
   > .panel
   .module-status-summary
   > div {
+  width: 100%;
+  justify-self: stretch;
   border: 0.0625rem solid
     color-mix(in srgb, var(--status-tone, var(--accent)) 16%, rgba(146, 172, 190, 0.52));
   border-radius: 0.625rem;
