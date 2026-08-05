@@ -373,10 +373,3 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .dashboard-color-picker-trigger,
-  .dashboard-color-picker-trigger svg {
-    transition: none;
-  }
-}

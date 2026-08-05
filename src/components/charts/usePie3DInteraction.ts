@@ -123,11 +123,7 @@ export function usePie3DInteraction({
 
   function syncAutoRotation() {
     stopAutoRotation()
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (autoRotate() && !reducedMotion) rotationFrame = requestAnimationFrame(runAutoRotation)
+    if (autoRotate()) rotationFrame = requestAnimationFrame(runAutoRotation)
   }
 
   onMounted(syncAutoRotation)

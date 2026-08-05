@@ -82,12 +82,6 @@
     height: 0.95rem;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .chart-loading-pulse,
-  .chart-loading-bars i {
-    animation: none;
-  }
-}
 /* 浅色主题:图表效果层集中覆盖(仅在此处调 light 值,基础规则用 var() 消费) */
 .dashboard-shell[data-theme-mode='light'] {
   --chart-loading-bg: rgba(255, 255, 255, 0.86);

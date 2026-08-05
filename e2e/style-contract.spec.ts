@@ -7,7 +7,8 @@ async function waitForDashboard(page: Page) {
 }
 
 test.describe('渲染样式与交互契约', () => {
-  test('默认大屏保持宽中列、可读品牌区和低动效降级', async ({ page }) => {
+  test('默认大屏保持宽中列、可读品牌区，且动效不随系统降级', async ({ page }) => {
+    // 大屏是无人值守展示：即使系统开启「减少动效」，动效也必须照常运行
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.addInitScript(() => window.localStorage.clear())
     await waitForDashboard(page)
@@ -31,7 +32,8 @@ test.describe('渲染样式与交互契约', () => {
     )
     await expect(page.locator('.hospital-subtitle')).toHaveCSS('white-space', 'nowrap')
 
-    await expect(page.locator('.panel-border-flow').first()).toHaveCSS('animation-name', 'none')
+    await expect(page.locator('.panel-border-flow').first()).not.toHaveCSS('animation-name', 'none')
+    await expect(page.locator('.gauge-base-rotor').first()).not.toHaveCSS('animation-name', 'none')
     await expect(page.locator('.hologram-gauge-base').first()).toHaveCSS('filter', 'none')
     await expect(page.locator('.work-order-summary')).toHaveCount(0)
 

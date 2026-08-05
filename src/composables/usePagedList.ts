@@ -57,14 +57,6 @@ export function usePagedList<T>(source: Ref<readonly T[]>, options: PagedListOpt
     return (pageIndex % pages.value.length) * perPage.value
   }
 
-  function prefersReducedMotion(): boolean {
-    return (
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    )
-  }
-
   function measure() {
     const viewport = viewportRef.value
     const track = trackRef.value
@@ -89,7 +81,7 @@ export function usePagedList<T>(source: Ref<readonly T[]>, options: PagedListOpt
   }
   function start() {
     stop()
-    if (!shouldPage.value || prefersReducedMotion()) return
+    if (!shouldPage.value) return
     timer = setInterval(() => {
       currentPage.value += 1
     }, holdMs)

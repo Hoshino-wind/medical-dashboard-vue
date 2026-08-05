@@ -199,21 +199,6 @@
   justify-content: center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .screen-grid > .panel {
-    animation: none;
-  }
-
-  .panel-border-flow {
-    animation: none;
-    opacity: 0.72;
-  }
-
-  .panel-title-mini-bars i {
-    animation: none;
-  }
-}
-
 .panel-title-suffix {
   position: relative;
   z-index: 1;

@@ -309,13 +309,6 @@
     0 0 1.65rem color-mix(in srgb, var(--chart-primary) 30%, transparent);
   opacity: 1;
 }
-@media (prefers-reduced-motion: reduce) {
-  .title-frame h1,
-  .brand-lockup::after,
-  .hospital-copy::after {
-    animation: none;
-  }
-}
 .hospital-badge {
   width: 4.75rem;
   height: 3.5rem;

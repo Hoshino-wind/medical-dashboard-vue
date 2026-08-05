@@ -123,14 +123,6 @@ function ringColorAt(localIndex: number, value: number): string {
   transform: translateY(-26px);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .availability-flip-enter-from,
-  .availability-flip-leave-to {
-    transform: none;
-    transition-duration: 0.2s;
-  }
-}
-
 .availability-grid.availability-life,
 .availability-grid.availability-ultrasound {
   transform: translate(0, 0.35rem);
