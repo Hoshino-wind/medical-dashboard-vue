@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import HologramGaugeBaseDefs from './HologramGaugeBaseDefs.vue'
+
+/** SVG viewBox 尺寸，用于反推用户单位 → 屏幕像素的缩放比 */
+const VIEWBOX_WIDTH = 220
+const VIEWBOX_HEIGHT = 76
 
 const props = withDefaults(
   defineProps<{
@@ -18,6 +22,34 @@ const props = withDefaults(
 
 const uid = `hgb-${Math.random().toString(36).slice(2, 8)}`
 
+/*
+ * 旋转的转子不能用 vector-effect: non-scaling-stroke —— 持续 transform 下浏览器
+ * 每帧都要重算描边几何，实测满屏 8 个底座时占约 4fps。这里按实际渲染缩放比反推
+ * 补偿系数，让 stroke-width 乘上它，屏幕描边宽度与 non-scaling-stroke 完全等价。
+ *
+ * preserveAspectRatio 默认 xMidYMid meet ⇒ 等比缩放取两轴较小者。
+ */
+const svgRef = ref<SVGSVGElement | null>(null)
+const strokeScale = ref(1)
+
+function measureStrokeScale() {
+  const svg = svgRef.value
+  if (!svg) return
+  const { width, height } = svg.getBoundingClientRect()
+  if (width <= 0 || height <= 0) return
+  const scale = Math.min(width / VIEWBOX_WIDTH, height / VIEWBOX_HEIGHT)
+  if (scale > 0) strokeScale.value = 1 / scale
+}
+
+let observer: ResizeObserver | undefined
+onMounted(() => {
+  measureStrokeScale()
+  if (typeof ResizeObserver === 'undefined') return
+  observer = new ResizeObserver(measureStrokeScale)
+  if (svgRef.value) observer.observe(svgRef.value)
+})
+onBeforeUnmount(() => observer?.disconnect())
+
 const baseStyle = computed(() => {
   const speed = Math.max(1.6, props.speed)
   const toneStyle = props.tone
@@ -34,6 +66,7 @@ const baseStyle = computed(() => {
     '--holo-speed-middle': `${Number((speed * 0.86).toFixed(2))}s`,
     '--holo-speed-fast': `${Number((speed * 0.72).toFixed(2))}s`,
     '--holo-intensity': Math.min(1.35, Math.max(0.2, props.intensity)),
+    '--gauge-stroke-k': Number(strokeScale.value.toFixed(3)),
   }
 })
 </script>
@@ -46,7 +79,7 @@ const baseStyle = computed(() => {
     aria-hidden="true"
   >
     <span class="hologram-gauge-volume" aria-hidden="true"></span>
-    <svg class="hologram-gauge-base-svg" viewBox="0 0 220 76" focusable="false">
+    <svg ref="svgRef" class="hologram-gauge-base-svg" viewBox="0 0 220 76" focusable="false">
       <HologramGaugeBaseDefs :uid="uid" />
 
       <!-- 底部投影光晕 -->

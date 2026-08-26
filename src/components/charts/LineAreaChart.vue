@@ -93,7 +93,8 @@ const option = computed(() => {
     },
     xAxis: {
       type: 'category',
-      boundaryGap: false,
+      // 单系列显示逐点数值时给首尾留出半个类目宽度，避免首点标签与 y 轴刻度重叠。
+      boundaryGap: !hasMultipleSeries,
       data: data.labels,
       axisLabel: {
         color: muted,

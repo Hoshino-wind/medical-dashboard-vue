@@ -20,6 +20,18 @@ const props = defineProps<{
   barColor?: string
 }>()
 
+/** “厂保”全周期均为 0 时不占图例和柱位；任一期有数据时恢复展示。 */
+const displayData = computed<CartesianChartData>(() => {
+  if (props.variant !== 'repair' || !('series' in props.data)) return props.data
+
+  return {
+    ...props.data,
+    series: props.data.series.filter(
+      (series) => series.name !== '厂保' || series.data.some((value) => value !== 0),
+    ),
+  }
+})
+
 const lineFooter = computed(() => {
   if (props.variant === 'repair' || 'series' in props.data) return null
   const values = (props.data as LineChartData).data
@@ -50,14 +62,14 @@ const lineFooter = computed(() => {
     <div class="statistics-chart-body">
       <CubeBarChart
         v-if="chartType === 'bar'"
-        :data="data"
+        :data="displayData"
         :theme="theme"
         :series-name="seriesName"
         :bar-color="barColor"
       />
       <LineAreaChart
         v-else
-        :data="data"
+        :data="displayData"
         :theme="theme"
         :variant="variant"
         :series-name="seriesName"
@@ -71,7 +83,9 @@ const lineFooter = computed(() => {
       </div>
       <div class="line-chart-trend" :class="`is-${lineFooter.direction}`">
         <span>环比上周</span>
-        <b>{{ lineFooter.direction === 'up' ? '↑' : lineFooter.direction === 'down' ? '↓' : '—' }}</b>
+        <b>{{
+          lineFooter.direction === 'up' ? '↑' : lineFooter.direction === 'down' ? '↓' : '—'
+        }}</b>
         <strong>{{ lineFooter.trend }}</strong>
       </div>
     </div>

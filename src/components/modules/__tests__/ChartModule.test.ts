@@ -2,7 +2,19 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import ChartModule from '@/components/modules/ChartModule.vue'
 import { themes } from '@/data/themes'
-import type { LineChartData } from '@/types/dashboard'
+import type { BarChartData, LineChartData } from '@/types/dashboard'
+
+const CubeBarChartStub = {
+  name: 'CubeBarChart',
+  props: ['data'],
+  template: '<div data-test="cube-bar-chart"></div>',
+}
+
+const LineAreaChartStub = {
+  name: 'LineAreaChart',
+  props: ['data'],
+  template: '<div data-test="line-area-chart"></div>',
+}
 
 const commonProps = {
   chartType: 'line' as const,
@@ -17,8 +29,8 @@ function mountChart(data: LineChartData) {
     global: {
       stubs: {
         CountUp: { props: ['value'], template: '<span>{{ value }}</span>' },
-        CubeBarChart: true,
-        LineAreaChart: true,
+        CubeBarChart: CubeBarChartStub,
+        LineAreaChart: LineAreaChartStub,
       },
     },
   })
@@ -46,4 +58,69 @@ describe('ChartModule trend semantics', () => {
 
     wrapper.unmount()
   })
+})
+
+describe('ChartModule repair-series visibility', () => {
+  function mountRepairChart(chartType: 'bar' | 'line', factoryData: number[]) {
+    const repairData: BarChartData = {
+      labels: ['2026-03', '2026-04'],
+      series: [
+        { name: '全保', data: [320, 300] },
+        { name: '技保', data: [100, 80] },
+        { name: '厂保', data: factoryData },
+      ],
+    }
+
+    const wrapper = mount(ChartModule, {
+      props: {
+        chartType,
+        variant: 'repair',
+        seriesName: '报修台次',
+        data: repairData,
+        theme: themes[1],
+      },
+      global: {
+        stubs: {
+          CountUp: true,
+          CubeBarChart: CubeBarChartStub,
+          LineAreaChart: LineAreaChartStub,
+        },
+      },
+    })
+
+    return { repairData, wrapper }
+  }
+
+  it.each([
+    ['bar', CubeBarChartStub],
+    ['line', LineAreaChartStub],
+  ] as const)(
+    'shows two series in the %s display when factory warranty is all zero',
+    (chartType, chartStub) => {
+      const { repairData, wrapper } = mountRepairChart(chartType, [0, 0])
+
+      const displayData = wrapper.findComponent(chartStub).props('data') as BarChartData
+
+      expect(displayData.series.map((series) => series.name)).toEqual(['全保', '技保'])
+      expect(repairData.series.map((series) => series.name)).toEqual(['全保', '技保', '厂保'])
+
+      wrapper.unmount()
+    },
+  )
+
+  it.each([
+    ['bar', CubeBarChartStub],
+    ['line', LineAreaChartStub],
+  ] as const)(
+    'shows three series in the %s display when factory warranty has data',
+    (chartType, chartStub) => {
+      const { wrapper } = mountRepairChart(chartType, [0, 12])
+
+      const displayData = wrapper.findComponent(chartStub).props('data') as BarChartData
+
+      expect(displayData.series.map((series) => series.name)).toEqual(['全保', '技保', '厂保'])
+
+      wrapper.unmount()
+    },
+  )
 })

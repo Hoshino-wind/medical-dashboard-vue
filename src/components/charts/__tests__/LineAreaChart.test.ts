@@ -13,6 +13,7 @@ interface LineChartOption {
     outerBoundsContain: string
   }
   xAxis: {
+    boundaryGap: boolean
     axisLabel: {
       showMinLabel: boolean
       showMaxLabel: boolean
@@ -61,6 +62,7 @@ describe('LineAreaChart', () => {
       outerBoundsContain: 'axisLabel',
     })
     expect(option.xAxis.axisLabel).toMatchObject({ showMinLabel: true, showMaxLabel: true })
+    expect(option.xAxis.boundaryGap).toBe(true)
 
     wrapper.unmount()
   })
@@ -90,6 +92,27 @@ describe('LineAreaChart', () => {
     },
   )
 
+  it('keeps the first inspection point away from the y axis for large monthly values', () => {
+    const wrapper = mount(LineAreaChart, {
+      props: {
+        data: {
+          labels: ['2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08'],
+          data: [25185, 11862, 11896, 14326, 13743, 12970],
+        },
+        theme: themes[1],
+        variant: 'inspection',
+      },
+      global: { stubs: { EChart: EChartStub } },
+    })
+
+    const option = wrapper.findComponent(EChartStub).props('option') as LineChartOption
+
+    expect(option.xAxis.boundaryGap).toBe(true)
+    expect(option.yAxis).toMatchObject({ max: 40_000, interval: 10_000 })
+
+    wrapper.unmount()
+  })
+
   it('renders multi-series repair data as separate lines with a matching legend', () => {
     const repairData: BarChartData = {
       labels: ['07-01', '07-02'],
@@ -115,6 +138,7 @@ describe('LineAreaChart', () => {
     const option = wrapper.findComponent(EChartStub).props('option') as LineChartOption
 
     expect(option.series.map((series) => series.name)).toEqual(['全保', '技保', '厂保'])
+    expect(option.xAxis.boundaryGap).toBe(false)
     expect(option.series.every((series) => series.type === 'line')).toBe(true)
     expect(option.series.every((series) => series.label.show === false)).toBe(true)
     expect(wrapper.findAll('.line-area-legend span').map((item) => item.text())).toEqual([

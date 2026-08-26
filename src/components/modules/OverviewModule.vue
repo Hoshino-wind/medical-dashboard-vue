@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Activity, ClipboardList, MonitorCog, ShieldCheck, Wrench } from 'lucide-vue-next'
+import { Activity, ClipboardList, MonitorCog, Wrench } from 'lucide-vue-next'
 import MetricRing from '../shared/MetricRing.vue'
 import CountUp from '../shared/CountUp.vue'
 import MechanicalFrame from '../visual/MechanicalFrame.vue'
@@ -31,7 +31,7 @@ const overviewRingSize = pxToRem(132)
       />
     </div>
 
-    <!-- 5 个指标环绕分布：左上 / 右上 / 左下 / 右下 / 正下 -->
+    <!-- 4 个业务指标环绕分布：左上 / 右上 / 左下 / 右下 -->
     <div class="overview-stat overview-stat--total with-icon pos-tl mechanical-frame-host">
       <MechanicalFrame variant="compact" />
       <MonitorCog class="overview-stat-icon text-[color:var(--data-pie-primary)]" />
@@ -42,13 +42,13 @@ const overviewRingSize = pxToRem(132)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--available with-icon pos-tr mechanical-frame-host">
+    <div class="overview-stat overview-stat--inspection with-icon pos-tr mechanical-frame-host">
       <MechanicalFrame variant="compact" />
-      <ShieldCheck class="overview-stat-icon text-[color:var(--good)]" />
+      <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
       <div>
-        <div class="kpi-label">可用设备</div>
-        <div class="overview-value text-[color:var(--good)]">
-          <CountUp :value="data.available" /><span class="overview-unit">台</span>
+        <div class="kpi-label">待巡检</div>
+        <div class="overview-value text-[color:var(--data-inspection-line)]">
+          <CountUp :value="data.inspectionDue" /><span class="overview-unit">台</span>
         </div>
       </div>
     </div>
@@ -76,21 +76,11 @@ const overviewRingSize = pxToRem(132)
         </div>
       </div>
     </div>
-    <div class="overview-stat overview-stat--inspection with-icon pos-bc mechanical-frame-host">
-      <MechanicalFrame variant="compact" />
-      <Activity class="overview-stat-icon text-[color:var(--data-inspection-line)]" />
-      <div>
-        <div class="kpi-label">待保养</div>
-        <div class="overview-value text-[color:var(--data-inspection-line)]">
-          <CountUp :value="data.inspectionDue" /><span class="overview-unit">台</span>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <style scoped>
-/* 设备总览：环形缩小居中，5 个指标卡环绕分布（grid 区域布局，天然防重叠） */
+/* 设备总览：环形缩小居中，4 个指标卡环绕分布（grid 区域布局，天然防重叠） */
 .overview-layout {
   display: grid;
   height: 100%;
@@ -99,11 +89,10 @@ const overviewRingSize = pxToRem(132)
   padding: 0.35rem 0.6rem;
   /* 左列 | 环形 | 右列，环形跨上下两行 */
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  grid-template-rows: 1fr 1fr auto;
+  grid-template-rows: 1fr 1fr;
   grid-template-areas:
     'tl   ring tr'
-    'bl   ring br'
-    'bc   bc   bc';
+    'bl   ring br';
   align-items: center;
   justify-items: center;
   gap: 0.35rem 0.5rem;
@@ -132,18 +121,12 @@ const overviewRingSize = pxToRem(132)
   grid-area: br;
   justify-self: end;
 }
-.overview-stat.pos-bc {
-  grid-area: bc;
-  justify-self: center;
-  width: min(100%, 11rem);
-}
 /* 指标卡基础样式（紧凑版，适配环绕布局） */
 .overview-stat {
   min-width: 0;
   width: 100%;
   max-width: 9rem;
-  border: 0.0625rem solid
-    color-mix(in srgb, var(--status-tone, var(--glass-edge)) 46%, transparent);
+  border: 0.0625rem solid color-mix(in srgb, var(--status-tone, var(--glass-edge)) 46%, transparent);
   border-radius: 0.375rem;
   background:
     linear-gradient(
@@ -161,8 +144,7 @@ const overviewRingSize = pxToRem(132)
     inset 0.1875rem 0 0
       color-mix(in srgb, var(--status-tone, var(--chart-primary)) 72%, transparent),
     inset 0 0.0625rem 0 color-mix(in srgb, var(--instrument-rim) 24%, transparent),
-    0 0 0.65rem
-      color-mix(in srgb, var(--status-tone, var(--chart-primary)) 6%, transparent);
+    0 0 0.65rem color-mix(in srgb, var(--status-tone, var(--chart-primary)) 6%, transparent);
 }
 .overview-stat.with-icon {
   display: flex;
@@ -215,9 +197,6 @@ const overviewRingSize = pxToRem(132)
 }
 .overview-stat--total {
   --status-tone: var(--data-pie-primary);
-}
-.overview-stat--available {
-  --status-tone: var(--good);
 }
 .overview-stat--repair {
   --status-tone: var(--danger);

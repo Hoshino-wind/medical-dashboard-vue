@@ -29,7 +29,7 @@ describe('rendered dashboard structure', () => {
     expect(wrapper.get('[data-test="body"]').text()).toBe('内容')
   })
 
-  it('renders five overview status entities with explicit semantic tone classes', () => {
+  it('renders four overview status entities and replaces available devices with pending inspection', () => {
     const wrapper = mount(OverviewModule, {
       props: {
         data: {
@@ -49,12 +49,14 @@ describe('rendered dashboard structure', () => {
       },
     })
 
-    expect(wrapper.findAll('.overview-stat')).toHaveLength(5)
-    expect(wrapper.findAll('.overview-unit')).toHaveLength(5)
-    expect(wrapper.findAll('.overview-stat .mechanical-frame--compact')).toHaveLength(5)
+    expect(wrapper.findAll('.overview-stat')).toHaveLength(4)
+    expect(wrapper.findAll('.overview-unit')).toHaveLength(4)
+    expect(wrapper.findAll('.overview-stat .mechanical-frame--compact')).toHaveLength(4)
     expect(wrapper.get('.overview-stat--repair').classes()).toContain('is-danger')
     expect(wrapper.get('.overview-stat--maintenance').classes()).toContain('is-warn')
-    expect(wrapper.get('.overview-stat--available').text()).toContain('88台')
+    expect(wrapper.find('.overview-stat--available').exists()).toBe(false)
+    expect(wrapper.get('.overview-stat--inspection').text()).toContain('待巡检3台')
+    expect(wrapper.text()).not.toContain('可用设备')
     expect(wrapper.findAll('.table-row-icon')).toHaveLength(0)
   })
 })
